@@ -1,0 +1,66 @@
+# Trailer Specifications and Equipment
+
+What is installed on the trailer, with the source of each fact. "To confirm" means the value is believed correct but has not been read off the equipment label. Update this file whenever a label is read or equipment changes.
+
+## Trailer
+
+| Item | Value | Source / status |
+| --- | --- | --- |
+| Model | 2026 Casita Liberty 17 Deluxe | Owner |
+| Options | Factory Solar System Package (300 Ah LiFePO4, 2000 W inverter with two inverted outlets, 200 W portable solar panel) | Casita add-ons page |
+| GVWR | 3,500 lb | Casita / dealer listings |
+| Dry weight | About 2,480 lb (17' Deluxe) | Dealer listings; weigh the actual trailer |
+| Dry tongue weight | Not published; owners report 350-450 lb loaded | To measure |
+| Length / width | 204 in (17 ft) / 80 in | Dealer listings |
+| Fresh water | About 16 gal | To confirm |
+| Propane | 2 x 20 lb tanks | |
+| Microwave | None | Owner |
+
+## Tow Vehicle
+
+| Item | Value |
+| --- | --- |
+| Vehicle | 2026 Toyota RAV4 PHEV |
+| Tow rating | 3,500 lb (equal to the trailer's GVWR, so there is no margin) |
+| Hitch | 750 lb tongue weight limit, 5,000 lb towing |
+
+Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 lb). See the weight section of the [upgrade plan](off-grid-upgrade-plan.md).
+
+## Electrical
+
+| Component | Model | Notes |
+| --- | --- | --- |
+| Batteries | 2 x Renogy Core Mini 12.8 V 300 Ah LiFePO4 w/ low-temperature protection (RBT12300LFP-M) | One factory, one added ([mod 01](../modifications/01-second-battery/README.md)). 200 A BMS, 150 A max charge, M8 terminals at 8 N-m, no self-heating (charging stops below 32 F), no Bluetooth |
+| Inverter | Renogy 2000 W 12 V pure sine (RNG-INVT-2000-12V-P2) | Factory. 4000 W surge for 1 s, 166.6 A max DC, 250 A fuse recommended. Manual says neutral and ground are bonded inside. `-P2` suffix to confirm on the label |
+| Inverted outlets | 2, wired directly from the inverter's hardwire terminal | Factory |
+| Power center | WFCO WF-8900-AD series (auto-detect lithium/lead-acid), 55 A converter | Exact model (for example WF-8955-AD) to confirm |
+| Breakers | 30 A main; converter 20 A; water heater element 20 A; A/C 20 A | Converter and water heater confirmed; A/C breaker size to confirm |
+| Shore power | 30 A, 25 ft 10-gauge cord | Casita FAQ |
+| Solar | 200 W portable suitcase panel with its own controller | Factory. Set the controller to lithium |
+| Battery monitor | Renogy 500 A Battery Monitor with Shunt (RBM500); display board Baiway TF03H V35 | Shunt rating (75 mV or 50 mV) unknown; see [mod 04](../modifications/04-battery-monitor-esp32/README.md) |
+| Home Assistant monitor | `casita-battery-monitor`: Seeed XIAO ESP32-S3 in the RBM500 housing | ESPHome device; see [mod 04](../modifications/04-battery-monitor-esp32/README.md) |
+
+## Heating, Cooling and Appliances
+
+| Component | Model | Notes |
+| --- | --- | --- |
+| Air conditioner | Coleman-Mach Mach 8 Plus Cub, 37200 series (R-32), 9,200 BTU | Likely 37201-076. Wiring sticker 1976-764 (PP 03-20): compressor Run = white, Common = black, Start = red. About 9.3-9.9 A cooling. Soft start: [mod 02](../modifications/02-ac-soft-start/README.md) |
+| Thermostat | Airxcel | [Manual](../manuals/air-conditioning/airxcel-thermostat-manual.pdf) |
+| Refrigerator | 12 V only (compressor) | Model to record |
+| Water heater | Gas/electric (electric element on its own 20 A breaker) | Model to record. Casita lists both a direct-vent gas manual and a Dometic 6-gal gas/electric manual |
+| Furnace | Propane | Model to record; [manual from Casita](../manuals/appliances/furnace-manual.pdf) |
+| Range/cooktop | Suburban SRNA3 (per Casita's manual list) | To confirm |
+| Water pump | Shurflo/Flojet (per Casita's manual list) | To confirm |
+| Roof vent fan | MaxxAir MaxxFan Deluxe (per Casita's manual list) | To confirm |
+| TV | NTD-2256 (per Casita's manual list) | To confirm |
+| Awning | Fiamma F45s (per Casita's manual list) | To confirm |
+| Axle | Dexter (per Casita's manual list) | To confirm |
+| LP/CO detector | Safe-T-Alert 30 series (per Casita's manual list) | To confirm |
+
+Items marked "per Casita's manual list" come from the manuals Casita publishes for its trailers, not from this trailer's labels.
+
+## Battery Bank Energy
+
+- 600 Ah x 12.8 V = about 7.7 kWh nominal; about 510 Ah usable at 85%.
+- The fridge draws from the batteries all the time off-grid: budget about 25-50 Ah per day, more in hot weather.
+- The inverter draws about 1.5-2 A just being on.

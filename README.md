@@ -1,0 +1,61 @@
+# Casita Liberty 17 (2026 Deluxe)
+
+Everything about our 2026 Casita Liberty 17 Deluxe travel trailer: what it came with, every modification made to it, and its manuals. Shared so other Casita owners can learn from (and improve on) these projects.
+
+This repository is the maintained record. The Google Docs that some of this started in are kept only as history (see [Sources](#sources)).
+
+## Layout
+
+| Path | Contents |
+| --- | --- |
+| [`docs/trailer.md`](docs/trailer.md) | Specifications, factory equipment, model numbers, breakers, and weight limits |
+| [`docs/off-grid-upgrade-plan.md`](docs/off-grid-upgrade-plan.md) | The overall off-grid upgrade plan, including research and decisions |
+| [`modifications/`](modifications/) | One folder per modification, each with its own instructions, diagrams and status |
+| [`manuals/`](manuals/) | Equipment manuals and datasheets, organized by system |
+| [`photos/`](photos/) | General trailer photos (modification photos live in each modification's folder) |
+
+## Modifications
+
+| # | Modification | Status |
+| --- | --- | --- |
+| 01 | [Second 300 Ah battery (600 Ah bank)](modifications/01-second-battery/README.md) | Done |
+| 02 | [A/C soft start (SpartanStart)](modifications/02-ac-soft-start/README.md) | Purchased; install status to confirm |
+| 03 | [Whole-panel inverter with automatic transfer switch](modifications/03-whole-panel-inverter/README.md) | Planned; transfer switch purchased |
+| 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | In progress |
+
+Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
+
+- Replace the Coleman Mach 8 with a 12 V rooftop A/C (Nomadic X2 Helix or Velit 2000R)
+- Inverter/charger to replace the standalone inverter and the WFCO converter
+- Roof solar, a DC-DC charger from the tow vehicle, and a roof fan for low-power cooling
+
+## Quick Facts
+
+| Item | Value |
+| --- | --- |
+| Trailer | 2026 Casita Liberty 17 Deluxe, factory Solar System Package |
+| GVWR / dry weight | 3,500 lb / about 2,480 lb |
+| Tow vehicle | 2026 Toyota RAV4 PHEV: 3,500 lb tow rating; hitch 750 lb tongue / 5,000 lb |
+| Battery bank | 2 x Renogy Core Mini 12.8 V 300 Ah LiFePO4 in parallel (600 Ah) |
+| Inverter | Renogy 2000 W pure sine (factory) |
+| Power center | WFCO WF-8900-AD series (auto-detect) |
+| A/C | Coleman-Mach Mach 8 Plus Cub, 37200 series (R-32), 9,200 BTU |
+| Refrigerator | 12 V only |
+| Water heater | Gas/electric |
+
+Full details are in [`docs/trailer.md`](docs/trailer.md).
+
+## Adding Manuals and Documents
+
+- **Manuals** go in `manuals/<system>/` as PDF, named `manufacturer-model-document-type.pdf` in lowercase with hyphens. Add a row to the index in [`manuals/README.md`](manuals/README.md).
+- Scan at 300 dpi to searchable (OCR) PDF where possible. GitHub rejects files over 100 MB and warns above 50 MB; split or compress very large scans.
+
+**This repository is public.** Do not add ownership documents (build sheet, purchase agreement, title, registration, warranty registrations) or anything showing the VIN, home address, phone numbers, or home network details. Keep those somewhere private. Check scanned manuals and warranty cards for handwritten personal information before adding them.
+
+The manuals are the manufacturers' and Casita's copyrighted documents, included here for reference.
+
+## Sources
+
+- Google Doc: [Casita 17 Off-Grid Upgrade Plan](https://docs.google.com/document/d/19vtmnKSUH-ELgTdLj574IR7fOklQ4ubDvtKm2_Idk6U/edit), converted to [`docs/off-grid-upgrade-plan.md`](docs/off-grid-upgrade-plan.md) on 2026-10-09.
+- Google Doc: [Casita 17 - Whole-Panel Inverter Install Guide](https://docs.google.com/document/d/1UxKIZB7UzQihbwPCcxAGNO0TLYZFERZ462aFt-3PrFA/edit), converted to [`modifications/03-whole-panel-inverter/README.md`](modifications/03-whole-panel-inverter/README.md) on 2026-10-09.
+- The battery monitor project moved here from `jameskorzekwa/maker-projects` (`projects/renogy-battery-monitor-esp32`, including the unmerged INA228 redesign from PR #43).

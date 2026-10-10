@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="760" viewBox="0 0 1100 760" role="img" aria-labelledby="title desc">
+  <title id="title">Wiring inside the RBM500 display housing with an INA228</title>
+  <desc id="desc">The B plus and B minus pins of the display's shunt connector feed a 470 microfarad capacitor and a 12 to 5 volt buck regulator, whose output powers the XIAO ESP32-S3 5V and GND pins. The INA228 breakout is powered from the XIAO 3V3 pin and GND, with SDA to XIAO D4 (GPIO5) and SCL to XIAO D5 (GPIO6). The INA228 VBUS pin connects to B plus. The connector's Rs plus and Rs minus pins connect through 10 ohm resistors to INA228 VIN plus and VIN minus, with a 0.1 microfarad capacitor across VIN plus and VIN minus at the breakout. The breakout's onboard shunt resistor must be removed.</desc>
+  <defs>
+    <style>
+      .batt{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
+      .esp{fill:#e3f8ff;stroke:#186faf;stroke-width:3}
+      .reg{fill:#fde8e8;stroke:#c53030;stroke-width:3}
+      .ina{fill:#efe9ff;stroke:#6b46c1;stroke-width:3}
+      .t{font:600 20px system-ui,sans-serif;fill:#102a43}
+      .s{font:15px system-ui,sans-serif;fill:#334e68}
+      .sb{font:600 15px system-ui,sans-serif;fill:#102a43}
+      .warn{font:600 15px system-ui,sans-serif;fill:#b44d12}
+      .w{fill:none;stroke-width:4}
+      .vp{stroke:#c53030}
+      .gnd{stroke:#334e68}
+      .sense{stroke:#6b46c1}
+      .v3{stroke:#d97706}
+      .sda{stroke:#2f855a}
+      .scl{stroke:#0e7490}
+      .res{fill:#fff;stroke:#243b53;stroke-width:3}
+    </style>
+  </defs>
+  <rect width="1100" height="760" rx="24" fill="#fff"/>
+  <text class="t" x="40" y="44">Inside the RBM500 display housing (one shared ground)</text>
+
+  <!-- Connector -->
+  <rect class="batt" x="40" y="80" width="230" height="330" rx="16"/>
+  <text class="t" x="155" y="116" text-anchor="middle">RBM500 board</text>
+  <text class="s" x="155" y="140" text-anchor="middle">shunt connector pin backs</text>
+  <text class="sb" x="60" y="185">Rs-</text><circle cx="240" cy="180" r="11" fill="#6b46c1"/>
+  <text class="sb" x="60" y="245">Rs+</text><circle cx="240" cy="240" r="11" fill="#6b46c1"/>
+  <text class="sb" x="60" y="305">B- (battery neg.)</text><circle cx="240" cy="300" r="11" fill="#334e68"/>
+  <text class="sb" x="60" y="365">B+ (battery pos.)</text><circle cx="240" cy="360" r="11" fill="#c53030"/>
+
+  <!-- Power to buck -->
+  <path class="w vp" d="M240 360 H272 A13 13 0 0 1 298 360 H330 V130 H560"/>
+  <path class="w gnd" d="M240 300 H272 A13 13 0 0 1 298 300 H320 A10 10 0 0 1 340 300 H350 V180 H560"/>
+  <circle cx="400" cy="130" r="6" fill="#c53030"/><circle cx="440" cy="180" r="6" fill="#334e68"/>
+  <path class="w vp" d="M400 130 V95"/><path class="w gnd" d="M440 180 V95"/>
+  <rect x="385" y="60" width="70" height="35" rx="8" fill="#fff" stroke="#243b53" stroke-width="3"/>
+  <text class="sb" x="420" y="83" text-anchor="middle">C1</text>
+  <text class="s" x="470" y="70">470 uF, 25 V</text>
+  <rect class="reg" x="560" y="105" width="180" height="100" rx="14"/>
+  <text class="sb" x="575" y="135">VIN</text><text class="sb" x="575" y="185">GND</text>
+  <text class="sb" x="725" y="135" text-anchor="end">VOUT 5V</text><text class="sb" x="725" y="185" text-anchor="end">GND</text>
+  <text class="s" x="650" y="228" text-anchor="middle">Buck, e.g. Pololu D24V5F5</text>
+  <path class="w vp" d="M740 130 H880"/>
+  <path class="w gnd" d="M740 180 H880"/>
+
+  <!-- XIAO -->
+  <rect class="esp" x="880" y="100" width="180" height="330" rx="16"/>
+  <circle cx="880" cy="130" r="8" fill="#c53030"/><text class="sb" x="895" y="135">5V</text>
+  <circle cx="880" cy="180" r="8" fill="#334e68"/><text class="sb" x="895" y="185">GND</text>
+  <circle cx="880" cy="250" r="8" fill="#d97706"/><text class="sb" x="895" y="255">3V3</text>
+  <circle cx="880" cy="320" r="8" fill="#2f855a"/><text class="sb" x="895" y="325">D4 / GPIO5 (SDA)</text>
+  <circle cx="880" cy="380" r="8" fill="#0e7490"/><text class="sb" x="895" y="385">D5 / GPIO6 (SCL)</text>
+  <text class="s" x="970" y="455" text-anchor="middle">XIAO ESP32-S3</text>
+
+  <!-- INA228 -->
+  <rect class="ina" x="560" y="430" width="230" height="290" rx="16"/>
+  <text class="t" x="675" y="462" text-anchor="middle">INA228 breakout</text>
+  <text class="s" x="675" y="484" text-anchor="middle">onboard shunt REMOVED</text>
+  <circle cx="790" cy="520" r="7" fill="#d97706"/><text class="sb" x="775" y="525" text-anchor="end">VIN / VS (power)</text>
+  <circle cx="790" cy="560" r="7" fill="#334e68"/><text class="sb" x="775" y="565" text-anchor="end">GND</text>
+  <circle cx="790" cy="600" r="7" fill="#2f855a"/><text class="sb" x="775" y="605" text-anchor="end">SDA</text>
+  <circle cx="790" cy="640" r="7" fill="#0e7490"/><text class="sb" x="775" y="645" text-anchor="end">SCL</text>
+  <circle cx="560" cy="520" r="7" fill="#c53030"/><text class="sb" x="575" y="525">VBUS</text>
+  <circle cx="560" cy="600" r="7" fill="#6b46c1"/><text class="sb" x="575" y="605">VIN+</text>
+  <circle cx="560" cy="660" r="7" fill="#6b46c1"/><text class="sb" x="575" y="665">VIN-</text>
+
+  <!-- XIAO to INA -->
+  <path class="w v3" d="M880 250 H840 V520 H790"/>
+  <path class="w gnd" d="M880 180 H860 V560 H790"/>
+  <path class="w sda" d="M880 320 H850 V600 H790"/>
+  <path class="w scl" d="M880 380 H870 V640 H790"/>
+
+  <!-- VBUS from B+ -->
+  <path class="w vp" d="M330 360 V520 H560"/>
+  <circle cx="330" cy="360" r="6" fill="#c53030"/>
+
+  <!-- Sense with filter -->
+  <path class="w sense" d="M240 240 H290 V600 H380"/>
+  <rect class="res" x="380" y="585" width="60" height="30" rx="5"/><text class="sb" x="410" y="606" text-anchor="middle">10 R</text>
+  <path class="w sense" d="M440 600 H560"/>
+  <path class="w sense" d="M240 180 H280 V660 H380"/>
+  <rect class="res" x="380" y="645" width="60" height="30" rx="5"/><text class="sb" x="410" y="666" text-anchor="middle">10 R</text>
+  <path class="w sense" d="M440 660 H560"/>
+  <circle cx="500" cy="600" r="6" fill="#6b46c1"/><circle cx="500" cy="660" r="6" fill="#6b46c1"/>
+  <rect x="482" y="615" width="36" height="30" rx="4" fill="#fff" stroke="#243b53" stroke-width="3"/>
+  <text class="s" x="455" y="636" text-anchor="end">C2</text>
+  <path class="sense" d="M500 600 V615 M500 645 V660" stroke-width="3" fill="none"/>
+  <text class="s" x="410" y="700" text-anchor="middle">C2: 0.1 uF ceramic, at the breakout</text>
+
+  <text class="warn" x="40" y="455">Remove the breakout's</text>
+  <text class="warn" x="40" y="477">onboard shunt before</text>
+  <text class="warn" x="40" y="499">connecting VIN+/VIN-.</text>
+  <text class="s" x="40" y="535">Rs+/Rs- order only sets</text>
+  <text class="s" x="40" y="557">the sign; fix it with</text>
+  <text class="s" x="40" y="579">current_sign in the YAML.</text>
+  <text class="s" x="40" y="740">Never plug USB into the XIAO while the shunt cable is connected.</text>
+</svg>
