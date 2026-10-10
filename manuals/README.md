@@ -2,12 +2,20 @@
 
 Equipment manuals and datasheets, one folder per system. The files below were downloaded on 2026-10-09 from the manufacturer or from Casita's [user manuals page](https://casitatraveltrailers.com/user-manuals/). Manuals digitized from the paper documents that came with the trailer go in the same folders.
 
+## Text versions
+
+Every PDF has a Markdown text version next to it with the same name (for example `furnace-manual.pdf` and `furnace-manual.md`), so the manuals can be searched on GitHub and read without opening the PDF. GitHub search indexes the Markdown files but not the text inside PDFs.
+
+- Pages with embedded text were extracted directly. Pages that are only images were OCR'd (RapidOCR at 200 dpi); each file's header lists which pages. The Casita owner's manual, the SpartanStart instructions and the water pump manual are entirely OCR'd.
+- Diagrams, photos and table layouts are not reproduced, and OCR text inside diagrams is mostly unreadable. Always check the PDF for wiring diagrams, torque values and anything safety-critical.
+- Regenerate a text version whenever its PDF is replaced.
+
 ## Conventions
 
 - File names: lowercase, hyphens, `manufacturer-model-document-type.pdf` (for example `dometic-dm2652-owners-manual.pdf`).
 - Paper manuals you scan: add `-scan` before `.pdf` if an online copy of the same document is also present, so both can be kept.
 - Scan at 300 dpi to a searchable (OCR) PDF where possible. Keep files under 50 MB.
-- Add every new file to the index below, including where it came from.
+- Add every new file to the index below, including where it came from, and add its `.md` text version.
 
 ## Index
 
