@@ -21,8 +21,9 @@ This repository is the maintained record. The Google Docs that some of this star
 | 01 | [Second 300 Ah battery (600 Ah bank)](modifications/01-second-battery/README.md) | Done |
 | 02 | [A/C soft start (SpartanStart)](modifications/02-ac-soft-start/README.md) | Done |
 | 03 | [Whole-panel inverter with automatic transfer switch](modifications/03-whole-panel-inverter/README.md) | Done |
-| 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | In progress (INA228 wiring next) |
+| 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | Installed and running; mirrored to the home Home Assistant. Calibration to confirm |
 | 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
+| 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit ordered |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
 

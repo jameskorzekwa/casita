@@ -1,0 +1,439 @@
+# Casita e-ink dashboard (TRMNL 7.5" OG DIY Kit)
+#
+# Seeed Studio / TRMNL 7.5" (OG) DIY Kit: XIAO ESP32-S3 Plus on the XIAO ePaper
+# Driver Board, driving an 800 x 480 monochrome e-paper panel. The ESP32 joins
+# the trailer Wi-Fi, connects to the trailer's Home Assistant, reads the
+# battery, propane and water entities, and redraws the panel on a schedule.
+# See ../README.md before flashing.
+#
+# Entity names omit the device name; Home Assistant prefixes them with the
+# friendly name, e.g. sensor.casita_dashboard_dashboard_battery.
+
+substitutions:
+  name: casita-dashboard
+  friendly_name: Casita Dashboard
+
+  # How often the panel redraws. Every redraw is a full refresh (about 3.5 s
+  # with a black/white flash), so keep this at a few minutes or more.
+  refresh_interval: 5min
+
+  # --- Entities on the trailer's Home Assistant ---
+  # Battery monitor (mod 04)
+  batt_soc: sensor.casita_battery_monitor_state_of_charge
+  batt_voltage: sensor.casita_battery_monitor_voltage
+  batt_current: sensor.casita_battery_monitor_current
+  batt_power: sensor.casita_battery_monitor_power
+  batt_time_to_empty: sensor.casita_battery_monitor_time_to_empty
+  batt_time_to_full: sensor.casita_battery_monitor_time_to_full
+  batt_daily_in: sensor.casita_battery_monitor_daily_charged_energy
+  batt_daily_out: sensor.casita_battery_monitor_daily_discharged_energy
+  batt_charging: binary_sensor.casita_battery_monitor_charging
+  # Propane monitor (mod 07). Shown as "--" until that project is built.
+  propane_1: sensor.casita_propane_monitor_tank_1_propane
+  propane_1_lb: sensor.casita_propane_monitor_tank_1_propane_remaining
+  propane_2: sensor.casita_propane_monitor_tank_2_propane
+  propane_2_lb: sensor.casita_propane_monitor_tank_2_propane_remaining
+  # Water tanks (future project). Percent full. Shown as "--" until they exist.
+  water_fresh: sensor.casita_water_monitor_fresh_tank
+  water_grey: sensor.casita_water_monitor_grey_tank
+  water_black: sensor.casita_water_monitor_black_tank
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  on_boot:
+    priority: 600
+    then:
+      # The driver board gates the battery divider; turn it on before reading.
+      - output.turn_on: adc_enable
+      - delay: 200ms
+      - component.update: dash_batt_voltage
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+  level: INFO
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Casita Dashboard Fallback"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: ha_time
+    on_time_sync:
+      then:
+        - component.update: epaper
+
+# ---------------- Display ----------------
+spi:
+  clk_pin: GPIO7
+  mosi_pin: GPIO9
+
+font:
+  - file: "gfonts://Inter@400"
+    id: f_small
+    size: 18
+  - file: "gfonts://Inter@600"
+    id: f_label
+    size: 22
+  - file: "gfonts://Inter@700"
+    id: f_value
+    size: 34
+  - file: "gfonts://Inter@800"
+    id: f_huge
+    size: 110
+
+globals:
+  - id: page_index
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+output:
+  - platform: gpio
+    pin: GPIO6
+    id: adc_enable
+
+# ---------------- Inputs from Home Assistant ----------------
+sensor:
+  - platform: homeassistant
+    id: soc
+    entity_id: ${batt_soc}
+    internal: true
+  - platform: homeassistant
+    id: voltage
+    entity_id: ${batt_voltage}
+    internal: true
+  - platform: homeassistant
+    id: current
+    entity_id: ${batt_current}
+    internal: true
+  - platform: homeassistant
+    id: power
+    entity_id: ${batt_power}
+    internal: true
+  - platform: homeassistant
+    id: time_to_empty
+    entity_id: ${batt_time_to_empty}
+    internal: true
+  - platform: homeassistant
+    id: time_to_full
+    entity_id: ${batt_time_to_full}
+    internal: true
+  - platform: homeassistant
+    id: daily_in
+    entity_id: ${batt_daily_in}
+    internal: true
+  - platform: homeassistant
+    id: daily_out
+    entity_id: ${batt_daily_out}
+    internal: true
+  - platform: homeassistant
+    id: propane1
+    entity_id: ${propane_1}
+    internal: true
+  - platform: homeassistant
+    id: propane1_lb
+    entity_id: ${propane_1_lb}
+    internal: true
+  - platform: homeassistant
+    id: propane2
+    entity_id: ${propane_2}
+    internal: true
+  - platform: homeassistant
+    id: propane2_lb
+    entity_id: ${propane_2_lb}
+    internal: true
+  - platform: homeassistant
+    id: fresh
+    entity_id: ${water_fresh}
+    internal: true
+  - platform: homeassistant
+    id: grey
+    entity_id: ${water_grey}
+    internal: true
+  - platform: homeassistant
+    id: black
+    entity_id: ${water_black}
+    internal: true
+
+  # ---------------- The dashboard's own battery ----------------
+  # Driver board: BAT_ADC on GPIO1 through a 100 k / 100 k divider, gated by
+  # ADC_EN on GPIO6. Values from Seeed's ESPHome cookbook for this kit.
+  - platform: adc
+    pin: GPIO1
+    id: dash_batt_voltage
+    name: "Dashboard Battery Voltage"
+    entity_category: diagnostic
+    unit_of_measurement: V
+    accuracy_decimals: 2
+    attenuation: 12db
+    update_interval: 60s
+    filters:
+      - multiply: 2.0
+  - platform: template
+    id: dash_batt_level
+    name: "Dashboard Battery"
+    unit_of_measurement: "%"
+    device_class: battery
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: 60s
+    lambda: return id(dash_batt_voltage).state;
+    filters:
+      - calibrate_linear:
+          - 4.15 -> 100.0
+          - 3.96 -> 90.0
+          - 3.91 -> 80.0
+          - 3.85 -> 70.0
+          - 3.80 -> 60.0
+          - 3.75 -> 50.0
+          - 3.68 -> 40.0
+          - 3.58 -> 30.0
+          - 3.49 -> 20.0
+          - 3.41 -> 10.0
+          - 3.30 -> 5.0
+          - 3.27 -> 0.0
+      - clamp:
+          min_value: 0
+          max_value: 100
+
+  - platform: wifi_signal
+    name: "Wi-Fi Signal"
+    id: wifi_rssi
+    entity_category: diagnostic
+    update_interval: 60s
+  - platform: uptime
+    name: "Uptime"
+    entity_category: diagnostic
+
+binary_sensor:
+  - platform: homeassistant
+    id: charging
+    entity_id: ${batt_charging}
+    internal: true
+  # Driver board user buttons (active low). KEY1 redraws, KEY2 changes page.
+  - platform: gpio
+    pin:
+      number: GPIO2
+      mode: INPUT_PULLUP
+      inverted: true
+    id: key1
+    name: "Button 1"
+    entity_category: diagnostic
+    on_press:
+      - component.update: epaper
+  - platform: gpio
+    pin:
+      number: GPIO3
+      mode: INPUT_PULLUP
+      inverted: true
+    id: key2
+    name: "Button 2"
+    entity_category: diagnostic
+    on_press:
+      - lambda: id(page_index) = (id(page_index) + 1) % 2;
+      - component.update: epaper
+
+button:
+  - platform: template
+    name: "Refresh Display"
+    icon: mdi:refresh
+    on_press:
+      - component.update: epaper
+  - platform: restart
+    name: "Restart"
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic
+
+display:
+  - platform: waveshare_epaper
+    id: epaper
+    model: 7.50inv2
+    cs_pin: GPIO44
+    dc_pin: GPIO10
+    reset_pin: GPIO38
+    busy_pin:
+      number: GPIO4
+      inverted: true
+    update_interval: ${refresh_interval}
+    lambda: |-
+      // ---------- helpers ----------
+      const int W = 800, H = 480;
+      auto ok = [](float v) { return !std::isnan(v); };
+      // Horizontal gauge: outline, filled to pct, with tick marks at 25/50/75.
+      auto hbar = [&](int x, int y, int w, int h, float pct) {
+        it.rectangle(x, y, w, h);
+        if (ok(pct)) {
+          int fw = (int) ((w - 4) * std::max(0.0f, std::min(100.0f, pct)) / 100.0f);
+          if (fw > 0) it.filled_rectangle(x + 2, y + 2, fw, h - 4);
+        }
+        for (int t = 1; t < 4; t++) {
+          int tx = x + (w * t) / 4;
+          it.line(tx, y + h, tx, y + h + 5);
+        }
+      };
+      // Vertical tank: outline, filled from the bottom to pct.
+      auto vtank = [&](int x, int y, int w, int h, float pct) {
+        it.rectangle(x, y, w, h);
+        if (ok(pct)) {
+          int fh = (int) ((h - 4) * std::max(0.0f, std::min(100.0f, pct)) / 100.0f);
+          if (fh > 0) it.filled_rectangle(x + 2, y + h - 2 - fh, w - 4, fh);
+        }
+      };
+      // Hours as "2d 4h" / "6h 20m" / "--".
+      auto hours_str = [&](float hrs) -> std::string {
+        if (!ok(hrs) || hrs < 0) return "--";
+        int m = (int) (hrs * 60.0f + 0.5f);
+        char b[24];
+        if (m >= 48 * 60) snprintf(b, sizeof b, "%dd %dh", m / 1440, (m % 1440) / 60);
+        else snprintf(b, sizeof b, "%dh %02dm", m / 60, m % 60);
+        return b;
+      };
+      auto pct_str = [&](float v) -> std::string {
+        if (!ok(v)) return "--";
+        char b[8]; snprintf(b, sizeof b, "%.0f%%", v); return b;
+      };
+
+      // ---------- header (both pages) ----------
+      it.print(16, 12, id(f_value), "CASITA");
+      auto now = id(ha_time).now();
+      if (now.is_valid()) {
+        it.strftime(W / 2, 18, id(f_label), TextAlign::TOP_CENTER, "%a %b %d   %H:%M", now);
+      }
+      // Dashboard's own battery, top right, only when running on it.
+      float db = id(dash_batt_level).state;
+      if (ok(db)) {
+        it.printf(W - 16, 18, id(f_label), TextAlign::TOP_RIGHT, "Panel %.0f%%", db);
+      }
+      it.filled_rectangle(0, 56, W, 2);
+
+      if (id(page_index) == 0) {
+        // ================= PAGE 0: overview =================
+        // ---- left column: battery ----
+        const int LX = 16, LW = 384;
+        it.print(LX, 72, id(f_label), "BATTERY");
+        float s = id(soc).state;
+        if (ok(s)) it.printf(LX + LW / 2, 180, id(f_huge), TextAlign::CENTER, "%.0f%%", s);
+        else it.print(LX + LW / 2, 180, id(f_huge), TextAlign::CENTER, "--");
+        hbar(LX, 250, LW, 30, s);
+        it.print(LX, 286, id(f_small), "0");
+        it.print(LX + LW, 286, id(f_small), TextAlign::TOP_RIGHT, "100");
+
+        float v = id(voltage).state, a = id(current).state, p = id(power).state;
+        // voltage / current / power row
+        int ry = 318;
+        if (ok(v)) it.printf(LX, ry, id(f_value), "%.1f V", v); else it.print(LX, ry, id(f_value), "-- V");
+        if (ok(a)) it.printf(LX + LW / 2, ry, id(f_value), TextAlign::TOP_CENTER, "%+.1f A", a);
+        else it.print(LX + LW / 2, ry, id(f_value), TextAlign::TOP_CENTER, "-- A");
+        if (ok(p)) it.printf(LX + LW, ry, id(f_value), TextAlign::TOP_RIGHT, "%.0f W", std::fabs(p));
+        else it.print(LX + LW, ry, id(f_value), TextAlign::TOP_RIGHT, "-- W");
+
+        // status line: charging / discharging and time estimate
+        bool chg = id(charging).state;
+        std::string status;
+        if (!ok(a)) status = "Battery monitor offline";
+        else if (chg) status = "Charging  -  full in " + hours_str(id(time_to_full).state);
+        else if (a < -0.2f) status = "Discharging  -  empty in " + hours_str(id(time_to_empty).state);
+        else status = "Idle";
+        it.print(LX, 372, id(f_label), status.c_str());
+
+        float din = id(daily_in).state, dout = id(daily_out).state;
+        if (ok(din) && ok(dout))
+          it.printf(LX, 410, id(f_small), "Today: +%.2f kWh in, -%.2f kWh out", din, dout);
+
+        // ---- divider ----
+        it.filled_rectangle(416, 70, 2, H - 86);
+
+        // ---- right column, top: propane ----
+        const int RX = 440, RW = 344;
+        it.print(RX, 72, id(f_label), "PROPANE");
+        float p1 = id(propane1).state, p2 = id(propane2).state;
+        float l1 = id(propane1_lb).state, l2 = id(propane2_lb).state;
+        const int TW = 70, TH = 120, TY = 104;
+        int t1x = RX + 40, t2x = RX + RW / 2 + 40;
+        vtank(t1x, TY, TW, TH, p1);
+        vtank(t2x, TY, TW, TH, p2);
+        it.print(t1x + TW + 14, TY + 10, id(f_value), pct_str(p1).c_str());
+        it.print(t2x + TW + 14, TY + 10, id(f_value), pct_str(p2).c_str());
+        if (ok(l1)) it.printf(t1x + TW + 14, TY + 54, id(f_small), "%.1f lb", l1);
+        if (ok(l2)) it.printf(t2x + TW + 14, TY + 54, id(f_small), "%.1f lb", l2);
+        it.print(t1x + TW / 2, TY + TH + 6, id(f_small), TextAlign::TOP_CENTER, "Tank 1");
+        it.print(t2x + TW / 2, TY + TH + 6, id(f_small), TextAlign::TOP_CENTER, "Tank 2");
+
+        // ---- right column, bottom: water ----
+        it.filled_rectangle(RX, 262, RW, 1);
+        it.print(RX, 276, id(f_label), "WATER");
+        const char *names[3] = {"Fresh", "Grey", "Black"};
+        float lv[3] = {id(fresh).state, id(grey).state, id(black).state};
+        for (int i = 0; i < 3; i++) {
+          int y = 310 + i * 54;
+          it.print(RX, y + 2, id(f_label), names[i]);
+          hbar(RX + 80, y, RW - 160, 24, lv[i]);
+          it.print(RX + RW, y + 2, id(f_label), TextAlign::TOP_RIGHT, pct_str(lv[i]).c_str());
+        }
+      } else {
+        // ================= PAGE 1: details =================
+        int y = 76;
+        const int X1 = 16, X2 = 400;
+        auto row = [&](int x, const char *label, const std::string &val) {
+          it.print(x, y, id(f_label), label);
+          it.print(x + 360, y, id(f_label), TextAlign::TOP_RIGHT, val.c_str());
+        };
+        auto num = [&](float v, const char *fmt) -> std::string {
+          if (!ok(v)) return "--";
+          char b[32]; snprintf(b, sizeof b, fmt, v); return b;
+        };
+        it.print(X1, y, id(f_value), "Battery");  y += 44;
+        row(X1, "State of charge", num(id(soc).state, "%.1f %%")); y += 32;
+        row(X1, "Voltage", num(id(voltage).state, "%.2f V")); y += 32;
+        row(X1, "Current", num(id(current).state, "%+.2f A")); y += 32;
+        row(X1, "Power", num(id(power).state, "%.0f W")); y += 32;
+        row(X1, "Time to empty", hours_str(id(time_to_empty).state)); y += 32;
+        row(X1, "Time to full", hours_str(id(time_to_full).state)); y += 32;
+        row(X1, "Charged today", num(id(daily_in).state, "%.2f kWh")); y += 32;
+        row(X1, "Discharged today", num(id(daily_out).state, "%.2f kWh")); y += 32;
+
+        y = 76;
+        it.print(X2, y, id(f_value), "Tanks");  y += 44;
+        row(X2, "Propane 1", num(id(propane1).state, "%.0f %%") + "  " + num(id(propane1_lb).state, "%.1f lb")); y += 32;
+        row(X2, "Propane 2", num(id(propane2).state, "%.0f %%") + "  " + num(id(propane2_lb).state, "%.1f lb")); y += 32;
+        row(X2, "Fresh water", num(id(fresh).state, "%.0f %%")); y += 32;
+        row(X2, "Grey water", num(id(grey).state, "%.0f %%")); y += 32;
+        row(X2, "Black water", num(id(black).state, "%.0f %%")); y += 48;
+        it.print(X2, y, id(f_value), "This panel");  y += 44;
+        row(X2, "Wi-Fi", num(id(wifi_rssi).state, "%.0f dBm")); y += 32;
+        row(X2, "Battery", num(id(dash_batt_voltage).state, "%.2f V")); y += 32;
+      }
+
+      // ---------- footer ----------
+      if (now.is_valid()) {
+        it.strftime(W - 16, H - 8, id(f_small), TextAlign::BOTTOM_RIGHT, "Updated %H:%M", now);
+      }
+      it.print(16, H - 8, id(f_small), TextAlign::BOTTOM_LEFT,
+               id(page_index) == 0 ? "Button 1: refresh   Button 2: details" : "Button 2: overview");
