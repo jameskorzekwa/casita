@@ -19,15 +19,22 @@ This repository is the maintained record. The Google Docs that some of this star
 | # | Modification | Status |
 | --- | --- | --- |
 | 01 | [Second 300 Ah battery (600 Ah bank)](modifications/01-second-battery/README.md) | Done |
-| 02 | [A/C soft start (SpartanStart)](modifications/02-ac-soft-start/README.md) | Purchased; install status to confirm |
-| 03 | [Whole-panel inverter with automatic transfer switch](modifications/03-whole-panel-inverter/README.md) | Planned; transfer switch purchased |
-| 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | In progress |
+| 02 | [A/C soft start (SpartanStart)](modifications/02-ac-soft-start/README.md) | Done |
+| 03 | [Whole-panel inverter with automatic transfer switch](modifications/03-whole-panel-inverter/README.md) | Done |
+| 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | In progress (INA228 wiring next) |
+| 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
 
 - Replace the Coleman Mach 8 with a 12 V rooftop A/C (Nomadic X2 Helix or Velit 2000R)
 - Inverter/charger to replace the standalone inverter and the WFCO converter
 - Roof solar, a DC-DC charger from the tow vehicle, and a roof fan for low-power cooling
+
+Open safety follow-ups:
+
+- Add a 10 A inline fuse on the Starlink adapter's positive wire ([mod 05](modifications/05-starlink-12v-power/README.md#required-fix-add-an-inline-fuse))
+- Replace the 1/0 copper-clad aluminum battery cables with pure copper, add a Class-T main fuse, and add a DC disconnect for the inverter ([mod 01](modifications/01-second-battery/README.md#recommended-follow-ups))
+- Replace the two IEC-only 20 A breakers in the shore-only box with UL 489 breakers ([mod 03](modifications/03-whole-panel-inverter/README.md#recommended-follow-ups))
 
 ## Quick Facts
 

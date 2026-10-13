@@ -7,7 +7,9 @@ The Renogy display keeps working exactly as before. The INA228 reads the same sh
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
-> **Status: in progress.** As of 2026-10-09 the XIAO is installed in the display housing and powered, but it is running temporary diagnostic firmware (`casita-battery-monitor-diag.yaml` in the ESPHome Device Builder) left over from the serial-tap tests. The INA228 is next.
+> **Status: in progress; the INA228 wiring is the next project (not started as of October 2026).** The XIAO is installed in the display housing and powered, running temporary diagnostic firmware (`casita-battery-monitor-diag.yaml` in the ESPHome Device Builder) left over from the serial-tap tests. The INA228 breakout model is still to confirm.
+>
+> The Renogy RBM500 itself now reads correctly: the WFCO converter's negative was moved from the shunt's B- terminal to P- in October 2026 (see [mod 01](../01-second-battery/README.md#wiring-as-built)).
 >
 > **Design status: documented, not yet built.** The ESPHome configuration validates and compiles with ESPHome 2026.9.1. The XIAO, buck regulator and power wiring are already installed and working in the display housing (from the earlier serial-tap attempt); the INA228 has not been wired or run yet. Step 2 checks that the display cable's sense wires carry the raw shunt voltage before anything is connected to them.
 

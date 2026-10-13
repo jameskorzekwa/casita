@@ -1,20 +1,115 @@
-# Casita 17 - Whole-Panel Inverter Install Guide (Renogy 2000W + Go Power TS-30)
+# Whole-Panel Inverter with Automatic Transfer Switch (Go Power TS-30)
 
-Trailer: 2026 Casita Liberty 17 Deluxe. Goal: when plugged into shore power, the whole trailer runs on shore power and the WFCO converter charges the batteries. When unplugged with the inverter on, the whole WFCO panel, including the A/C, runs from the 600Ah battery bank, automatically, with no breakers to flip. The converter and the water heater's electric element can only ever run on shore power.
+> **Status: done, October 2026.** Installed and tested. When the trailer is plugged in, everything runs on shore power and the WFCO converter charges the batteries. When it is unplugged and the Renogy 2000 W inverter is on, the whole WFCO panel, including the A/C, runs from the batteries, with no breakers to flip. The converter and the water heater's electric element are on a separate shore-only breaker box, so they can never run from the inverter.
 
-> **Status: planned.** Parts purchased: Go Power GP-TS-30 transfer switch and Spartan Power SpartanStart soft start. Still to buy: the shore-only breaker box and wire. The soft start (Phase 2) is also documented on its own in [02-ac-soft-start](../02-ac-soft-start/README.md).
+Related: [off-grid upgrade plan](../../docs/off-grid-upgrade-plan.md) · [trailer equipment](../../docs/trailer.md) · [A/C soft start](../02-ac-soft-start/README.md) · manuals: [GP-TS-30](../../manuals/electrical/go-power-gp-ts-30-transfer-switch-manual.pdf), [Renogy 2000W P2](../../manuals/electrical/renogy-2000w-p2-inverter-manual.pdf)
 
-Related: [off-grid upgrade plan](../../docs/off-grid-upgrade-plan.md) · [trailer equipment](../../docs/trailer.md) · manuals: [GP-TS-30](../../manuals/electrical/go-power-gp-ts-30-transfer-switch-manual.pdf), [Renogy 2000W P2](../../manuals/electrical/renogy-2000w-p2-inverter-manual.pdf), [SpartanStart](../../manuals/air-conditioning/spartan-power-spartanstart-instructions-2024-07.pdf)
+## As built
 
-Originally written as the Google Doc *Casita 17 - Whole-Panel Inverter Install Guide*; this file is now the maintained copy.
+This section records what was actually installed. The [installation guide](#installation-guide) below is the plan it was built from; where the two differ (mainly the shore-only box), this section is correct.
 
-## Read this first
+![As-built wiring: shore-only breaker box and TS-30](images/as-built-wiring.svg)
 
-### Safety
+### How it works
+
+```text
+Shore cord ──► SHORE-ONLY BOX ──[30A]──► TS-30 "SHORE" (factory GENERATOR leads) ─┐
+                    ├──[20A]──► WFCO converter (120 V input)                      ├─► TS-30 PANEL ─► WFCO 30A main ─► A/C, outlets
+                    └──[20A]──► water heater electric element                     │
+Renogy 2000 W inverter (hardwire L/N/G) ──► TS-30 "INVERTER" (factory SHORE leads) ┘
+```
+
+- **Plugged in:** shore power reaches the TS-30's dominant input. After a 20-45 second delay the relay switches the WFCO panel to shore. The converter and water heater element get shore power directly from the shore-only box.
+- **Unplugged:** the relay drops back to the inverter immediately. The converter and water heater element have no power, so the converter cannot charge the batteries from the batteries.
+- The TS-30 switches both hot and neutral. The Renogy inverter bonds neutral to ground internally (measured 0 V neutral-to-ground), the WFCO panel has no bond of its own (measured open), and nothing else adds a bond.
+
+### TS-30 leads
+
+This TS-30 (lid label 813075D) has pre-wired relay leads with Wago lever connectors instead of numbered terminals. Its lid uses generator-style names, so the leads were re-labeled with tape:
+
+| TS-30 factory name | Behavior | Tape label | Connected to |
+| --- | --- | --- | --- |
+| GENERATOR (Gen Hot, Gen Neu) | Dominant: relay switches to it after 20-45 s | **SHORE** | 10/2 cable from the shore-only box's 30A breaker |
+| SHORE / Power Cord (Hot, Neu) | Default: relay rests here | **INVERTER** | 10 AWG cable from the Renogy inverter's hardwire terminal |
+| PANEL (Hot, Neu) | Output | **PANEL** | 10 AWG cable to the WFCO 30A main breaker, neutral bar and ground bar |
+
+Black leads are hot and white leads are neutral. All grounds land on the TS-30 ground bar (25 in-lb for 10-14 AWG). The lead identification was confirmed by continuity (PANEL to factory SHORE beeps at rest; GENERATOR beeps to neither).
+
+### Parts used
+
+| Part | Qty | Notes | Link |
+| --- | ---: | --- | --- |
+| Go Power GP-TS-30 30A automatic transfer switch | 1 | 120 V, 30 A, 2-pole (switches hot and neutral) | [Go Power](https://gopowersolar.com/products/30-amp-transfer-switch/) |
+| SYIZYEN HT-5 5-way IP65 DIN-rail enclosure | 1 | Shore-only box. Plastic, clear cover, comes with only a DIN rail and two rubber cable sleeves (no neutral or ground bars) | [Amazon](https://www.amazon.com/dp/B0DHZ76XH2) |
+| US Breaker C60X1C30 30A 1-pole DIN breaker | 1 | UL 489 listed, 10 kA, C curve. Feeds the TS-30 | [Amazon](https://www.amazon.com/dp/B07CX4VM6H) |
+| CHTAIXI DZ47N-63 C20 20A 1-pole DIN breaker | 2 | Converter and water heater element. **IEC 60898-1 only (6 kA), not UL 489 listed; see Recommended follow-ups** | [Amazon](https://www.amazon.com/dp/B09WF4692D) |
+| Wago lever connectors rated 20-10 AWG | as needed | Hot, neutral and ground distribution inside the shore-only box (in place of bus bars) and other splices | |
+| DJC Supply 4 x 4 x 3 in PVC junction box | 1 | Splice extending the former inverter-outlet circuit to the WFCO | [Amazon](https://www.amazon.com/dp/B08RHN8H2B) |
+| 10 AWG cable (black/white/ground) | as needed | Inverter to TS-30; TS-30 to WFCO; shore-only box to TS-30 | |
+| 12 AWG cable | as needed | Converter and water heater circuits; outlet-circuit extension | |
+
+### Shore-only box
+
+Mounted next to the WFCO panel, under the seating beside the sink, with the TS-30.
+
+| Connection | Detail |
+| --- | --- |
+| Shore cord | Black to the hot Wago, white to the neutral Wago, green to the ground Wago |
+| Hot Wago | Short 10 AWG jumpers to the line terminal of each breaker |
+| 30A breaker | 10/2 with ground to the TS-30 SHORE (factory GENERATOR) leads |
+| 20A breaker | 12 AWG to the WFCO converter's 120 V input |
+| 20A breaker | 12 AWG to the water heater's electric element |
+| Neutral Wago | Shore white plus the white of each outgoing cable. Never joined to ground |
+| Ground Wago | Shore green plus the green of each outgoing cable |
+
+Each cable enters through a cable gland or clamp. The box is labeled "120V only".
+
+### WFCO panel changes
+
+| Breaker / item | Before | After |
+| --- | --- | --- |
+| 30A main | Shore cord | TS-30 PANEL cable |
+| Old "converter" 20A breaker | Converter **and** the sink and door outlets (two yellow 12/2 cables), joined under one wire nut | Sink and door outlets only (12 AWG pigtail). The converter's black wire now goes to the shore-only box |
+| Old water heater 20A breaker | Water heater element | The two factory "inverted" outlets, which used to be wired directly from the inverter's hardwire terminal. Their 12 AWG cable is extended to the WFCO through a splice in the DJC junction box |
+| Neutral and ground bars | | Unchanged; no neutral-ground bond (measured open) |
+
+The sink and door outlets sharing the converter's breaker was Casita's factory wiring; it was found when they went dead after the converter circuit was disconnected.
+
+### Tests passed
+
+All passed after installation:
+
+1. Shore power only: the TS-30 clicks over within 20-45 seconds and the trailer runs on shore.
+2. Inverter only: the trailer, including the A/C and TV, runs from the inverter.
+3. Transfer: plugging in with the inverter on switches to shore; unplugging drops back to the inverter.
+4. Outlets: a plug-in tester shows correct wiring and GFCI outlets trip on test.
+5. Converter isolation: on inverter power, the battery monitor shows no charging current.
+6. On shore power, the converter charges the batteries.
+
+Pre-wiring checks: inverter outlet hot-neutral 120 V, hot-ground 120 V, neutral-ground 0 V; WFCO neutral bar to ground bar open.
+
+### Everyday operation
+
+- The inverter does not need to be turned off before plugging in. The TS-30 waits 20-45 seconds, then switches to shore.
+- Turn the A/C off before plugging in or unplugging, and wait about 3 minutes before turning it back on.
+- Turn the inverter off when on shore power for a while (it idles at about 1.5-2 A), and back on before unplugging.
+
+### Recommended follow-ups
+
+- **Replace the two CHTAIXI 20A breakers with UL 489 listed 20A DIN breakers**, for example the US Breaker 1P 20A (C60X1C20), matching the 30A breaker. The installed ones are rated only to the European standard.
+- The SYIZYEN box is a generic enclosure, not a listed panelboard. Keep its cover closed and the cable glands tight.
+
+## Installation guide
+
+The guide below is the plan this modification was built from, originally written as the Google Doc *Casita 17 - Whole-Panel Inverter Install Guide*. The as-built section above supersedes it where they differ: the shore-only box became a DIN-rail enclosure with Wago connectors instead of a main-lug load center, and this TS-30 has labeled leads instead of numbered terminals.
+
+### Read this first
+
+#### Safety
 
 This guide covers 120V AC shore-power wiring and a high-current lithium battery bank. Both can kill or start a fire. Go Power's own manual says the TS-30 should be installed by qualified service personnel. If any step is unclear, or what you find in the trailer doesn't match this guide, stop and ask, or have an RV electrician do or inspect the 120V work. Having a pro inspect the finished work before first use is cheap insurance.
 
-### What is confirmed vs. what you must verify
+#### What is confirmed vs. what you must verify
 
 Confirmed from manufacturer documents:
 
@@ -31,9 +126,9 @@ Verify on your trailer (steps below tell you how):
 - Fridge: CONFIRMED 12V-only. It runs from the battery/DC side, so it never touches the inverter or the 120V panel. Nothing to move.
 - The inverter's existing DC cable size and fuse.
 
-## How the system works
+### How the system works
 
-### Diagram 1 - Before (factory)
+#### Diagram 1 - Before (factory)
 
 ```text
   Shore cord (30A)
@@ -52,7 +147,7 @@ Verify on your trailer (steps below tell you how):
   (inverter is not connected to the panel; A/C is shore-only)
 ```
 
-### Diagram 2 - After (this project)
+#### Diagram 2 - After (this project)
 
 ```text
   Shore cord (30A, 10 AWG)
@@ -89,7 +184,7 @@ Verify on your trailer (steps below tell you how):
                   +-------------------------------------+
 ```
 
-### Diagram 3 - What powers what
+#### Diagram 3 - What powers what
 
 ```text
  SITUATION                   PANEL FED BY  CONVERTER  WH ELEC
@@ -105,7 +200,7 @@ Verify on your trailer (steps below tell you how):
  is wired upstream of the TS-30, on shore power only.
 ```
 
-### Diagram 4 - Where neutral meets ground (exactly one place)
+#### Diagram 4 - Where neutral meets ground (exactly one place)
 
 ```text
  On shore power:  at the campground pedestal.
@@ -120,14 +215,14 @@ Verify on your trailer (steps below tell you how):
    shore-only box GND = TS-30 GND bar = WFCO GND = trailer chassis
 ```
 
-## Parts, tools, and supplies
+### Parts, tools, and supplies
 
-### Already purchased
+#### Already purchased
 
 - Go Power GP-TS-30 30A automatic transfer switch
 - Spartan Power SpartanStart soft start
 
-### To buy
+#### To buy
 
 - Shore-only box: a small indoor 120/240V main-lug load center with at least 6 spaces (Square D QO, Eaton BR, or Siemens), plus that brand's separate ground bar kit. Breakers to match that brand: 1 x 30A single-pole, 2 x 20A single-pole.
 - 10/2 with ground cable (10 AWG): shore-only box to TS-30, inverter to TS-30, and TS-30 to WFCO main. Measure each run and add 2 ft per run.
@@ -138,7 +233,7 @@ Verify on your trailer (steps below tell you how):
 - Splice connectors rated for the wire size (Wago 221 for 12 AWG; for 10 AWG use connectors rated for 10 AWG and 30A).
 - Labels or a label maker.
 
-### Tools
+#### Tools
 
 - Digital multimeter (AC volts, DC volts, continuity/ohms)
 - Non-contact voltage tester
@@ -147,7 +242,7 @@ Verify on your trailer (steps below tell you how):
 - Torque screwdriver (inch-pounds), wire strippers, crimper for ring terminals, screwdrivers, drill for mounting
 - Phone camera: photograph every connection before you change it
 
-## Phase 0 - Gather information (no tools, no risk)
+### Phase 0 - Gather information (no tools, no risk)
 
 Step 0.1 - Record model numbers and photograph labels: inverter (confirm '-P2'), WFCO power center, A/C data plate (full model number, e.g. 37201-076, plus RLA and LRA), refrigerator, water heater.
 
@@ -163,7 +258,7 @@ Step 0.6 - Call Spartan Power at (775) 800-1725 (or email sales@spartanpower.com
 
 Step 0.7 - Read the TS-30 manual and the Renogy P2 manual's AC wiring section once, start to finish.
 
-## Phase 1 - Power-down procedure (use at the start of every work session)
+### Phase 1 - Power-down procedure (use at the start of every work session)
 
 1. Turn the A/C off at the thermostat.
 2. Unplug the shore cord at the pedestal or generator. Tag the plug 'DO NOT PLUG IN'.
@@ -173,11 +268,11 @@ Step 0.7 - Read the TS-30 manual and the Renogy P2 manual's AC wiring section on
 6. Wait at least 2 minutes for capacitors (A/C run capacitor, inverter input capacitors) to discharge.
 7. Verify dead with a meter: 0V AC at the WFCO main breaker terminals and neutral bar, and at the inverter's hardwire terminals. Use the non-contact tester as a second check.
 
-## Phase 2 - Install and test the soft start (shore power only)
+### Phase 2 - Install and test the soft start (shore power only)
 
 Do this first, on shore power, before changing any panel wiring. If the soft start doesn't work, you'll know before the A/C is depending on the inverter.
 
-### Diagram 5 - SpartanStart wire identification
+#### Diagram 5 - SpartanStart wire identification
 
 ```text
  Spliced INLINE twice: supply side AND compressor side
@@ -218,7 +313,7 @@ Step 2.8 - Test on shore power: plug in, turn the A/C breaker on, set the thermo
 
 **Stop point: if the A/C won't start, trips its breaker, or the compressor hums without starting, turn it off immediately and call Spartan before continuing.**
 
-## Phase 3 - Pre-wiring checks (before buying or cutting anything else)
+### Phase 3 - Pre-wiring checks (before buying or cutting anything else)
 
 Step 3.1 - Confirm the inverter's neutral-ground bond. With shore unplugged, reconnect the inverter's DC fuse and turn the inverter on. At one of its front receptacles, measure AC volts:
 
@@ -242,7 +337,7 @@ Step 3.3 - Identify the TS-30's relay poles (unpowered, lid off). Read the wirin
 
    - The N.O. terminals only connect when the relay is energized, so take the N.O. pairing from the lid diagram. Hot must use the same pole on the inverter input, the shore input and the output; neutral uses the other pole. The polarity tests in Phase 10 will catch a mistake.
 
-## Phase 4 - Mount the enclosures
+### Phase 4 - Mount the enclosures
 
 Step 4.1 - Mount the TS-30 on a solid interior surface with screws through the holes in the bottom corners of the can. It must be accessible later. It contains a relay that can arc: not in the battery compartment, propane compartment, or anywhere fuel is stored.
 
@@ -256,9 +351,9 @@ Step 4.3 - Mount the shore-only box near the WFCO panel and the shore cord route
 
 Step 4.4 - Plan every cable route. Use a clamp at every knockout and secure cables along their run. Keep 120V cables away from the battery terminals and DC cables, and away from sharp edges.
 
-## Phase 5 - Wire the shore-only box
+### Phase 5 - Wire the shore-only box
 
-### Diagram 6 - Shore-only box
+#### Diagram 6 - Shore-only box
 
 ```text
  SHORE-ONLY BOX (6-space main-lug load center)
@@ -288,9 +383,9 @@ Step 5.5 - Breaker spaces: a 120/240V load center has two hot legs, and with a s
 
 Step 5.6 - Install the 30A breaker. Run 10/2 with ground from it to the TS-30's location (connected to the TS-30 in Phase 7): black to the 30A breaker, white to the neutral bar, green to the ground bar.
 
-## Phase 6 - Move the converter and the water heater circuits
+### Phase 6 - Move the converter and the water heater circuits
 
-### Diagram 7 - Converter relocation (inside the WFCO)
+#### Diagram 7 - Converter relocation (inside the WFCO)
 
 ```text
  BEFORE                           AFTER
@@ -319,9 +414,9 @@ Step 6.2 - Water heater element. Find the WFCO breaker labeled for the water hea
 
 Step 6.3 - In the WFCO, switch off the two now-empty breakers and label them 'Moved to shore-only box'. One can be reused in Phase 8.
 
-## Phase 7 - Wire the TS-30
+### Phase 7 - Wire the TS-30
 
-### Diagram 8 - TS-30 connections (Configuration C)
+#### Diagram 8 - TS-30 connections (Configuration C)
 
 ```text
  From Renogy hardwire terminal (inverter = default, N.C.)
@@ -363,7 +458,7 @@ Step 7.9 - Leave the TS-30 time delay as shipped (no jumper). The 20-45 second d
 
 Step 7.10 - Tighten the cable clamps and snap the TS-30 lid on.
 
-## Phase 8 - The factory 'inverted' outlets (do this in the same session as Phase 7)
+### Phase 8 - The factory 'inverted' outlets (do this in the same session as Phase 7)
 
 CONFIRMED: the two factory outlets are wired directly from the inverter's hardwire terminal. That terminal is about to feed the TS-30, so the outlet circuit moves to the WFCO panel. Afterwards these outlets work on shore and on battery like every other outlet. Never feed the same outlets from both the inverter and the panel.
 
@@ -371,7 +466,7 @@ Confirmed: the two outlets are wired directly from the inverter. Move that outle
 
 If instead the cable is a cord plugged into the inverter's front receptacle, unplug it and replace the plug end with a proper connection to the WFCO breaker in the same way. Don't leave anything plugged into the inverter's own receptacles as a permanent load.
 
-## Phase 9 - The refrigerator (DONE - nothing to do)
+### Phase 9 - The refrigerator (DONE - nothing to do)
 
 - CONFIRMED: the fridge runs only on 12V, so nothing to do. It's powered from the battery/DC side at all times (the converter keeps the battery up on shore). Budget roughly 25-50Ah per day for it off-grid, more in hot weather.
 - (The 3-way fridge scenario from earlier versions of this guide doesn't apply to this trailer.)
@@ -379,16 +474,16 @@ If instead the cable is a cord plugged into the inverter's front receptacle, unp
 
 Nothing else to do in this phase.
 
-## Phase 10 - Inspect, then power up and test
+### Phase 10 - Inspect, then power up and test
 
-### 10.1 Inspection, still powered down
+#### 10.1 Inspection, still powered down
 
 - Every screw terminal torqued per its label, every lever connector closed and tug-tested, no bare copper showing outside a terminal.
 - Every cable clamped at every box; all covers installed.
 - Shore-only box: neutral bar to ground bar = open (no continuity). Shore cord unplugged.
 - Note: with the TS-30 at rest, the WFCO neutral now connects through the TS-30 to the inverter, whose neutral is bonded to ground inside. A neutral-to-ground continuity reading at the WFCO is now expected. That's the one correct bond when the inverter is the source.
 
-### 10.2 Test A - shore power only (inverter OFF)
+#### 10.2 Test A - shore power only (inverter OFF)
 
 1. Reinstall the inverter's DC fuse, but leave the inverter switched OFF. Battery disconnect on.
 2. All breakers off in both boxes. Plug in the shore cord.
@@ -399,7 +494,7 @@ Nothing else to do in this phase.
 7. Water heater electric: ONLY if the tank is full of water (an element powered with an empty tank burns out in seconds). Turn on its electric switch and confirm it heats.
 8. A/C: runs normally with the soft start.
 
-### 10.3 Test B - inverter only (shore unplugged)
+#### 10.3 Test B - inverter only (shore unplugged)
 
 1. A/C off at the thermostat. Unplug the shore cord. The panel goes dead, which is expected with the inverter off.
 2. Turn the inverter ON. The TS-30 is at rest (no click needed), and the WFCO panel should be live from the inverter.
@@ -410,13 +505,13 @@ Nothing else to do in this phase.
 7. Let it run 30-60 minutes. Feel the inverter, the DC cables, the fuse holder and the battery terminals: warm is fine; too hot to keep your hand on means stop and investigate. The inverter's fan should be running.
 8. If the inverter faults or its GFCI light comes on: turn everything off and see Troubleshooting.
 
-### 10.4 Test C - switching between sources
+#### 10.4 Test C - switching between sources
 
 1. Inverter on, A/C off. Plug in shore power. The panel stays on the inverter for 20-45 seconds, then the TS-30 clicks over to shore. The battery monitor starts showing charging.
 2. A/C off. Unplug shore power. The panel switches straight back to the inverter (lights may blink).
 3. Inverter off, shore unplugged: the panel is dead. This is expected.
 
-## Everyday operation
+### Everyday operation
 
 - Turn the A/C off before plugging in or unplugging shore power, and wait about 3 minutes before turning it back on. Restarting a compressor against high pressure right after a power blip is hard on it and can trip the inverter or the relay.
 - Arriving at a site with hookups: A/C off, plug in, wait for the click, then A/C on. You can leave the inverter on or off; with the inverter on, it idles at about 1.5-2A while shore power runs the trailer.
@@ -428,7 +523,7 @@ Nothing else to do in this phase.
 - Solar: the portable panel charges the batteries directly over 12V DC, separately from the breaker panel. It works on shore power or on inverter power and adds to the converter's charging. Make sure its controller is set to LITHIUM.
 - Storage: inverter off, fridge emptied and off, battery disconnect off.
 
-## Troubleshooting
+### Troubleshooting
 
 - Panel dead after unplugging: the inverter is off, its DC fuse is out, or it shut down on low battery or overload. Check the inverter's lights.
 - Renogy GFCI or fault light trips on inverter power: most likely a second neutral-ground bond (WFCO or shore-only box), hot and neutral on mismatched TS-30 poles, or a neutral tied to the wrong source. Recheck Steps 3.2, 3.3 and 4.2, and the inverted-outlet wiring.
@@ -438,7 +533,7 @@ Nothing else to do in this phase.
 - A/C won't start on the inverter but does on shore: soft start wiring or settings. Call Spartan with your clamp-meter readings.
 - Inverter overloads with the A/C running: something else is drawing heavily too (for example, the water heater element still on the panel, or a space heater or hair dryer plugged in). Recheck Phase 6.
 
-## Wire and breaker schedule
+### Wire and breaker schedule
 
 ```text
  RUN                                CABLE         PROTECTION
@@ -457,7 +552,7 @@ Nothing else to do in this phase.
  * 12/2 + G acceptable if the terminal won't take 10 AWG
 ```
 
-## Open items to confirm
+### Open items to confirm
 
 - Spartan's confirmation of the SpartanStart wiring for the 37200-series R-32 A/C, and the colors on your unit's sticker.
 - Fridge: RESOLVED (12V-only, nothing to move).

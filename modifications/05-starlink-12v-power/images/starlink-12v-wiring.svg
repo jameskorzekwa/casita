@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520" role="img" aria-labelledby="title desc">
+  <title id="title">Starlink Mini 12 V battery power wiring</title>
+  <desc id="desc">The positive busbar feeds the RVMARINEPAT 12 to 36 volt adapter's red wire through a 10 amp inline fuse that still needs to be added. The adapter's negative wire lands on the P minus terminal of the Renogy shunt. The adapter's 36 volt output connects through a 1 foot STARGEAR DC extension to Casita's factory exterior Starlink port on the rear passenger side. Outside, a 16.4 foot Jasput retractable DC cable runs from the port to the Starlink Mini.</desc>
+  <defs>
+    <style>
+      .box{fill:#f5f7fa;stroke:#243b53;stroke-width:3}
+      .batt{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
+      .dev{fill:#e3f8ff;stroke:#186faf;stroke-width:3}
+      .out{fill:#e6fffa;stroke:#0f766e;stroke-width:3}
+      .todo{fill:#fde8e8;stroke:#c53030;stroke-width:3;stroke-dasharray:8 5}
+      .t{font:600 18px system-ui,sans-serif;fill:#102a43}
+      .s{font:14px system-ui,sans-serif;fill:#334e68}
+      .warn{font:600 14px system-ui,sans-serif;fill:#c53030}
+      .w{fill:none;stroke-width:4}
+      .pos{stroke:#c53030}
+      .neg{stroke:#243b53}
+      .dc{stroke:#7b2cbf}
+      .wall{stroke:#829ab1;stroke-width:3;stroke-dasharray:10 8}
+    </style>
+  </defs>
+  <rect width="1100" height="520" rx="24" fill="#fff"/>
+  <text class="t" x="40" y="40">Starlink Mini on 12 V battery power</text>
+
+  <rect class="batt" x="40" y="80" width="200" height="90" rx="14"/>
+  <text class="t" x="140" y="118" text-anchor="middle">Positive busbar</text>
+  <text class="s" x="140" y="142" text-anchor="middle">Joinfworld 250 A</text>
+
+  <rect class="batt" x="40" y="300" width="200" height="110" rx="14"/>
+  <text class="t" x="140" y="335" text-anchor="middle">Renogy shunt</text>
+  <text class="s" x="140" y="360" text-anchor="middle">B-: batteries</text>
+  <text class="s" x="140" y="382" text-anchor="middle">P-: all loads</text>
+
+  <rect class="todo" x="300" y="95" width="130" height="60" rx="10"/>
+  <text class="warn" x="365" y="122" text-anchor="middle">10 A fuse</text>
+  <text class="s" x="365" y="142" text-anchor="middle">TO ADD</text>
+  <path class="w pos" d="M240 125 H300"/>
+  <path class="w pos" d="M430 125 H480 V200 H500"/>
+  <path class="w neg" d="M240 355 H460 V250 H500"/>
+  <text class="s" x="330" y="345">to P-</text>
+
+  <rect class="dev" x="500" y="170" width="235" height="120" rx="14"/>
+  <text class="t" x="617" y="205" text-anchor="middle">RVMARINEPAT</text>
+  <text class="s" x="617" y="228" text-anchor="middle">12-36 V in, 36 V / 60 W out</text>
+  <text class="s" x="617" y="250" text-anchor="middle">under rear passenger seat,</text>
+  <text class="s" x="617" y="270" text-anchor="middle">on the water tank (tape)</text>
+
+  <path class="w dc" d="M735 230 H800"/>
+  <text class="s" x="767" y="200" text-anchor="middle" style="font-size:12px">1 ft</text>
+  <text class="s" x="767" y="268" text-anchor="middle" style="font-size:12px">STARGEAR</text>
+
+  <line class="wall" x1="860" y1="70" x2="860" y2="470"/>
+  <text class="s" x="860" y="495" text-anchor="middle">trailer wall (rear passenger side)</text>
+  <rect class="box" x="800" y="195" width="120" height="70" rx="10"/>
+  <text class="s" x="860" y="225" text-anchor="middle">Casita factory</text>
+  <text class="s" x="860" y="245" text-anchor="middle">Starlink port</text>
+
+  <path class="w dc" d="M920 230 H980 V330"/>
+  <text class="s" x="985" y="290">16.4 ft Jasput</text>
+  <text class="s" x="985" y="308">retractable</text>
+  <rect class="out" x="930" y="330" width="140" height="90" rx="14"/>
+  <text class="t" x="1000" y="370" text-anchor="middle">Starlink</text>
+  <text class="t" x="1000" y="394" text-anchor="middle">Mini</text>
+</svg>

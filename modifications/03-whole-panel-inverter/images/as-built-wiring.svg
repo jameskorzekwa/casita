@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1000" viewBox="0 0 1500 1000" font-family="Helvetica, Arial, sans-serif">
+<style>.w{fill:none;stroke-linejoin:round;stroke-linecap:round}</style>
+<rect x="0" y="0" width="1500" height="1000" rx="0" fill="#fafafa" stroke="none" stroke-width="2"/>
+<text x="20" y="32" font-size="22" font-weight="bold" text-anchor="start" fill="#000" >Casita 120 V wiring as built: shore-only breaker box + TS-30 (120 V, 30 A)</text>
+<rect x="20" y="355" width="130" height="150" rx="6" fill="#e8eef7" stroke="#000" stroke-width="2"/>
+<text x="85" y="373" font-size="13" font-weight="bold" text-anchor="middle" fill="#000" >SHORE CORD</text>
+<text x="28" y="400" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >30A, 10 AWG</text>
+<text x="140" y="386" font-size="11" font-weight="normal" text-anchor="end" fill="#000" >black</text>
+<text x="140" y="426" font-size="11" font-weight="normal" text-anchor="end" fill="#000" >white</text>
+<text x="140" y="466" font-size="11" font-weight="normal" text-anchor="end" fill="#000" >green</text>
+<text x="85" y="495" font-size="11" font-weight="normal" text-anchor="middle" fill="#555" >to pedestal (TT-30)</text>
+<rect x="280" y="50" width="520" height="880" rx="10" fill="#f1f1f1" stroke="#000" stroke-width="3"/>
+<text x="295" y="75" font-size="15" font-weight="bold" text-anchor="start" fill="#000" >SYIZYEN 5-way DIN box  —  label “120V ONLY”</text>
+<rect x="440" y="244" width="350" height="12" fill="#bbb" stroke="#888"/>
+<text x="785" y="272" font-size="11" font-weight="normal" text-anchor="end" fill="#555" >35 mm DIN rail</text>
+<rect x="272" y="375" width="16" height="110" rx="3" fill="#666" stroke="#000" stroke-width="2"/>
+<rect x="792" y="378" width="16" height="64" rx="3" fill="#666" stroke="#000" stroke-width="2"/>
+<rect x="792" y="518" width="16" height="64" rx="3" fill="#666" stroke="#000" stroke-width="2"/>
+<rect x="792" y="658" width="16" height="64" rx="3" fill="#666" stroke="#000" stroke-width="2"/>
+<rect x="320" y="140" width="60" height="150" rx="6" fill="#ffe9a8" stroke="#000" stroke-width="2"/>
+<text x="350" y="308" font-size="12" font-weight="bold" text-anchor="middle" fill="#000" >HOT Wago</text>
+<text x="350" y="322" font-size="11" font-weight="normal" text-anchor="middle" fill="#000" >5-port</text>
+<rect x="320" y="395" width="60" height="310" rx="6" fill="#ffffff" stroke="#000" stroke-width="2.5"/>
+<text x="355" y="388" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >NEUTRAL Wago</text>
+<text x="343" y="480" font-size="11" font-weight="normal" text-anchor="middle" fill="#000" transform="rotate(-90 343 480)">5-port</text>
+<text x="362" y="620" font-size="11" font-weight="normal" text-anchor="middle" fill="#c00" transform="rotate(-90 362 620)">never join to ground</text>
+<rect x="330" y="800" width="150" height="50" rx="6" fill="#d6f2da" stroke="#1f9d32" stroke-width="2.5"/>
+<text x="405" y="870" font-size="12" font-weight="bold" text-anchor="middle" fill="#146b22" >GROUND Wago (5-port)</text>
+<text x="405" y="885" font-size="11" font-weight="normal" text-anchor="middle" fill="#146b22" >(green tape)</text>
+<rect x="455" y="170" width="50" height="160" rx="6" fill="#fff" stroke="#000" stroke-width="2"/>
+<rect x="472" y="232" width="16" height="22" fill="#2a6" stroke="#000"/>
+<text x="480" y="228" font-size="15" font-weight="bold" text-anchor="middle" fill="#000" >20A</text>
+<text x="487" y="348" font-size="10" font-weight="bold" text-anchor="start" fill="#000" >WATER HTR</text>
+<rect x="545" y="170" width="50" height="160" rx="6" fill="#fff" stroke="#000" stroke-width="2"/>
+<rect x="562" y="232" width="16" height="22" fill="#2a6" stroke="#000"/>
+<text x="570" y="228" font-size="15" font-weight="bold" text-anchor="middle" fill="#000" >20A</text>
+<text x="577" y="348" font-size="10" font-weight="bold" text-anchor="start" fill="#000" >CONVERTER</text>
+<rect x="635" y="170" width="50" height="160" rx="6" fill="#fff" stroke="#000" stroke-width="2"/>
+<rect x="652" y="232" width="16" height="22" fill="#2a6" stroke="#000"/>
+<text x="660" y="228" font-size="15" font-weight="bold" text-anchor="middle" fill="#000" >30A</text>
+<text x="667" y="348" font-size="10" font-weight="bold" text-anchor="start" fill="#000" >TS-30</text>
+<text x="452" y="182" font-size="9" font-weight="normal" text-anchor="end" fill="#555" >LINE</text>
+<text x="452" y="322" font-size="9" font-weight="normal" text-anchor="end" fill="#555" >LOAD</text>
+<rect x="725" y="170" width="50" height="160" rx="6" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="5,4"/>
+<text x="750" y="255" font-size="11" font-weight="normal" text-anchor="middle" fill="#999" >spare</text>
+<text x="735" y="155" font-size="11" font-weight="normal" text-anchor="middle" fill="#555" >30A UL489 · 20A IEC</text>
+<rect x="910" y="60" width="280" height="410" rx="10" fill="#e9f3ff" stroke="#000" stroke-width="3"/>
+<text x="1050" y="90" font-size="15" font-weight="bold" text-anchor="middle" fill="#000" >TS-30 TRANSFER SWITCH</text>
+<text x="925" y="110" font-size="11" font-weight="normal" text-anchor="start" fill="#555" >Shore wins after 20–45 s;</text>
+<text x="925" y="125" font-size="11" font-weight="normal" text-anchor="start" fill="#555" >inverter when shore is off.</text>
+<rect x="1110" y="95" width="80" height="70" rx="6" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="1184" y="181" font-size="12" font-weight="bold" text-anchor="end" fill="#000" >INVERTER IN</text>
+<text x="1184" y="195" font-size="9" font-weight="normal" text-anchor="end" fill="#555" >factory “SHORE / Power Cord”</text>
+<text x="1184" y="206" font-size="9" font-weight="normal" text-anchor="end" fill="#555" >leads (default); tape: INVERTER</text>
+<rect x="1110" y="245" width="80" height="70" rx="6" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="1184" y="331" font-size="12" font-weight="bold" text-anchor="end" fill="#000" >PANEL OUT</text>
+<text x="1184" y="345" font-size="9" font-weight="normal" text-anchor="end" fill="#555" >factory “PANEL” leads</text>
+<rect x="910" y="375" width="80" height="70" rx="6" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="950" y="368" font-size="12" font-weight="bold" text-anchor="middle" fill="#000" >SHORE IN</text>
+<text x="1000" y="400" font-size="9" font-weight="normal" text-anchor="start" fill="#555" >factory “GENERATOR” leads</text>
+<text x="1000" y="412" font-size="9" font-weight="normal" text-anchor="start" fill="#555" >(dominant, 20–45 s delay)</text>
+<text x="1000" y="424" font-size="9" font-weight="normal" text-anchor="start" fill="#555" >tape label: SHORE</text>
+<text x="1125" y="114" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >L</text>
+<text x="1125" y="134" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >N</text>
+<text x="1125" y="154" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >G</text>
+<text x="1125" y="264" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >L</text>
+<text x="1125" y="284" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >N</text>
+<text x="1125" y="304" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >G</text>
+<text x="965" y="394" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >L</text>
+<text x="965" y="414" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >N</text>
+<text x="965" y="434" font-size="12" font-weight="bold" text-anchor="start" fill="#000" >G</text>
+<text x="1030" y="240" font-size="11" font-weight="normal" text-anchor="middle" fill="#c00" >N &amp; G: NO bond</text>
+<text x="1030" y="256" font-size="11" font-weight="normal" text-anchor="middle" fill="#c00" >in the TS-30</text>
+<rect x="1290" y="70" width="190" height="110" rx="6" fill="#fff3e6" stroke="#000" stroke-width="2"/>
+<text x="1385" y="98" font-size="14" font-weight="bold" text-anchor="middle" fill="#000" >INVERTER</text>
+<text x="1385" y="116" font-size="11" font-weight="normal" text-anchor="middle" fill="#000" >AC OUT (hardwire)</text>
+<text x="1385" y="150" font-size="11" font-weight="normal" text-anchor="middle" fill="#555" >Renogy 2000 W, L / N / G</text>
+<text x="1385" y="166" font-size="11" font-weight="normal" text-anchor="middle" fill="#555" >→ TS-30 leads taped INVERTER</text>
+<rect x="1290" y="225" width="190" height="165" rx="6" fill="#fff3e6" stroke="#000" stroke-width="2"/>
+<text x="1385" y="248" font-size="14" font-weight="bold" text-anchor="middle" fill="#000" >WFCO PANEL</text>
+<text x="1300" y="264" font-size="11" font-weight="normal" text-anchor="start" fill="#000" >Main breaker</text>
+<text x="1300" y="284" font-size="11" font-weight="normal" text-anchor="start" fill="#000" >Neutral bar</text>
+<text x="1300" y="304" font-size="11" font-weight="normal" text-anchor="start" fill="#000" >Ground bar</text>
+<text x="1385" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#555" >Outlets, A/C, etc.</text>
+<text x="1385" y="344" font-size="11" font-weight="normal" text-anchor="middle" fill="#c00" >Converter &amp; water heater</text>
+<text x="1385" y="359" font-size="11" font-weight="normal" text-anchor="middle" fill="#c00" >hots removed from here</text>
+<text x="1385" y="375" font-size="9" font-weight="normal" text-anchor="middle" fill="#555" >old CONV breaker → sink/door outlets</text>
+<rect x="910" y="510" width="260" height="80" rx="6" fill="#fff3e6" stroke="#000" stroke-width="2"/>
+<text x="1055" y="540" font-size="13" font-weight="bold" text-anchor="middle" fill="#000" >CONVERTER (120V AC input)</text>
+<text x="1055" y="560" font-size="11" font-weight="normal" text-anchor="middle" fill="#555" >not behind TS-30 → never on inverter</text>
+<text x="925" y="534" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >L</text>
+<text x="925" y="554" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >N</text>
+<text x="925" y="574" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >G</text>
+<rect x="910" y="650" width="260" height="80" rx="6" fill="#fff3e6" stroke="#000" stroke-width="2"/>
+<text x="1055" y="680" font-size="13" font-weight="bold" text-anchor="middle" fill="#000" >WATER HEATER 120V ELEMENT</text>
+<text x="1055" y="700" font-size="11" font-weight="normal" text-anchor="middle" fill="#555" >shore power only</text>
+<text x="925" y="674" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >L</text>
+<text x="925" y="694" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >N</text>
+<text x="925" y="714" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >G</text>
+<text x="812" y="380" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >10/2 w/G</text>
+<text x="812" y="520" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >12/2 w/G</text>
+<text x="812" y="660" font-size="11" font-weight="bold" text-anchor="start" fill="#000" >12/2 w/G</text>
+<text x="1240" y="102" font-size="10" font-weight="normal" text-anchor="middle" fill="#555" >10 AWG</text>
+<text x="1240" y="252" font-size="10" font-weight="normal" text-anchor="middle" fill="#555" >10 AWG</text>
+<path d="M150,390 L300,390 L300,170 L320,170" class="w" stroke="#111" stroke-width="4"/>
+<path d="M150,430 L320,430" class="w" stroke="#444" stroke-width="6.5"/><path d="M150,430 L320,430" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M150,470 L300,470 L300,825 L330,825" class="w" stroke="#1f9d32" stroke-width="4"/>
+<path d="M380,190 L400,190 L400,95 L660,95 L660,185" class="w" stroke="#111" stroke-width="4"/>
+<path d="M380,220 L415,220 L415,110 L570,110 L570,185" class="w" stroke="#111" stroke-width="4"/>
+<path d="M380,250 L430,250 L430,125 L480,125 L480,185" class="w" stroke="#111" stroke-width="4"/>
+<path d="M660,315 L660,390 L800,390" class="w" stroke="#111" stroke-width="4"/>
+<path d="M570,315 L570,530 L800,530" class="w" stroke="#111" stroke-width="4"/>
+<path d="M480,315 L480,670 L800,670" class="w" stroke="#111" stroke-width="4"/>
+<path d="M380,410 L474,410 A6,6 0 0 1 486,410 L564,410 A6,6 0 0 1 576,410 L800,410" class="w" stroke="#444" stroke-width="6.5"/><path d="M380,410 L474,410 A6,6 0 0 1 486,410 L564,410 A6,6 0 0 1 576,410 L800,410" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M380,550 L414,550 A6,6 0 0 1 426,550 L474,550 A6,6 0 0 1 486,550 L800,550" class="w" stroke="#444" stroke-width="6.5"/><path d="M380,550 L414,550 A6,6 0 0 1 426,550 L474,550 A6,6 0 0 1 486,550 L800,550" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M380,690 L414,690 A6,6 0 0 1 426,690 L434,690 A6,6 0 0 1 446,690 L800,690" class="w" stroke="#444" stroke-width="6.5"/><path d="M380,690 L414,690 A6,6 0 0 1 426,690 L434,690 A6,6 0 0 1 446,690 L800,690" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M420,800 L420,430 L474,430 A6,6 0 0 1 486,430 L564,430 A6,6 0 0 1 576,430 L800,430" class="w" stroke="#1f9d32" stroke-width="4"/>
+<path d="M440,800 L440,570 L474,570 A6,6 0 0 1 486,570 L800,570" class="w" stroke="#1f9d32" stroke-width="4"/>
+<path d="M460,800 L460,710 L800,710" class="w" stroke="#1f9d32" stroke-width="4"/>
+<path d="M800,390 L910,390" class="w" stroke="#111" stroke-width="4"/>
+<path d="M800,410 L910,410" class="w" stroke="#444" stroke-width="6.5"/><path d="M800,410 L910,410" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M800,430 L910,430" class="w" stroke="#1f9d32" stroke-width="4"/>
+<path d="M800,530 L910,530" class="w" stroke="#111" stroke-width="4"/>
+<path d="M800,550 L910,550" class="w" stroke="#444" stroke-width="6.5"/><path d="M800,550 L910,550" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M800,570 L910,570" class="w" stroke="#1f9d32" stroke-width="4"/>
+<path d="M800,670 L910,670" class="w" stroke="#111" stroke-width="4"/>
+<path d="M800,690 L910,690" class="w" stroke="#444" stroke-width="6.5"/><path d="M800,690 L910,690" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M800,710 L910,710" class="w" stroke="#1f9d32" stroke-width="4"/>
+<path d="M1290,110 L1190,110" class="w" stroke="#111" stroke-width="4"/>
+<path d="M1290,130 L1190,130" class="w" stroke="#444" stroke-width="6.5"/><path d="M1290,130 L1190,130" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M1290,150 L1190,150" class="w" stroke="#1f9d32" stroke-width="4"/>
+<path d="M1190,260 L1290,260" class="w" stroke="#111" stroke-width="4"/>
+<path d="M1190,280 L1290,280" class="w" stroke="#444" stroke-width="6.5"/><path d="M1190,280 L1290,280" class="w" stroke="#fff" stroke-width="3.5"/>
+<path d="M1190,300 L1290,300" class="w" stroke="#1f9d32" stroke-width="4"/>
+<circle cx="320" cy="170" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="380" cy="190" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="380" cy="220" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="380" cy="250" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="320" cy="430" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="380" cy="410" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="380" cy="550" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="380" cy="690" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="330" cy="825" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="420" cy="800" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="440" cy="800" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="460" cy="800" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="480" cy="185" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="570" cy="185" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="660" cy="185" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="480" cy="315" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="570" cy="315" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="660" cy="315" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="390" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="410" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="430" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="530" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="550" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="570" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="670" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="690" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="910" cy="710" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1190" cy="110" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1190" cy="130" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1190" cy="150" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1190" cy="260" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1190" cy="280" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1190" cy="300" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1290" cy="110" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1290" cy="130" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1290" cy="150" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1290" cy="260" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1290" cy="280" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="1290" cy="300" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<circle cx="380" cy="275" r="4" fill="#ccc" stroke="#000" stroke-width="1"/>
+<text x="388" y="279" font-size="9" font-weight="normal" text-anchor="start" fill="#888" >spare</text>
+<rect x="840" y="770" width="640" height="215" rx="6" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="855" y="795" font-size="14" font-weight="bold" text-anchor="start" fill="#000" >KEY</text>
+<path d="M855,815 h50" class="w" stroke="#111" stroke-width="4"/>
+<text x="915" y="820" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >Hot (black)</text>
+<path d="M1020,815 h50" class="w" stroke="#444" stroke-width="6.5"/>
+<path d="M1020,815 h50" class="w" stroke="#fff" stroke-width="3.5"/>
+<text x="1080" y="820" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >Neutral (white)</text>
+<path d="M1200,815 h50" class="w" stroke="#1f9d32" stroke-width="4"/>
+<text x="1260" y="820" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >Ground (green)</text>
+<circle cx="860" cy="842" r="5" fill="#c00" stroke="#000" stroke-width="1"/>
+<text x="872" y="847" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >= screw/lever terminal (connection)</text>
+<path d="M1140,842 h14 a6,6 0 0 1 12,0 h14" class="w" stroke="#111" stroke-width="3"/>
+<path d="M1160,830 v24" class="w" stroke="#1f9d32" stroke-width="3"/>
+<text x="1190" y="847" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >= wires cross, NOT connected</text>
+<text x="855" y="875" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >• Neutral and ground stay separate everywhere in the trailer. No green bonding screw/jumper.</text>
+<text x="855" y="895" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >• Wagos: lever connectors rated 20–10 AWG (221-6xx size). Strip 11 mm, tug-test.</text>
+<text x="855" y="915" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >• Converter + water heater feeds come OFF the WFCO panel; they are fed only from this box.</text>
+<text x="855" y="935" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >• 30A: US Breaker C60X1C30 (UL 489). 20A: CHTAIXI C20 (IEC only; UL 489 recommended).</text>
+<text x="855" y="955" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >• Cable clamp/gland on every cable entry. Never two wires under one breaker screw.</text>
+<text x="855" y="975" font-size="12" font-weight="normal" text-anchor="start" fill="#000" >• Inverter bonds N-G inside (measured 0 V N-G). Add no other N-G bond anywhere.</text>
+<text x="300" y="905" font-size="11" font-weight="normal" text-anchor="start" fill="#333" >Shore N → Neutral Wago → 3 whites out.  Shore G → Ground Wago → 3 greens out.</text>
+<text x="300" y="920" font-size="11" font-weight="normal" text-anchor="start" fill="#333" >Shore hot → Hot Wago → 3 short 10 AWG jumpers → breaker LINE terminals.</text>
+</svg>

@@ -1,6 +1,6 @@
 # Second 300 Ah Battery (600 Ah Bank)
 
-> **Status: done.** Installed and paralleled with the factory battery.
+> **Status: done, October 2026.** Installed and paralleled with the factory battery.
 
 The factory Solar System Package came with one Renogy 300 Ah LiFePO4 battery. A second, identical battery (confirmed with Casita to be the same model) was added in parallel, doubling the bank to 600 Ah (about 7.7 kWh nominal).
 
@@ -22,17 +22,27 @@ Renogy Core Mini 12.8 V 300 Ah LiFePO4 with low-temperature protection, model RB
 
 ## Location
 
-The factory battery sits in the rear exterior battery compartment, which holds only one battery. The plan was to mount the second battery inside, low and close to the axle (under the dinette), so it adds almost nothing to tongue weight.
+Both batteries are in the factory battery compartment at the back center of the trailer. The compartment was rearranged to fit the second battery. (The original plan was to mount it inside near the axle; it fit in the existing compartment instead.)
 
-**To record:** where the second battery was actually mounted, how it is secured, and the cable length to the busbar. Add a photo to `photos/`.
+**To record:** how the batteries are secured, and a photo in `photos/`.
 
-## Wiring
+## Wiring (as built)
 
-- Each battery has **its own fuse** at its positive terminal (the factory battery keeps its factory fuse; the new one has a matching fuse). Per-battery fuses protect each battery's cable; the inverter is protected by its own fuse (Renogy recommends 250 A).
-- Both batteries connect to a **common positive and negative busbar** with equal-length, equal-gauge cables. Battery 2 is not daisy-chained off battery 1.
-- Fuses should be Class-T (or at least ANL) because a lithium bank can deliver very high fault current.
+| Item | Part | Link |
+| --- | --- | --- |
+| Per-battery fuse | Chatovalo MEGA fuse holder with 200 A MEGA fuse, one on each battery's positive (2-pack). M8 studs, 4 AWG to 2/0 | [Amazon](https://www.amazon.com/dp/B0FS27VSYM) |
+| Busbars | Joinfworld 250 A power distribution blocks, red and black pair, 4 x M8 studs + 3 x #8 screws each, with covers | [Amazon](https://www.amazon.com/dp/B0BYMNL4YX) |
+| Cable | JURPLIX 1/0 AWG **copper-clad aluminum (CCA)** battery cable kit, red and black, with lugs | [Amazon](https://www.amazon.com/dp/B0F8BNBKPB) |
 
-**To record:** cable gauge, fuse type and rating for each battery, and the busbar used.
+- Each battery connects through its own 200 A fuse to the common positive busbar, and its negative to the common negative busbar. Battery 2 is not daisy-chained off battery 1.
+- The **inverter's cables run from the busbars** to the inverter, so the per-battery 200 A fuses are the inverter cable's only protection. There is **no battery disconnect switch**.
+- The Renogy RBM500 shunt is in the negative path: battery negatives on **B-**, every load and charger on **P-**. The WFCO converter's negative was originally on B- (so charging was not measured) and was moved to P- in October 2026; the monitor now reads charging correctly. The Starlink adapter's negative is also on P- ([mod 05](../05-starlink-12v-power/README.md)).
+
+## Recommended follow-ups
+
+- **Replace the CCA cable with pure copper (OFC) 1/0.** Copper-clad aluminum carries roughly what 2 AWG copper does, and copper lugs on aluminum strands can loosen and heat over time. This matters for long A/C runs on the inverter at 110-150 A. Until then, feel the lugs after an hour of heavy load.
+- **Add a Class-T main fuse** (for example 300 A in a Blue Sea 5502 holder) between the positive busbar and the loads. MEGA fuses interrupt about 2,000 A; a 600 Ah lithium bank can deliver well over 10,000 A into a short. Class-T is rated about 20,000 A.
+- **Add a DC disconnect** for the inverter. A 250 A DC circuit breaker in the inverter's positive cable would serve as both its fuse (Renogy recommends 250 A) and an off switch for maintenance.
 
 ## Connecting the batteries (procedure used)
 
@@ -53,4 +63,4 @@ To disconnect later: positives first, then negatives.
 
 | Date | Change |
 | --- | --- |
-| 2026-10 | Second battery installed and paralleled |
+| 2026-10 | Second battery installed and paralleled in the rear compartment; MEGA fuses, busbars and CCA cable recorded; converter negative moved to shunt P- |

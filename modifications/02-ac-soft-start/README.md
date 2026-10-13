@@ -1,6 +1,6 @@
 # A/C Soft Start (Spartan Power SpartanStart)
 
-> **Status: purchased; install status to confirm.** The wiring sticker has been read (1976-764). Update this line with the install date and test results.
+> **Status: done, October 2026.** Installed; the start capacitor and PTCR were removed. The A/C starts and runs on the Renogy 2000 W inverter.
 
 The Coleman-Mach Mach 8 Plus Cub's compressor draws a large surge when it starts (locked-rotor current around 58 A on the older R-410A version; not published for the R-32 version). That surge is far more than the factory Renogy 2000 W inverter's 4000 W one-second peak can supply. A soft start ramps the compressor up gently so the inverter can start it. It is a prerequisite for running the A/C from the batteries ([mod 03](../03-whole-panel-inverter/README.md)).
 
@@ -26,7 +26,7 @@ The A/C is a 37200-series (R-32) unit. Spartan's install table does not list it,
 
 The SpartanStart splices **inline** into all three compressor wires: each wire is cut, and the supply-side end goes to the SpartanStart's supply harness while the compressor-side end goes to its compressor harness (six splices). Still check the colors at the compressor before cutting, and never swap Run and Start.
 
-Start components (start capacitor, start relay, PTCR) are optional on this sticker. If any are present, remove them as described in the procedure below.
+Start components (start capacitor, start relay, PTCR) are optional on this sticker. **This unit had both a start capacitor and a PTCR; both were removed** before the SpartanStart was spliced in, following Micro-Air's Coleman Mach 8 procedure (the compressor's red Start wire now connects only to the dual capacitor's RED/HERM terminal).
 
 ## Procedure
 
@@ -42,10 +42,12 @@ Key points:
 
 ## Results
 
-**To record:** install date, start current before and after (clamp meter with inrush mode, if available), and whether the A/C starts from the inverter.
+- The A/C starts and runs on the inverter (verified during the [whole-panel inverter](../03-whole-panel-inverter/README.md) tests).
+- **To record:** start current before and after, if measured with a clamp meter.
 
 ## Revisions
 
 | Date | Change |
 | --- | --- |
 | 2026-10 | SpartanStart purchased; wiring confirmed from sticker 1976-764 |
+| 2026-10 | Installed; start capacitor and PTCR removed; A/C runs on the inverter |
