@@ -151,9 +151,9 @@ Follow [Prepare the INA228 breakout](#prepare-the-ina228-breakout). Do not skip 
 
 1. Unplug the shunt cable from the display.
 2. Solder a 10 ohm resistor in series with each of two thin wires, then twist the wires together. Connect one end to the `Rs+` and `Rs-` pin backs, without bridging to the neighboring `B-` pin.
-3. At the breakout, connect the resistor ends to `VIN+` and `VIN-` and solder C2 directly across those two pins.
-4. Connect `VBUS` to the `B+` pin back (or to the buck's `VIN` joint).
-5. Connect breakout power (`VIN`/`VS`) to XIAO `3V3`, `GND` to the shared ground, `SDA` to `D4` and `SCL` to `D5`.
+3. At the breakout's screw terminal, clamp the resistor ends into `VIN+` and `VIN-`, with C2's two leads clamped in the same two screws so the capacitor sits directly across them.
+4. Connect the terminal's middle screw, `VBUS`, to the `B+` pin back (or to the buck's `VIN` joint).
+5. Connect the header's `VCC` to XIAO `3V3`, `GND` to the shared ground, `SDA` to `D4` and `SCL` to `D5`. Leave `ALE` unconnected. (Adafruit 5832: the power pin is `VIN`.)
 6. Insulate every joint, secure the breakout with Kapton tape or hot glue so nothing can touch the display board, and keep the U.FL antenna against the housing wall.
 
 ### Step 5: Check before power
