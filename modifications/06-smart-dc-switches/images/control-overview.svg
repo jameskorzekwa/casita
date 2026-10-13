@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">Planned four-channel Carling and KC868-A4S control architecture</title>
+  <desc id="desc">Four spring-return rockers connect only dry contacts to DI1 through DI8. Terminal 2 is common; continuity determines which throw is UP. The independently fused controller commands four relay channels. Dashed arrows show conditional external DC-rated interfaces, not approved direct load wiring. All current returns use the system side of the shunt.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#334155"/></marker>
+  </defs>
+  <rect width="1200" height="820" fill="#f8fafc"/>
+  <g font-family="sans-serif" fill="#0f172a">
+    <text x="30" y="36" font-size="24" font-weight="bold">Four smart DC switches — PLANNED / bench validation required</text>
+    <text x="30" y="64" font-size="16">Control mapping only. No direct DC load approval; load ratings, fuses and power terminals remain TBD.</text>
+    <rect x="30" y="94" width="1140" height="102" rx="8" fill="#fef3c7" stroke="#b45309"/>
+    <text x="50" y="121" font-size="17">Protected RV DC distribution → independent source fuse → protection / regulation as required → board supply</text>
+    <text x="50" y="148" font-size="16">Unswitched by these four outputs; controller remains powered. Published board supply: 9–24 V DC.</text>
+    <text x="50" y="175" font-size="16">Fuse, wire and transient protection: TBD. Returns → system negative / shunt P-; never bypass the shunt.</text>
+    <rect x="30" y="230" width="330" height="326" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+    <text x="48" y="259" font-size="20" font-weight="bold">4 × Carling V8D1-S00B</text>
+    <text x="48" y="286" font-size="16">Unlit; new compatible actuators</text>
+    <text x="48" y="318" font-size="16">Rocker 1: UP / DOWN → DI1 / DI2</text>
+    <text x="48" y="356" font-size="16">Rocker 2: UP / DOWN → DI3 / DI4</text>
+    <text x="48" y="394" font-size="16">Rocker 3: UP / DOWN → DI5 / DI6</text>
+    <text x="48" y="432" font-size="16">Rocker 4: UP / DOWN → DI7 / DI8</text>
+    <text x="48" y="471" font-size="16">Each terminal 2 → input common</text>
+    <text x="48" y="498" font-size="16">Throws 1 / 3: verify UP by continuity</text>
+    <text x="48" y="530" font-size="16" font-weight="bold">NO 12 V feed on dry contacts</text>
+    <rect x="425" y="230" width="340" height="326" rx="8" fill="#dcfce7" stroke="#15803d"/>
+    <text x="443" y="259" font-size="20" font-weight="bold">KC868-A4S / ESPHome</text>
+    <text x="443" y="287" font-size="16">SDA GPIO4 / SCL GPIO16</text>
+    <text x="443" y="318" font-size="16">DI1 / DI2 = 0x22 P0 / P1</text>
+    <text x="443" y="356" font-size="16">DI3 / DI4 = 0x22 P2 / P3</text>
+    <text x="443" y="394" font-size="16">DI5 / DI6 = 0x22 P4 / P5</text>
+    <text x="443" y="432" font-size="16">DI7 / DI8 = 0x22 P6 / P7</text>
+    <text x="443" y="471" font-size="16">Relay 1–4 = 0x24 P0–P3</text>
+    <text x="443" y="498" font-size="16">Inputs / relays inverted: true</text>
+    <text x="443" y="530" font-size="16">25 ms debounce; release = no action</text>
+    <rect x="830" y="230" width="340" height="326" rx="8" fill="#ffedd5" stroke="#c2410c" stroke-dasharray="7 5"/>
+    <text x="848" y="259" font-size="20" font-weight="bold">CONDITIONAL load side</text>
+    <text x="848" y="294" font-size="16">4 independent output channels</text>
+    <text x="848" y="330" font-size="16">Approved coil/interface + suppression</text>
+    <text x="848" y="367" font-size="16">External DC-rated power relays</text>
+    <text x="848" y="399" font-size="16">as required by each identified load</text>
+    <text x="848" y="440" font-size="16">Separately fused load branches</text>
+    <text x="848" y="477" font-size="16">Start / stall / DC ratings: TBD</text>
+    <text x="848" y="515" font-size="16" font-weight="bold">AC 10 A ≠ DC motor approval</text>
+    <g stroke="#334155" stroke-width="2" fill="none" marker-end="url(#arrow)">
+      <path d="M360 313 H425"/><path d="M360 351 H425"/><path d="M360 389 H425"/><path d="M360 427 H425"/>
+      <path d="M595 196 V230"/>
+      <path d="M765 365 H830" stroke-dasharray="6 5"/>
+    </g>
+    <rect x="30" y="592" width="1140" height="186" rx="8" fill="#e2e8f0"/>
+    <text x="50" y="624" font-size="18" font-weight="bold">UP → local ON. DOWN → local OFF. Center release → retain state.</text>
+    <text x="50" y="656" font-size="16">HA native API controls the same outputs; manual switching does not require HA or Wi-Fi.</text>
+    <text x="50" y="688" font-size="16">Wi-Fi + API reboot_timeout: 0s. All outputs ALWAYS_OFF on initialization, pending per-load review.</text>
+    <text x="50" y="720" font-size="16">Boot / brownout / held contact / safe mode still require tests. Software is not a glitch-free guarantee.</text>
+    <text x="50" y="752" font-size="16">No dead-controller bypass. Isolate all energy sources before wiring; retain original panel for rollback.</text>
+  </g>
+</svg>
