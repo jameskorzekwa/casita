@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="600" viewBox="0 0 1100 600" role="img" aria-labelledby="title desc">
+  <title id="title">Magnetic collar for the DYP L06 sensor</title>
+  <desc id="desc">Left: plan view from the tank side of a printed ring, 54 millimetres outside diameter with a 34.2 millimetre bore for the sensor's 33.8 millimetre flange, three 8 millimetre magnet pockets at 120 degrees on a 44 millimetre pitch circle, and a 4 millimetre cable notch. Right: section through the collar on the tank. The ring is 5 millimetres tall: a 3.8 millimetre deep pocket for the 4.2 millimetre flange, so the sensor's flat face stands 0.4 millimetres proud of the magnet faces, and a 1.2 millimetre back lip with a 28 millimetre opening that retains the flange and clears the 17.5 millimetre boss. Magnets are 8 by 3 millimetres, flush with the tank-side face. A thin film of silicone grease fills the gap between the sensor face and the steel. Dimensions are a starting point to confirm by test fit.</desc>
+  <defs>
+    <style>
+      .t{font:600 18px system-ui,sans-serif;fill:#102a43}
+      .s{font:14px system-ui,sans-serif;fill:#334e68}
+      .d{font:13px ui-monospace,monospace;fill:#102a43}
+      .ring{fill:#e3f8ff;stroke:#186faf;stroke-width:3}
+      .sensor{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
+      .mag{fill:#cbd2d9;stroke:#243b53;stroke-width:2}
+      .steel{fill:#9fb3c8;stroke:#243b53;stroke-width:2}
+      .grease{fill:#fde68a}
+      .dim{stroke:#c53030;stroke-width:1.5;fill:none}
+      .thin{stroke:#829ab1;stroke-width:1.5;fill:none;stroke-dasharray:6 4}
+    </style>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#c53030"/></marker>
+  </defs>
+  <rect width="1100" height="600" rx="24" fill="#fff"/>
+  <text class="t" x="40" y="40">Magnetic collar for the DYP L06 (dimensions in mm, starting point: confirm by test fit)</text>
+
+  <!-- Plan view, scale 4 px per mm, centre (260,320) -->
+  <text class="t" x="260" y="90" text-anchor="middle">Plan view, from the tank side</text>
+  <circle class="ring" cx="260" cy="320" r="108"/>
+  <circle class="sensor" cx="260" cy="320" r="67.6"/>
+  <circle class="thin" cx="260" cy="320" r="35"/>
+  <circle class="thin" cx="260" cy="320" r="88"/>
+  <!-- magnets at 90, 210, 330 degrees on r=88 -->
+  <circle class="mag" cx="260" cy="232" r="16"/>
+  <circle class="mag" cx="183.8" cy="364" r="16"/>
+  <circle class="mag" cx="336.2" cy="364" r="16"/>
+  <!-- cable notch at bottom -->
+  <rect x="252" y="386" width="16" height="44" fill="#fff" stroke="#186faf" stroke-width="3"/>
+  <path d="M268 384 V388" stroke="#186faf" stroke-width="3"/>
+  <!-- dimension labels -->
+  <text class="d" x="260" y="324" text-anchor="middle">sensor flange</text>
+  <text class="d" x="260" y="340" text-anchor="middle">dia 33.8 (bore 34.2)</text>
+  <text class="d" x="260" y="236" text-anchor="middle" fill="#fff">8x3</text>
+  <text class="d" x="60" y="470">OD 54</text>
+  <path class="dim" d="M152 460 H368" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text class="d" x="300" y="482">pitch circle dia 44</text>
+  <text class="d" x="275" y="445">cable notch 4 wide</text>
+  <text class="s" x="40" y="520">Three magnets at 120 degrees, outside the flange; the dashed inner circle is the 17.5 boss (back side).</text>
+  <text class="s" x="40" y="542">Pull of three 8 x 3 N42-N52 magnets is roughly 3 kg: plenty for a 20 g sensor and its cable.</text>
+  <text class="s" x="40" y="564">Print in ASA or PETG, 100% infill. Magnets glued in with CA or epoxy, same pole outward.</text>
+
+  <!-- Section view, scale 8 px per mm vertical, centre x=820 -->
+  <text class="t" x="820" y="90" text-anchor="middle">Section on the tank (not to scale across)</text>
+  <!-- steel tank bottom -->
+  <rect class="steel" x="600" y="150" width="440" height="20"/>
+  <text class="s" x="1030" y="145" text-anchor="end">cylinder bottom, steel 2-3 thick</text>
+  <!-- grease film -->
+  <rect class="grease" x="686" y="170" width="268" height="4"/>
+  <!-- ring: tank-side face at y=173.2 (0.4 below sensor face at 170+... ) -->
+  <!-- sensor face at y=174 (on grease). magnets face at y=177.2 (0.4 mm = 3.2 px lower) -->
+  <!-- ring left -->
+  <rect class="ring" x="606" y="177" width="80" height="40"/>
+  <rect class="ring" x="640" y="207" width="46" height="10"/>
+  <!-- ring right -->
+  <rect class="ring" x="954" y="177" width="80" height="40"/>
+  <rect class="ring" x="954" y="207" width="46" height="10"/>
+  <!-- magnets in pockets -->
+  <rect class="mag" x="614" y="177" width="64" height="24"/>
+  <rect class="mag" x="962" y="177" width="64" height="24"/>
+  <!-- sensor flange and boss -->
+  <rect class="sensor" x="686" y="174" width="268" height="33.6"/>
+  <rect class="sensor" x="750" y="207.6" width="140" height="63"/>
+  <!-- cable -->
+  <path d="M954 195 H1000" stroke="#243b53" stroke-width="4"/>
+  <text class="s" x="1005" y="200">cable</text>
+
+  <!-- dimension callouts -->
+  <path class="dim" d="M566 174 V207.6" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path class="dim" d="M588 177 V201" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path class="thin" d="M566 174 H686"/>
+  <path class="thin" d="M588 177 H614"/>
+  <path class="thin" d="M566 207.6 H640"/>
+  <text class="d" x="456" y="183" text-anchor="end">flange 4.2</text>
+  <text class="d" x="456" y="201" text-anchor="end">magnet 3.0</text>
+  <text class="d" x="456" y="219" text-anchor="end">pocket 3.8 deep</text>
+  <text class="d" x="456" y="237" text-anchor="end">face proud 0.4</text>
+  <text class="d" x="456" y="255" text-anchor="end">ring 5.0 tall</text>
+  <text class="d" x="820" y="296" text-anchor="middle">boss dia 17.5; lip opening 28; back lip 1.2 thick</text>
+  <text class="d" x="820" y="314" text-anchor="middle">sensor overall 12.1 tall</text>
+  <text class="s" x="600" y="352">The sensor's flat face touches the steel through the grease</text>
+  <text class="s" x="600" y="374">film; the magnets sit 0.4 behind it and pull the collar,</text>
+  <text class="s" x="600" y="396">and so the face, onto the tank. The lip stops the sensor</text>
+  <text class="s" x="600" y="418">falling out of the collar when it is off the tank.</text>
+  <text class="s" x="600" y="452">The sensor and collar sit inside the foot-ring recess, which</text>
+  <text class="s" x="600" y="474">must be deeper than about 15 mm at the centre (Step 1).</text>
+</svg>

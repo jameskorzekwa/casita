@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560" role="img" aria-labelledby="title desc">
   <title id="title">Propane tank monitor system overview</title>
-  <desc id="desc">Two DYP L06 ultrasonic sensors are glued to the centre of the domed bottom of each 20 pound propane cylinder on the trailer tongue, inside the foot ring. Each sensor's four-wire cable runs through the front wall to a XIAO ESP32-S3 inside the trailer. The ESP32 is powered from a fused 12 volt circuit through a 5 volt buck regulator and supplies 3.3 volts to both sensors. Every minute it wakes each sensor over its own serial UART, reads the liquid height, temperature, echo strength and tilt, and publishes propane percentage and pounds remaining to Home Assistant over Wi-Fi. A local web page on the ESP32 shows the same readings.</desc>
+  <desc id="desc">Two DYP L06 ultrasonic sensors are held by a magnetic collar against the centre of the domed bottom of each 20 pound propane cylinder on the trailer tongue, inside the foot ring. Each sensor's four-wire cable runs through the front wall to a XIAO ESP32-S3 inside the trailer. The ESP32 is powered from a fused 12 volt circuit through a 5 volt buck regulator and supplies 3.3 volts to both sensors. Every minute it wakes each sensor over its own serial UART, reads the liquid height, temperature, echo strength and tilt, and publishes propane percentage and pounds remaining to Home Assistant over Wi-Fi. A local web page on the ESP32 shows the same readings.</desc>
   <defs>
     <style>
       .box{fill:#f5f7fa;stroke:#243b53;stroke-width:3}
@@ -32,8 +32,8 @@
   <path class="w neg" d="M62 326 h126" stroke-width="3"/>
   <text class="t" x="125" y="170" text-anchor="middle">Tank 1</text>
   <text class="s" x="125" y="192" text-anchor="middle">20 lb cylinder</text>
-  <text class="s" x="125" y="350" text-anchor="middle">L06 sensor, epoxied</text>
-  <text class="s" x="125" y="368" text-anchor="middle">inside the foot ring</text>
+  <text class="s" x="125" y="350" text-anchor="middle">L06 sensor in a</text>
+  <text class="s" x="125" y="368" text-anchor="middle">magnetic collar</text>
 
   <!-- Tank 2 -->
   <path class="tank" d="M250 110 h110 a14 14 0 0 1 14 14 v170 a62 24 0 0 1 -138 0 v-170 a14 14 0 0 1 14 -14 z"/>
@@ -86,5 +86,5 @@
 
   <!-- Key -->
   <text class="s" x="40" y="520">No batteries: sensors run from the ESP32's 3.3 V output; the sensor sleeps between readings.</text>
-  <text class="s" x="40" y="542">Sensors are bonded with epoxy, so this suits cylinders that are refilled, not exchanged.</text>
+  <text class="s" x="40" y="542">Sensors sit in magnetic collars with silicone grease, so they move to a new cylinder in a minute (epoxy is the fallback).</text>
 </svg>

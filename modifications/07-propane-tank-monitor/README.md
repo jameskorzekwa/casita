@@ -1,13 +1,13 @@
 # Propane Tank Monitor to Home Assistant (DYP L06 + XIAO ESP32-S3)
 
-Two DYP L06 ultrasonic liquid-level sensors, one glued to the bottom of each 20 lb propane cylinder, read by a Seeed Studio XIAO ESP32-S3 running ESPHome. The ESP32 is powered from the trailer's 12 V system and powers the sensors, so **there are no batteries to replace**. Every minute it wakes each sensor, reads the liquid height through the steel tank wall, converts it to a percentage and pounds remaining, and publishes everything to Home Assistant over Wi-Fi. A local web page shows the same readings at the campsite without Home Assistant.
+Two DYP L06 ultrasonic liquid-level sensors, one held magnetically against the bottom of each 20 lb propane cylinder, read by a Seeed Studio XIAO ESP32-S3 running ESPHome. The ESP32 is powered from the trailer's 12 V system and powers the sensors, so **there are no batteries to replace**. Every minute it wakes each sensor, reads the liquid height through the steel tank wall, converts it to a percentage and pounds remaining, and publishes everything to Home Assistant over Wi-Fi. A local web page shows the same readings at the campsite without Home Assistant.
 
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
 > **Status: designed, not purchased or built (October 2026).** The ESPHome configuration validates and compiles with ESPHome 2026.9.1 but has not run on hardware, and no L06 has been tried on a Casita cylinder yet. Buy one sensor first and bench-test it (Step 1) before ordering the second.
 >
-> **Only for cylinders you refill.** The sensor is epoxied to the tank. If you swap cylinders at an exchange cage, the sensor leaves with the tank. Any cylinder that is replaced (exchange, or at its 12-year requalification date) needs a new sensor installation.
+> **Mounting:** DYP's documented method is epoxy, which ties the sensor to one cylinder. This project mounts the sensor in a small **magnetic collar** with silicone grease as the couplant instead, the same way Mopeka and Safiery hold their ultrasonic sensors on the same spot, so a sensor moves to a new cylinder in a minute. The collar is **not tested on an L06 yet**; the epoxy method stays as the fallback (Step 3b).
 
 ## Why this design
 
@@ -19,13 +19,13 @@ The requirement was tank level in Home Assistant with no batteries to maintain. 
 | Mopeka Pro Plus | 2 x AAA lithium | Native Bluetooth integration | Batteries |
 | Gaslock GASLEVEL with external display | 12 V | Wired LED only; no data output | Threshold (above/below the sensor) only, no percentage |
 | Safiery magnetic LPG sensor (LPG05080001-A) | 12 V | 0-5 V analog; needs an interface | Real option; about A$183 each plus a preprocessor, designed for Victron GX |
-| **DYP L06 (this project)** | **3.3-5 V from the ESP32** | **Serial data, read directly by ESPHome** | **Chosen: cheapest, digital output, continuous level** |
+| **DYP L06 (this project)** | **3.3-5 V from the ESP32** | **Serial data, read directly by ESPHome** | **Chosen: cheapest, digital output, continuous level; mounted magnetically like the Mopeka** |
 
 The L06 is an OEM sensor module made for exactly this job (bottom-mounted, non-contact LPG level through a steel wall, with built-in temperature compensation), not a finished consumer product. This project supplies the rest: power, mounting, wiring, firmware and the Home Assistant side.
 
 ## How It Works
 
-1. The sensor sits in the recess inside the cylinder's foot ring, at the center of the domed bottom, bonded to the steel with ultrasonic couplant and two-part epoxy. It fires a high-frequency ultrasonic pulse through the steel into the liquid propane and times the echo from the liquid surface. Propane vapor above the liquid returns almost no echo, so the first strong echo marks the liquid height.
+1. The sensor sits in the recess inside the cylinder's foot ring, at the center of the domed bottom, its flat face pressed against the steel through a thin film of silicone grease by three magnets in a collar around it (or, as the fallback, bonded with DYP's couplant and two-part epoxy). It fires a high-frequency ultrasonic pulse through the steel into the liquid propane and times the echo from the liquid surface. Propane vapor above the liquid returns almost no echo, so the first strong echo marks the liquid height.
 2. The ESP32 sends one byte to the sensor's `RX` lead. That wakes the sensor (it sleeps at under 15 uA otherwise), it measures once (about 730 ms) and replies on `TX` with a 10-byte frame: liquid height in mm, temperature, echo strength and tilt angle, with a checksum. ESPHome parses the frame and publishes the values.
 3. Percentage = liquid height / "Full Level". Full Level is a per-tank calibration number stored on the ESP32, set once by pressing **Mark Full** on a freshly filled cylinder. Pounds remaining = percentage x 20 lb.
 4. If the liquid is below the sensor's 30 mm blind zone the sensor reports "no liquid" (`0xFFFD`). The firmware shows that as 0 mm / 0%, and the **Liquid Detected** diagnostic turns off. A near-empty 20 lb cylinder still has roughly 1-2 lb of propane at that point, so the low-propane alert should fire well above 0%.
@@ -34,7 +34,9 @@ Everything is powered from the trailer: 12 V from a fused circuit to a 5 V buck 
 
 ## Known Limitations
 
-- **Permanent mounting.** Epoxy, not magnets. Refilled cylinders only (see the status note). Mopeka's magnetic sensors mount in the same spot, which is reassuring about the geometry, but the L06 has not been tested on a US DOT 20 lb cylinder: the foot-ring recess depth and the surface at the center of the dome are the two things to check in Step 1.
+- **The magnetic collar is this project's design, not DYP's.** DYP only documents epoxy. Mopeka's magnetic sensors mount in the same spot with the same kind of grease couplant, which is reassuring about the physics and the geometry, but the L06 has not been tested on a US DOT 20 lb cylinder with either method. The foot-ring recess depth and the surface at the center of the dome are the two things to check in Step 1, and echo strength after the first tow is the proof that the collar holds.
+- **Grease needs refreshing.** Silicone grease does not dry out, but it should be renewed whenever the sensor is moved and about yearly. A falling **Echo Strength** reading is the signal.
+- **Exchanged cylinders still need a minute of work:** move the collar, wipe the dome, fresh grease, check echo strength, press **Mark Full** on the next proper fill. With the epoxy fallback the sensor stays with the old cylinder.
 - **The bottom 30 mm is invisible.** Below about 30 mm of liquid the sensor reports nothing. Treat "0%" as "under about 1-2 lb".
 - **Percent is linear in height.** The cylinder's domed bottom and shoulder mean the true volume per millimeter is lower near the ends. Readings are honest at full and near empty (the calibration points) and a little pessimistic in the middle. That is fine for "time to refill".
 - **Level moves with temperature.** Liquid propane expands about 0.15% per degC, so a tank reads a few percent higher on a hot afternoon than on a cold morning with no gas used. The sensor's temperature entity shows why.
@@ -48,7 +50,10 @@ Everything is powered from the trailer: 12 V from a fused circuit to a 5 V buck 
 
 | Component | Qty | Notes | Purchase link |
 | --- | ---: | --- | --- |
-| DYP-L062MTW-V1.0 LPG level sensor (UART controlled) | 2 | The **MTW** (UART controlled) model, not MUW (auto), MCW (I2C) or M4W (RS-485). Ask for the installation kit (couplant, EVA ring, AB epoxy) and two mating 1.25 mm 4-pin pigtails or extension leads. Roughly US$25-40 each plus shipping, to confirm | [DYP product page](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) (order via DYP's Alibaba store or [Evelta](https://evelta.com/l06-ip67-waterproof-ultrasonic-lpg-gas-level-measuring-sensor-3-100cm/)) |
+| DYP-L062MTW-V1.0 LPG level sensor (UART controlled) | 2 | The **MTW** (UART controlled) model, not MUW (auto), MCW (I2C) or M4W (RS-485). Ask for the installation kit (couplant, EVA ring, AB epoxy, kept as the fallback) and two mating 1.25 mm 4-pin pigtails or extension leads. Roughly US$25-40 each plus shipping, to confirm | [DYP product page](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) (order via DYP's Alibaba store or [Evelta](https://evelta.com/l06-ip67-waterproof-ultrasonic-lpg-gas-level-measuring-sensor-3-100cm/)) |
+| Magnetic collar (3D-printed, ASA or PETG, 100% infill) | 2 | Ring around the sensor's 33.8 mm flange with three magnet pockets and a cable notch; drawing below. Print one and test-fit before printing the second | |
+| Neodymium disc magnets, 8 mm x 3 mm, N42-N52 | 6 (3 per collar) | About 1 kg pull each; nickel plated. Glued into the collar pockets with CA or epoxy, faces flush with the collar | |
+| Silicone dielectric grease (couplant) | 1 tube | Any silicone dielectric grease; Mopeka's "Sonic Grease" is the same idea in sachets. Not DYP's water-based gel, which dries out | [Mopeka Sonic Grease](https://mopeka.com/product/mopeka-sonic-grease-4-pack/) |
 | Seeed Studio XIAO ESP32-S3 | 1 | Same board as the battery monitor. Built-in or external antenna; the external U.FL antenna helps inside a metal-framed front compartment | [Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html) |
 | 12 V to 5 V buck regulator, 500 mA or more | 1 | Pololu D24V5F5 (same as mod 04) or D24V10F5 | [Pololu](https://www.pololu.com/product/2843) |
 | 470 uF 25 V electrolytic capacitor | 1 | Across the regulator input, close to it | |
@@ -88,7 +93,7 @@ Sensor lead colors from the DYP datasheet: red `VCC`, black `GND`, yellow `RX` (
 
 ### Where things go
 
-- **Sensors:** under each cylinder, inside the foot ring, at the center of the domed bottom. The cable exits through one of the foot ring's drain notches and is zip-tied up the cylinder's side under the tank cover, with enough slack to lift the cylinder out for refilling. Use a small inline connector near each tank so a cylinder can be taken out without cutting anything.
+- **Sensors:** under each cylinder, inside the foot ring, at the center of the domed bottom, in their magnetic collars. The cable exits through one of the foot ring's drain notches and is zip-tied up the cylinder's side under the tank cover, with enough slack to lift the cylinder out for refilling. Use a small inline connector near each tank so a cylinder can be taken out, or the sensor moved to a new one, without cutting anything.
 - **ESP32 and regulator:** inside the trailer at the front, in the enclosure, powered from the nearest 12 V circuit. The two sensor cables pass through the front wall to the tongue through an existing grommet (the propane line and 7-way harness come through somewhere nearby) or a new sealed gland. **To confirm:** find the pass-through.
 - The alternative, a weatherproof box on the tongue, keeps the cables short but puts the ESP32 next to the regulator and valves. Prefer inside.
 
@@ -98,9 +103,9 @@ Sensor lead colors from the DYP datasheet: red `VCC`, black `GND`, yellow `RX` (
 
 Before gluing anything, prove that the sensor reads through the Casita's cylinders and fits under them.
 
-1. Measure the cylinder: the depth of the recess from the lowest point of the foot ring up to the center of the dome. The sensor is 33.8 mm across and 12.1 mm tall, with the cable leaving the side. It needs at least about 15 mm of recess so the tank still sits on its foot ring and nothing presses on the sensor. Note the value in Revisions.
+1. Measure the cylinder: the depth of the recess from the lowest point of the foot ring up to the center of the dome. The sensor is 33.8 mm across and 12.1 mm tall, with the cable leaving the side; the collar adds 54 mm across but no height. It needs at least about 15 mm of recess so the tank still sits on its foot ring and nothing presses on the sensor. Note the value in Revisions.
 2. Wire one sensor to the XIAO on the bench (table above, tank 1 pins), flash the firmware (Step 4) and open the device's web page.
-3. With the cylinder at least a third full (the sensor needs more than 10 cm of liquid to validate an installation), clean the center of the dome and put a blob of couplant on the sensor face. Press the sensor onto the center of the dome by hand. Within a few readings (press **Read Tanks Now**), **Tank 1 Liquid Level** should show a plausible height and **Echo Strength** should be well above zero; DYP's examples show about 1,500 mV at a good spot.
+3. With the cylinder at least a third full (the sensor needs more than 10 cm of liquid to validate an installation), clean the center of the dome and put a blob of silicone grease (the same couplant the collar uses) on the sensor face. Press the sensor onto the center of the dome by hand. This is the same coupling the magnetic collar provides, so a good reading here means the collar will work. Within a few readings (press **Read Tanks Now**), **Tank 1 Liquid Level** should show a plausible height and **Echo Strength** should be well above zero; DYP's examples show about 1,500 mV at a good spot.
 4. Slide the sensor around the center a few millimeters at a time. The spot with the highest echo strength and a steady level is the installation spot. If the echo is weak or the level jumps around everywhere, try a cleaner spot; if it never settles, the sensor does not suit this cylinder and the project stops here.
 5. Check the reading changes with level: weigh the cylinder (propane weight = scale weight - the tare weight stamped `TW` on the collar) and compare with the height. Record both.
 
@@ -108,16 +113,33 @@ Before gluing anything, prove that the sensor reads through the Casita's cylinde
 
 DYP's documented installation check uses their Windows **Sensor Assistant** program with a USB-TTL adapter (115200 baud): it plots the echo waveform, and the "installation mode" has the sensor grade the spot 0-9 and adapt to the medium. The datasheet describes the same functions as Modbus registers (`0x0303` to start installation mode, `0x0120` for the grade, `0x0122` for media adaptation). Whether the MTW model answers Modbus on its TTL UART is **to confirm**; the echo-strength reading from the normal frame is the ESPHome substitute. If you have a Windows machine, run the tool once at the chosen spot and note the grade.
 
-### Step 3: Glue the sensors
+### Step 3a: Mount the sensors in the magnetic collars
 
-Follow DYP's installation instruction ([PDF](../../manuals/propane/dyp-l06-lpg-level-sensor-installation-instruction.pdf)):
+![Magnetic collar](images/magnetic-collar.svg)
 
-1. Clean the spot found in Step 1 with isopropyl alcohol: no dirt, rust, water or loose paint. Wipe the sensor face clean of couplant.
+The collar is a ring that the sensor's 33.8 mm flange drops into from the tank side, retained by a lip at the back, with three magnets in pockets on the tank-side face. The pocket is 0.4 mm shallower than the flange is thick, so the sensor's flat face stands about 0.4 mm proud of the magnet faces: the magnets pull the face into the grease film instead of leaving a gap. A cable notch lets the lead out at the side.
+
+1. Print the collar (ASA or PETG, 100% infill, 0.2 mm layers) and test-fit: the flange should slide in without force and the face should sit proud of the ring. Adjust the pocket depth if your printer runs tight or loose.
+2. Glue the three magnets into their pockets, all with the same pole facing out (it does not matter which, but they must match), faces flush with the ring. Let the glue cure.
+3. Drop the sensor into the collar from the magnet side, cable through the notch. A drop of CA at two points on the back lip keeps it from falling out when it is off the tank.
+4. Wipe the spot found in Step 1 clean with isopropyl alcohol. Put a pea-sized blob of silicone grease on the center of the sensor face and spread it to cover the face; no air pockets.
+5. Press the collar onto the spot, give it a small twist to spread the grease, and check the reading on the web page: level and echo strength should match the hand-held bench reading. If echo strength is much lower, lift it off, re-grease and try again.
+6. Route the cable out through the foot ring notch, zip-tie it up the side of the cylinder with a service loop, and add the inline connector.
+7. Repeat for tank 2.
+
+**Moving a sensor to a new cylinder:** unplug the inline connector, pull the collar off, wipe both surfaces, fresh grease, and repeat steps 4-6. Press **Mark Full** on the next full fill.
+
+**No 3D printer?** The minimum version is three 6 mm x 2 mm magnets glued directly to the rim of the sensor's flat face at 120 degrees, outside the central 20 mm, standing no more than about 0.3 mm proud of the face, with grease filling the rest. It holds less well and is harder to get flat; try the collar first.
+
+### Step 3b (fallback): Glue the sensors
+
+If a collar will not hold on your cylinders, or the echo strength through a grease film is poor, use DYP's documented epoxy method ([installation instruction](../../manuals/propane/dyp-l06-lpg-level-sensor-installation-instruction.pdf)). This ties the sensor to one cylinder: refilled cylinders only.
+
+1. Clean the spot with isopropyl alcohol: no dirt, rust, water or loose paint. Wipe the sensor face clean of grease.
 2. Stick the double-sided EVA ring to the sensor (bottom release paper only).
 3. Mix the AB epoxy for at least 30 seconds and spread it over the whole center face of the sensor, no gaps.
 4. Peel the top release paper, press the sensor onto the spot and hold for a moment. Check the reading on the web page again: it must still show the same level and echo strength. At 25 degC the epoxy sets in 5-10 minutes and is fully cured after an hour; longer when cold.
-5. Route the cable out through the foot ring notch, zip-tie it up the side of the cylinder with a service loop, and add the inline connector.
-6. Repeat for tank 2.
+5. Route the cable as in Step 3a.
 
 ### Step 4: Install the ESP32
 
@@ -241,7 +263,7 @@ On the trailer's Wi-Fi, open `http://casita-propane-monitor.local` (or the devic
 3. After gluing, the level and echo strength match the hand-held reading.
 4. 3.3 V at each sensor's red lead; XIAO and regulator only slightly warm after an hour.
 5. Weigh a cylinder: pounds from the scale (gross minus `TW`) agree with **Propane Remaining** within about 10% after Mark Full.
-6. Reading survives a tow: level and echo strength are the same before and after a trip (checks that the epoxy held and the cable connectors are tight).
+6. Reading survives a tow: level and echo strength are the same before and after a trip, and the collar has not moved on the dome (checks that the magnets and grease hold and the cable connectors are tight). Repeat after the first long or rough trip.
 7. A full-to-empty cycle on one tank shows a steady decline and the low-propane alert fires once at 20%.
 
 ## Troubleshooting
@@ -250,7 +272,7 @@ On the trailer's Wi-Fi, open `http://casita-propane-monitor.local` (or the devic
 | --- | --- | --- |
 | `No valid frame (0 bytes received)` every reading | Sensor not powered, TX/RX swapped, or broken cable | Check 3.3 V at the red lead, that ESP32 TX goes to sensor yellow and sensor green goes to ESP32 RX, continuity through the connectors |
 | `No valid frame (n bytes received)` with n > 0 | Baud rate or checksum problem; noise on a long cable | Confirm the sensor was supplied at 115200 baud; shorten or shield the cable; try the other tank's port to separate sensor from wiring |
-| Liquid Detected off and Echo Strength near 0 on a tank you know has gas | Sensor not coupled: epoxy gap, moved, or dirt under it | Re-seat with fresh couplant (Step 1), re-glue if needed |
+| Liquid Detected off and Echo Strength near 0 on a tank you know has gas | Sensor not coupled: grease film dried or squeezed out, collar moved, dirt under it, or (epoxy) a gap | Pull the collar, clean, fresh grease, re-seat; if the collar keeps moving, add a strip of foam under it or fall back to epoxy |
 | Liquid Detected off, Echo Strength normal | Less than 30 mm of liquid | The tank is nearly empty |
 | Level jumps between two values | Sensor near the edge of the dome, or the tank is tilted | Check Tilt; re-position closer to the center |
 | Percentage over 100% after a fill | Full Level is too low (different fill level than last time) | Press Mark Full again on the new fill |
@@ -260,11 +282,11 @@ On the trailer's Wi-Fi, open `http://casita-propane-monitor.local` (or the devic
 ## Safety Notes
 
 - Propane is heavier than air and collects low. The sensors are low-voltage (3.3 V, under 50 mA) and have no switching contacts, but they are not certified intrinsically safe and neither is anything else here. Keep the ESP32, regulator and all connectors inside the trailer or well away from the regulator, pigtails and valve area; never put an open connector or the ESP32 enclosure inside the tank cover.
-- Turn both cylinder valves off before working under the tanks, and lift cylinders out to glue the sensors rather than working under a tank in the tray.
+- Turn both cylinder valves off before working under the tanks, and lift cylinders out to fit the sensors rather than working under a tank in the tray.
 - Do not drill, grind or heat the cylinders. The sensor is bonded with adhesive only.
-- The epoxy and couplant from DYP are consumer two-part adhesive and ultrasonic gel; read their labels. Do not substitute a solvent-based adhesive that could attack the cylinder's paint.
+- Neodymium magnets are brittle and snap together hard; keep them away from fingers, cards and the ESP32 when loose. Silicone grease is harmless to the cylinder's paint. If using the epoxy fallback, DYP's AB adhesive and gel are consumer products; read their labels and do not substitute a solvent-based adhesive that could attack the paint.
 - Fuse the 12 V feed at 2 A close to the source. The regulator and XIAO draw well under 0.5 A.
-- A glued-on sensor does not change the cylinder's DOT status, but a refill station may ask about it. It is a passive sensor; be ready to say so, and remove it if asked.
+- A sensor under the cylinder does not change its DOT status, but a refill station may ask about it. It is a passive sensor; be ready to say so, and with the collar it lifts off in seconds if asked.
 - The Safe-T-Alert LP/CO detector in the trailer remains the leak protection; this project only measures level.
 
 ## Photos
@@ -273,7 +295,8 @@ Add photos to `photos/` as the build progresses:
 
 - `cylinder-recess.jpg`: the foot ring recess with a ruler, from Step 1
 - `bench-test.jpg`: sensor held on the cylinder with couplant, web page in view
-- `sensor-glued.jpg`: the sensor installed with the cable routed out of the foot ring
+- `collar.jpg`: the printed collar with magnets, sensor fitted
+- `sensor-mounted.jpg`: the sensor on the dome with the cable routed out of the foot ring
 - `enclosure.jpg`: the XIAO and regulator in their box
 - `installed.jpg`: both tanks in the tray with cables routed
 
@@ -292,3 +315,4 @@ Add photos to `photos/` as the build progresses:
 | Date | Change |
 | --- | --- |
 | 2026-10-13 | Design written: two DYP-L062MTW sensors on a XIAO ESP32-S3, ESPHome configuration validated and compiled. Nothing purchased or built |
+| 2026-10-13 | Magnetic collar with silicone grease made the primary mount (sensor can move between cylinders); DYP's epoxy method kept as the fallback. Collar untested |
