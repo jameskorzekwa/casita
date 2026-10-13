@@ -109,9 +109,8 @@ Everything is powered from the trailer: 12 V from a fused circuit to a 5 V buck 
 | Small ABS enclosure (about 80 x 60 x 30 mm) | 1 | For the XIAO and regulator inside the trailer | [Amazon: 83 x 58 x 33 mm IP65, 2 pack](https://www.amazon.com/dp/B0FDQCHNQP) |
 | Cable gland (PG7) and sealant | 1-2 | Where the sensor cables pass through to the tongue, and into the enclosure | [Amazon: PG7 nylon glands, 50 pack](https://www.amazon.com/dp/B0CTCG4HMM) |
 | Heat-shrink (adhesive-lined), Kapton tape, zip ties | As needed | | [Amazon: 3:1 adhesive-lined heat-shrink kit](https://www.amazon.com/dp/B0DC5YN5CD), [Amazon: Kapton tape 10 mm, 4 rolls](https://www.amazon.com/dp/B07S227ZLH) |
-| USB to TTL serial adapter (3.3 V, CP2102 or FTDI) | 1, optional | For DYP's Windows "Sensor Assistant" tool during installation (Step 2). The ESPHome web page can substitute | [Amazon: DSD TECH CP2102, 2 pack](https://www.amazon.com/dp/B078W5L8W1) |
 
-Amazon links checked on 2026-10-13; prices then were roughly: sensor $25, XIAO $17, regulator $11, magnets $18, grease $10, cable $17, pigtails $9, enclosure $9, glands $10, fuse holders $9 + fuses $7, capacitors $7, heat-shrink $10, Kapton $10, USB-TTL $12. About **$200** for everything including both sensors, most of it in packs with plenty left over.
+Amazon links checked on 2026-10-13; prices then were roughly: sensor $25, XIAO $17, regulator $11, magnets $18, grease $10, cable $17, pigtails $9, enclosure $9, glands $10, fuse holders $9 + fuses $7, capacitors $7, heat-shrink $10, Kapton $10. About **$190** for everything including both sensors, most of it in packs with plenty left over.
 
 ## Tools and Supplies
 
@@ -157,9 +156,9 @@ Before printing or gluing anything, prove that the sensor reads through the Casi
 4. Slide the sensor around the center a few millimeters at a time. The spot with the highest echo strength and a steady level is the installation spot. If the echo is weak or the level jumps around everywhere, try a cleaner spot; if it never settles, the sensor does not suit this cylinder and the project stops here.
 5. Check the reading changes with level: weigh the cylinder (propane weight = scale weight - the tare weight stamped `TW` on the collar) and compare with the height. Record both.
 
-### Step 2 (optional): DYP's installation mode
+### Step 2 (skip unless troubleshooting): DYP's Sensor Assistant
 
-DYP's documented installation check uses their Windows **Sensor Assistant** program with a USB-TTL adapter (115200 baud): it plots the echo waveform, and the "installation mode" has the sensor grade the spot 0-9 and adapt to the medium. The datasheet describes the same functions as Modbus registers (`0x0303` to start installation mode, `0x0120` for the grade, `0x0122` for media adaptation). Whether the MTW model answers Modbus on its TTL UART is **to confirm**; the echo-strength reading from the normal frame is the ESPHome substitute. If you have a Windows machine, run the tool once at the chosen spot and note the grade.
+Nothing to do here on a normal build. The ESPHome web page's **Echo Strength** and **Liquid Level** readings are the installation check. See [Troubleshooting extras](#troubleshooting-extras) for when DYP's Windows tool is worth getting out.
 
 ### Step 3a: Mount the sensors in the magnetic collars
 
@@ -326,6 +325,16 @@ On the trailer's Wi-Fi, open `http://casita-propane-monitor.local` (or the devic
 | Percentage over 100% after a fill | Full Level is too low (different fill level than last time) | Press Mark Full again on the new fill |
 | Readings drift a few percent over the day with no use | Thermal expansion of the propane | Expected; compare readings at similar temperatures |
 | Entities unknown after a tow | A connector pulled apart | Re-connect; add strain relief |
+
+### Troubleshooting extras
+
+**DYP Sensor Assistant (Windows) with a USB-to-TTL adapter.** Not needed for the build; the ESPHome firmware already shows echo strength and level. It becomes useful if:
+
+- a cylinder gives a weak or jumpy reading and you want to see the actual echo waveform to tell a bad spot from a bad sensor (DYP's installation instruction shows what good and bad look like);
+- a sensor arrives at the wrong baud rate or address (every read logs `No valid frame` with some bytes received) and you need to reset it;
+- you want DYP's "installation mode", which grades the spot 0-9 and reports the adaptive-media result.
+
+You need a Windows PC, a 3.3 V USB-to-TTL adapter such as the [DSD TECH CP2102, 2 pack](https://www.amazon.com/dp/B078W5L8W1) (about $12), and the Sensor Assistant download from DYP (ask them; the install instruction shows version 1.0.3.x). Wire sensor red to the adapter's **3.3 V** (not 5 V), black to GND, yellow (sensor RX) to the adapter's TXD, green (sensor TX) to RXD. Open the port at 115200 and use the waveform tab. Whether the UART-controlled model answers the tool's Modbus commands for installation mode is to confirm; the waveform view is the main point.
 
 ## Safety Notes
 
