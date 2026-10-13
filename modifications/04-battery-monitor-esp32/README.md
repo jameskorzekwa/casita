@@ -7,11 +7,18 @@ The Renogy display keeps working exactly as before. The INA228 reads the same sh
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
-> **Status: in progress; the INA228 wiring is the next project (not started as of October 2026).** The XIAO is installed in the display housing and powered, running temporary diagnostic firmware (`casita-battery-monitor-diag.yaml` in the ESPHome Device Builder) left over from the serial-tap tests. The INA228 breakout model is still to confirm.
+> **Status (2026-10-13): in progress. The INA228 wiring is next.**
 >
-> The Renogy RBM500 itself now reads correctly: the WFCO converter's negative was moved from the shunt's B- terminal to P- in October 2026 (see [mod 01](../01-second-battery/README.md#wiring-as-built)).
+> | Item | State |
+> | --- | --- |
+> | XIAO, buck regulator, C1 and power wiring | Installed in the display housing (from the earlier serial-tap attempt) |
+> | Firmware on the XIAO | Old diagnostic firmware, still set for the home Wi-Fi. The XIAO is currently offline |
+> | INA228 board | GODIYMODULES INA228 module on hand; not yet prepared or wired |
+> | ESPHome configuration | Validates and compiles with ESPHome 2026.9.1. Loaded in the ESPHome Device Builder on the trailer's own Home Assistant, set for the trailer Wi-Fi. Not yet installed |
+> | Home Assistant | The device will be adopted in the trailer's Home Assistant (it was removed from the home one) |
+> | Renogy display | Reads correctly since the WFCO converter's negative was moved from the shunt's `B-` to `P-` (see [mod 01](../01-second-battery/README.md#wiring-as-built)) |
 >
-> **Design status: documented, not yet built.** The ESPHome configuration validates and compiles with ESPHome 2026.9.1. The XIAO, buck regulator and power wiring are already installed and working in the display housing (from the earlier serial-tap attempt); the INA228 has not been wired or run yet. Step 2 checks that the display cable's sense wires carry the raw shunt voltage before anything is connected to them.
+> **Remaining work:** follow [Build](#build) Steps 1-8 in order, then [Home Assistant Setup](#home-assistant-setup) and the [Testing Checklist](#testing-checklist). Step 3 (preparing the INA228) can be done on the bench at any time.
 
 ## How It Works
 
@@ -165,16 +172,17 @@ With the shunt cable still unplugged:
 - INA228 `VBUS` to display `B+`: continuity
 - display `B+` to `B-`: not a short
 
-### Step 6: Flash the new firmware
+### Step 6: Install the firmware
 
-The XIAO is already installed and online, so this is a wireless update from the ESPHome Device Builder.
+The firmware is installed wirelessly from the ESPHome Device Builder on the trailer's Home Assistant (**Settings > Add-ons > ESPHome Device Builder**, or **ESPHome** in the sidebar). `casita-battery-monitor.yaml` is already there, set for the trailer Wi-Fi with the device's existing API key and OTA password.
 
-1. Open `casita-battery-monitor.yaml` in the Device Builder.
-2. Keep your existing `api:`, `ota:`, `wifi:` and `web_server:` credentials. Replace everything else with the contents of [`esphome/casita-battery-monitor.yaml`](esphome/casita-battery-monitor.yaml), or move those credentials into `secrets.yaml` and use the file as-is.
-3. Delete any leftover diagnostic configuration (`casita-battery-monitor-diag.yaml`) from the Device Builder.
-4. Plug the shunt cable back into the display and wait for the XIAO to join Wi-Fi.
-5. Select **Install**, then **Wirelessly**.
-6. Open **Logs**. The I2C scan should report a device at `0x40`, and the INA228 component should log `Supported device found: INA228`.
+1. Plug the shunt cable back into the display. The XIAO powers up.
+2. **Move the XIAO to the trailer Wi-Fi.** Its old firmware only knows the home Wi-Fi, so away from home it starts its fallback hotspot after about a minute. On a phone, join the **Casita Battery Fallback** hotspot (password: `fallback_ap_password` from the configuration). A setup page opens; if not, browse to `192.168.4.1`, ESPHome's standard hotspot address. Choose the trailer Wi-Fi network, enter its password and save. The XIAO restarts and joins it. If the trailer is parked at home, the XIAO may join the home Wi-Fi instead and no hotspot appears; do this step away from home's Wi-Fi range.
+3. In the travel router's admin page, give the XIAO a DHCP reservation so its address never changes.
+4. In the Device Builder, open `casita-battery-monitor` and select **Install**, then **Wirelessly**.
+5. Open **Logs**. The I2C scan should report a device at `0x40`, and the INA228 component should log `Supported device found: INA228`.
+
+If the configuration ever needs rebuilding, copy [`esphome/casita-battery-monitor.yaml`](esphome/casita-battery-monitor.yaml) into the Device Builder and fill in `secrets.yaml` (see [Secrets](#secrets)).
 
 ### Step 7: Calibrate
 
@@ -213,7 +221,7 @@ The configuration is [`esphome/casita-battery-monitor.yaml`](esphome/casita-batt
 | `empty_max_current` | `"20.0"` | Floor applies only under a light discharge load (A) |
 | `empty_soc` | `"5.0"` | SoC (%) the floor caps to |
 | `sda_pin`, `scl_pin` | `GPIO5`, `GPIO6` | XIAO `D4`, `D5` |
-| `ina228_address` | `"0x40"` | Default with A0/A1 open |
+| `ina228_address` | `"0x40"` | A0 and A1 tied to GND (GODIYMODULES as shipped; Adafruit with A0/A1 open) |
 
 INA228 settings: `adc_range: 0` (plus or minus 163.84 mV, enough for a 500 A shunt at 75 mV or 50 mV), 64-sample averaging, and 1 s updates. Raw 1 s readings stay internal; published voltage and current are 5 s averages.
 
@@ -228,15 +236,15 @@ Validation on bee2 with ESPHome 2026.9.1 on 2026-10-09: `esphome config` passed 
 
 ### Secrets
 
-The configuration references `api_encryption_key`, `ota_password`, `wifi_ssid`, `wifi_password`, `fallback_ap_password`, `web_username` and `web_password`. Copy [`esphome/secrets.example.yaml`](esphome/secrets.example.yaml) into ESPHome's `secrets.yaml` and replace every placeholder, or keep your existing inline values as described in Step 6. Generate a new API key with `openssl rand -base64 32`.
+The configuration references `api_encryption_key`, `ota_password`, `wifi_ssid`, `wifi_password`, `fallback_ap_password`, `web_username` and `web_password`. Copy [`esphome/secrets.example.yaml`](esphome/secrets.example.yaml) into ESPHome's `secrets.yaml` and replace every placeholder. The copy in the trailer's Device Builder has these values filled in already. Generate a new API key with `openssl rand -base64 32`.
 
 ## Home Assistant Setup
 
-The device is already adopted in Home Assistant as **Casita Battery Monitor**. After the wireless update, the new entities appear on the same device.
+The device belongs in the trailer's Home Assistant, which runs on the trailer network and so can always reach it.
 
-### Remove the old entities
-
-The serial-tap firmware's **Monitor Online** and **Time Remaining** entities no longer exist. On the device page, open each one and delete it.
+1. After Step 6, open **Settings > Devices & services**. **Casita Battery Monitor** should appear as a discovered ESPHome device. Select **Add** (or **Configure**) and enter the API encryption key from the configuration if asked.
+2. If it is not discovered, select **Add integration > ESPHome** and enter the XIAO's reserved address, port 6053.
+3. The serial-tap firmware's **Monitor Online** and **Time Remaining** entities do not exist in the new firmware. If they appear, delete them on the device page.
 
 ### Entities
 
@@ -308,13 +316,11 @@ On the trailer's Wi-Fi, open `http://casita-battery-monitor.local` (or the devic
 
 ## Reading the Battery Away From Home
 
-ESPHome's Home Assistant connection is opened **by Home Assistant** to the device on port 6053. That works when the trailer is parked on the home Wi-Fi. When the trailer is elsewhere, the home Home Assistant cannot reach a device behind a campground or Starlink connection.
+ESPHome's Home Assistant connection is opened **by Home Assistant** to the device on port 6053, so the Home Assistant must be on the same network as the XIAO. That is why the device lives in the trailer's own Home Assistant: the trailer's travel router, its Home Assistant and the XIAO travel together, and the readings keep recording wherever the trailer is.
 
-Options, not yet built or tested:
-
-1. **Travel router with a VPN subnet route.** A router in the trailer, such as a GL.iNet running Tailscale, advertises the trailer's network as a subnet route, and the Home Assistant host accepts that route. Give the XIAO a DHCP reservation so its address does not change.
-2. **MQTT.** Add ESPHome's `mqtt:` component and publish to a broker reachable from both places.
-3. **Local only.** Use the local web page at the campsite and let Home Assistant catch up when the trailer returns home.
+- **From a phone away from the trailer:** open the trailer's Home Assistant over Tailscale.
+- **At the campsite:** use the trailer's Home Assistant, or the local web page below, on the trailer Wi-Fi.
+- **In the home Home Assistant (optional, not yet set up):** link the trailer's Home Assistant to the home one, for example with the Remote Home Assistant integration over Tailscale, so the battery entities also appear at home.
 
 ## Testing Checklist
 
@@ -332,7 +338,7 @@ Options, not yet built or tested:
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| No device at `0x40` in the I2C scan | SDA/SCL swapped, no power to the breakout, or address jumpers closed | Check `D4`=SDA, `D5`=SCL, 3.3 V at the breakout, A0/A1 open |
+| No device at `0x40` in the I2C scan | SDA/SCL swapped, no power to the breakout, or the address pads changed | Check `D4`=SDA, `D5`=SCL and 3.3 V on `VCC`. If the scan shows another address, either set `ina228_address` to it or re-bridge A0/A1 to `G` |
 | Logs say the device is not an INA228 | Clone module with an INA226 | Use a genuine INA228 breakout |
 | Current reads about 0 A under load | Sense wires not connected, or a filter resistor open | Check continuity from `Rs+`/`Rs-` to `VIN+`/`VIN-` through the 10 ohm resistors |
 | Current is far too small and the Renogy display changed too | The breakout's onboard shunt is still fitted | Remove it (see Prepare the INA228) |
@@ -342,6 +348,7 @@ Options, not yet built or tested:
 | SoC never returns to 100% | Charger never meets the full-charge conditions | Lower `full_voltage` to just below your charger's absorption voltage, or press **Mark Battery Full** after a full charge |
 | SoC drifts high over days | XIAO and display draw are not metered | Expected; the full-charge resync corrects it |
 | XIAO resets or drops Wi-Fi | Supply sags during Wi-Fi bursts | Check the regulator and C1 |
+| XIAO not on the network after power-up | Still running firmware with the home Wi-Fi | Use its fallback hotspot (Step 6, item 2) |
 
 ## Safety Notes
 
@@ -377,4 +384,4 @@ Add photos to `photos/` as the build progresses:
 | --- | --- |
 | 2026-10-08 | Serial-tap design: XIAO inside the display housing reading the display's serial output (built; did not work) |
 | 2026-10-09 | Serial output proven absent on the TF03H V35. Redesigned around an INA228 measuring the shunt sense pair, with software state-of-charge tracking (not yet built) |
-| 2026-10-13 | INA228 board chosen: GODIYMODULES module (B0GX5HM4X3). Board preparation steps updated for its `R002` shunt, pinout and address pads |
+| 2026-10-13 | ESPHome moved to the trailer's own Home Assistant; configuration set for the trailer Wi-Fi. INA228 board chosen: GODIYMODULES module (B0GX5HM4X3). Board preparation, wiring steps and diagrams updated for its `R002` shunt, pinout and address pads |
