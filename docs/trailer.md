@@ -42,7 +42,7 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | Solar | 200 W portable suitcase panel with its own controller | Factory. Set the controller to lithium |
 | Battery monitor | Renogy 500 A Battery Monitor with Shunt (RBM500); display board Baiway TF03H V35 | Batteries on shunt B-; every load and charger (including the converter and Starlink) on P-. Shunt rating (75 mV or 50 mV) unknown; see [mod 04](../modifications/04-battery-monitor-esp32/README.md) |
 | Starlink | Starlink Mini on 12 V via RVMARINEPAT 12-36 V adapter; Casita factory exterior Starlink port | [mod 05](../modifications/05-starlink-12v-power/README.md). Needs a 10 A inline fuse added |
-| Home Assistant monitor | `casita-battery-monitor`: Seeed XIAO ESP32-S3 in the RBM500 housing | ESPHome device; see [mod 04](../modifications/04-battery-monitor-esp32/README.md) |
+| Home Assistant monitor | `casita-battery-monitor`: Seeed XIAO ESP32-S3 in the RBM500 housing, with a GODIYMODULES INA228 module (B0GX5HM4X3, onboard `R002` shunt to be removed) reading the RBM500 shunt | ESPHome device; INA228 not yet wired; see [mod 04](../modifications/04-battery-monitor-esp32/README.md) |
 
 ## Heating, Cooling and Appliances
 

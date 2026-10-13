@@ -52,14 +52,14 @@ Baiway's documentation describes serial output as a customized model option, the
 | --- | ---: | --- | --- |
 | Seeed Studio XIAO ESP32-S3 | 1 | Already installed. Uses an external U.FL antenna | [Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html) |
 | 12 V to 5 V buck regulator and C1 (470 uF, 25 V) | 1 each | Already installed. Example: Pololu D24V5F5 | [Pololu](https://www.pololu.com/product/2843) |
-| INA228 breakout | 1 | Already owned. Adafruit 5832 or a module with a genuine INA228 chip. **The onboard shunt must be removed** | [Adafruit](https://www.adafruit.com/product/5832) |
+| INA228 breakout | 1 | Owned: GODIYMODULES INA228 module (10 A version, 2 mohm shunt marked `R002`). The Adafruit 5832 also works. **The onboard shunt must be removed** | [Amazon B0GX5HM4X3](https://www.amazon.com/dp/B0GX5HM4X3), [Adafruit](https://www.adafruit.com/product/5832) |
 | 10 ohm resistors | 2 | 1/4 W or 0805; input filter and protection | |
 | C2: 0.1 uF ceramic capacitor | 1 | X7R or C0G, 25 V or higher; across `VIN+`/`VIN-` | |
 | Thin stranded hookup wire | About 0.5 m | 26-28 AWG silicone; use a twisted pair for `Rs+`/`Rs-` | |
 | Inline fuse holder and 1 A fuse | 1 | On the RBM500's `B+` wire, close to the battery, if not already fused | |
 | Kapton tape, heat-shrink, hot glue | As needed | Insulation and mounting inside the housing | |
 
-Check that the INA228 breakout fits inside the housing next to the XIAO and regulator (the Adafruit board is about 25 x 23 mm). If it does not, mount everything in a small enclosure directly behind the display and run the same wires to it.
+Check that the INA228 breakout fits inside the housing next to the XIAO and regulator. If it does not, mount everything in a small enclosure directly behind the display and run the same wires to it.
 
 ## Tools and Supplies
 
@@ -73,11 +73,14 @@ Check that the INA228 breakout fits inside the housing next to the XIAO and regu
 
 INA228 breakouts are built to measure current through their own small shunt. **That shunt must come off.** If it stays, it sits directly across the display cable's `Rs+`/`Rs-` sense wires, forming a parallel path to the 500 A shunt: the sense wires would carry part of the trailer's load current, both monitors would read wrong, and the thin wires could overheat.
 
-1. **Remove the onboard shunt.** On the Adafruit 5832 it is R1, a large 2512 resistor marked `R015` (15 mohm) between the INA228 chip and the 3-pin terminal block. On generic modules it is usually marked `R002`, `R010` or `R100`. Desolder it with hot air or two irons.
-2. **Check:** resistance from `VIN+` to `VIN-` must now read tens of kilohms (the chip's input), not near zero.
-3. **VBUS jumper:** on the Adafruit board, leave SJ1 (on the back, near `VBUS`) open, which is the default. Check that `VBUS` to `VIN+` reads open.
-4. **Address:** leave A0 and A1 open for I2C address 0x40.
-5. **Chip check:** confirm the chip is marked INA228. Some low-cost "INA228" modules carry an INA226, which this configuration does not support.
+The board used here is the GODIYMODULES INA228 module (10 A version). Its 3-screw terminal is labelled `VIN+`, `VBUS`, `VIN-`; its 5-pin header is `GND`, `ALE`, `SCL`, `SDA`, `VCC`; it has 10 kohm I2C pull-ups and no input filter. The Adafruit 5832 differences are noted in each step.
+
+1. **Chip check:** confirm the 10-pin chip's marking includes `228`. Some low-cost "INA228" modules carry an INA226, which this configuration does not support.
+2. **Remove the onboard shunt.** On the GODIYMODULES module it is the large resistor marked `R002` (2 mohm) next to the terminal block. On the Adafruit 5832 it is R1, marked `R015` (15 mohm). Other modules may use `R010` or `R100`. Desolder it with hot air, or with two irons or a solder blob heating both ends at once. Do not cut it off: leftover metal can still bridge the pads.
+3. **Check:** resistance from `VIN+` to `VIN-` must now read tens of kilohms (the chip's input), not near zero.
+4. **VBUS:** `VBUS` must not be tied to `VIN+`, because it gets its own wire to `B+`. Check that `VBUS` to `VIN+` reads open. If it does not, open the solder jumper that links them: the two-pad `V+` jumper beside the shunt on the GODIYMODULES module (open as shipped), or SJ1 on the back of the Adafruit board (open by default).
+5. **Address 0x40:** `A0` and `A1` must both connect to GND. On the GODIYMODULES module the pad grid has a column for each address pin and rows `G`, `V`, `SDA`, `SCL`; only the `G` row should be bridged for both (as shipped). Do not leave either pin floating. On the Adafruit board leave A0 and A1 open (pulled down on the board). The boot log's I2C scan confirms the address.
+6. **Header:** solder the 5-pin header, or wires directly to the pads. Leave `ALE` (alert) unconnected.
 
 ## Where to Connect on the Display Board
 
@@ -104,8 +107,8 @@ Which way round `Rs+`/`Rs-` go only sets the sign of the reading; `current_sign`
 | Display `B-` pin (back) | Buck `GND`, C1 `-` | Already installed |
 | Buck `VOUT` (5 V) | XIAO `5V` | Already installed |
 | Buck `GND` | XIAO `GND`, INA228 `GND` | |
-| XIAO `3V3` | INA228 `VIN` / `VS` (the breakout's power pin) | Not to be confused with `VIN+`/`VIN-` |
-| XIAO `D4` (GPIO5) | INA228 `SDA` | The Adafruit board has 10 kohm pull-ups |
+| XIAO `3V3` | INA228 `VCC` (GODIYMODULES) or `VIN` (Adafruit), the breakout's power pin | Not to be confused with `VIN+`/`VIN-` |
+| XIAO `D4` (GPIO5) | INA228 `SDA` | Both boards have 10 kohm pull-ups |
 | XIAO `D5` (GPIO6) | INA228 `SCL` | |
 | Display `Rs+` | 10 ohm, then INA228 `VIN+` | Twist with the `Rs-` wire |
 | Display `Rs-` | 10 ohm, then INA228 `VIN-` | |
@@ -361,6 +364,7 @@ Add photos to `photos/` as the build progresses:
 ## References
 
 - [TI INA228 datasheet](https://www.ti.com/lit/ds/symlink/ina228.pdf): input range, filtering (10 ohm series resistors, 0.1-1 uF capacitor), VBUS and address table
+- [GODIYMODULES INA228 module (Amazon B0GX5HM4X3)](https://www.amazon.com/dp/B0GX5HM4X3): the board used here; 2 mohm `R002` shunt, pinout and address pads from the listing photos and schematic
 - [Adafruit INA228 guide](https://learn.adafruit.com/adafruit-ina228-i2c-power-monitor): onboard 15 mohm shunt, VBUS jumper, pinout
 - [ESPHome INA2xx component](https://esphome.io/components/sensor/ina2xx/)
 - [Renogy RBM500 product page](https://www.renogy.com/products/500a-battery-monitor-with-shunt) and [G3 manual](https://cdn.shopify.com/s/files/1/0631/0137/0483/files/RBM500-G3-Manual_26f37388-12d7-442a-99e6-77ee6e79f8bf.pdf)
@@ -373,3 +377,4 @@ Add photos to `photos/` as the build progresses:
 | --- | --- |
 | 2026-10-08 | Serial-tap design: XIAO inside the display housing reading the display's serial output (built; did not work) |
 | 2026-10-09 | Serial output proven absent on the TF03H V35. Redesigned around an INA228 measuring the shunt sense pair, with software state-of-charge tracking (not yet built) |
+| 2026-10-13 | INA228 board chosen: GODIYMODULES module (B0GX5HM4X3). Board preparation steps updated for its `R002` shunt, pinout and address pads |
