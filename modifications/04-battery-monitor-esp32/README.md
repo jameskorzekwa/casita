@@ -58,7 +58,8 @@ Baiway's documentation describes serial output as a customized model option, the
 | Component | Quantity | Notes | Purchase link |
 | --- | ---: | --- | --- |
 | Seeed Studio XIAO ESP32-S3 | 1 | Already installed. Uses an external U.FL antenna | [Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html) |
-| 12 V to 5 V buck regulator and C1 (470 uF, 25 V) | 1 each | Already installed. Example: Pololu D24V5F5 | [Pololu](https://www.pololu.com/product/2843) |
+| 12 V to 5 V buck regulator | 1 | Already installed. Example: Pololu D24V5F5 | [Pololu](https://www.pololu.com/product/2843) |
+| C1: electrolytic capacitor, 220-470 uF, **25 V or higher** | 1 | Across the buck's input. Pololu recommends at least 33 uF at the input when the supply leads are long, against destructive LC spikes at power-up; it also smooths the XIAO's Wi-Fi bursts. **Not fitted during the serial-tap build**; a 220 uF 25 V part was added on 2026-10-13. Do not use a 10 V or 16 V part: the bank reaches 14.6 V while charging | |
 | INA228 breakout | 1 | Owned: GODIYMODULES INA228 module (10 A version, 2 mohm shunt marked `R002`). The Adafruit 5832 also works. **The onboard shunt must be removed** | [Amazon B0GX5HM4X3](https://www.amazon.com/dp/B0GX5HM4X3), [Adafruit](https://www.adafruit.com/product/5832) |
 | 10 ohm resistors | 2 | 1/4 W or 0805; input filter and protection | |
 | C2: 0.1 uF ceramic capacitor | 1 | X7R or C0G, 25 V or higher; across `VIN+`/`VIN-` | |
@@ -78,11 +79,14 @@ Check that the INA228 breakout fits inside the housing next to the XIAO and regu
 
 ![Preparing the INA228 breakout](images/ina228-board-prep.svg)
 
-INA228 breakouts are built to measure current through their own small shunt. **That shunt must come off.** If it stays, it sits directly across the display cable's `Rs+`/`Rs-` sense wires, forming a parallel path to the 500 A shunt: the sense wires would carry part of the trailer's load current, both monitors would read wrong, and the thin wires could overheat.
+INA228 breakouts are built to measure current through their own small shunt. **That shunt must come off.** Here the INA228 is used only as a precise millivolt meter across the trailer's 500 A shunt, so nothing else may sit across its `VIN+`/`VIN-` inputs. If the onboard shunt stays:
+
+- **With the 10 ohm filter resistors (as designed),** the two 10 ohm resistors and the 2 mohm onboard shunt form a divider, so the INA228 sees about 1/10,000 of the shunt signal and reads close to 0 A all the time.
+- **Without the resistors,** the onboard shunt sits through the thin sense wires directly across the 500 A shunt: the sense wires carry part of the trailer's load current, both the INA228 and the Renogy display read wrong, and at high current the thin wires can heat up.
 
 The board used here is the GODIYMODULES INA228 module (10 A version). Its 3-screw terminal is labelled `VIN+`, `VBUS`, `VIN-`; its 5-pin header is `GND`, `ALE`, `SCL`, `SDA`, `VCC`; it has 10 kohm I2C pull-ups and no input filter. The Adafruit 5832 differences are noted in each step.
 
-1. **Chip check:** confirm the 10-pin chip's marking includes `228`. Some low-cost "INA228" modules carry an INA226, which this configuration does not support.
+1. **Chip check:** TI marks a genuine INA228 (`INA228AIDGSR`, VSSOP-10) **`228I`**, usually above a date/lot code and the TI logo; it is easy to misread as `2281`. An INA226, which some low-cost "INA228" modules carry and this configuration does not support, is marked just `226`. The module used here is marked `228I` (checked 2026-10-13).
 2. **Remove the onboard shunt.** On the GODIYMODULES module it is the large resistor marked `R002` (2 mohm) next to the terminal block. On the Adafruit 5832 it is R1, marked `R015` (15 mohm). Other modules may use `R010` or `R100`. Desolder it with hot air, or with two irons or a solder blob heating both ends at once. Do not cut it off: leftover metal can still bridge the pads.
 3. **Check:** resistance from `VIN+` to `VIN-` must now read tens of kilohms (the chip's input), not near zero.
 4. **VBUS:** `VBUS` must not be tied to `VIN+`, because it gets its own wire to `B+`. Check that `VBUS` to `VIN+` reads open. If it does not, open the solder jumper that links them: the two-pad `V+` jumper beside the shunt on the GODIYMODULES module (open as shipped), or SJ1 on the back of the Adafruit board (open by default).
@@ -110,8 +114,8 @@ Which way round `Rs+`/`Rs-` go only sets the sign of the reading; `current_sign`
 
 | From | To | Notes |
 | --- | --- | --- |
-| Display `B+` pin (back) | Buck `VIN`, C1 `+`, INA228 `VBUS` | Buck and C1 already installed |
-| Display `B-` pin (back) | Buck `GND`, C1 `-` | Already installed |
+| Display `B+` pin (back) | Buck `VIN`, C1 `+`, INA228 `VBUS` | C1's unstriped (longer) leg |
+| Display `B-` pin (back) | Buck `GND`, C1 `-` | C1's striped leg. Backwards, an electrolytic can bulge or vent |
 | Buck `VOUT` (5 V) | XIAO `5V` | Already installed |
 | Buck `GND` | XIAO `GND`, INA228 `GND` | |
 | XIAO `3V3` | INA228 `VCC` (GODIYMODULES) or `VIN` (Adafruit), the breakout's power pin | Not to be confused with `VIN+`/`VIN-` |
@@ -138,7 +142,7 @@ Unplug the shunt cable from the display, then remove:
 - the probe wires from `Rx`, `TEN`, `MK2 T` and `MK2 R` to XIAO `D0`, `D1`, `D3` and `D4`, with their 1 kohm resistors
 - the 10 kohm resistor between `TEN` and `V+`
 
-Leave the buck regulator, C1 and the XIAO's `5V`/`GND` power wiring in place. Clean any solder bridges on the six-hole row.
+Leave the buck regulator and the XIAO's `5V`/`GND` power wiring in place. If C1 is not already across the buck's input, fit it now (see [Parts](#parts)): stripe to `GND`, the other leg to `VIN`. Clean any solder bridges on the six-hole row.
 
 ### Step 2: Confirm the sense pair is passive
 
@@ -179,8 +183,26 @@ The firmware is installed wirelessly from the ESPHome Device Builder on the trai
 1. Plug the shunt cable back into the display. The XIAO powers up.
 2. **Move the XIAO to the trailer Wi-Fi** (done 2026-10-13; needed again only if the XIAO is ever flashed with firmware that knows a different network). Firmware that only knows the home Wi-Fi starts its fallback hotspot after about a minute away from home. On a phone, join the **Casita Battery Fallback** hotspot (password: `fallback_ap_password` from the configuration). A setup page opens; if not, browse to `192.168.4.1`, ESPHome's standard hotspot address. Choose the trailer Wi-Fi network, enter its password and save. The XIAO restarts and joins it. If the trailer is parked at home, the XIAO may join the home Wi-Fi instead and no hotspot appears; do this step away from home's Wi-Fi range.
 3. In the travel router's admin page, give the XIAO a DHCP reservation so its address never changes.
-4. In the Device Builder, open `casita-battery-monitor` and select **Install**, then **Wirelessly**.
+4. In the Device Builder, open `casita-battery-monitor` and select **Install**, then **Wirelessly**. The **first** build on the trailer's Raspberry Pi 4 took about 25 minutes (it compiles the whole ESP32 framework); later builds take a few minutes.
 5. Open **Logs**. The I2C scan should report a device at `0x40`, and the INA228 component should log `Supported device found: INA228`.
+
+> [!IMPORTANT]
+> **AP isolation must be off on the travel router.** With it on (or with the XIAO on a guest network), Home Assistant discovers the XIAO through mDNS but every connection fails with `[Errno 113] no route to host`, because the router blocks Wi-Fi clients from talking to each other. Turn **AP Isolation** off for the trailer network in the GL.iNet admin page (**Wireless**); this was the fix on 2026-10-13.
+
+**Home Wi-Fi as a backup network.** The configuration running on the XIAO (in the trailer's Device Builder) lists the trailer Wi-Fi first and the home Wi-Fi as a lower-priority backup, so the XIAO stays reachable instead of falling back to its hotspot if the trailer router is off while parked at home:
+
+```yaml
+wifi:
+  networks:
+    - ssid: !secret wifi_ssid          # trailer Wi-Fi
+      password: !secret wifi_password
+      priority: 10
+    - ssid: !secret home_wifi_ssid     # backup only
+      password: !secret home_wifi_password
+      priority: 0
+```
+
+The committed configuration keeps a single network so it builds with the example secrets; add the block above (and the two `home_wifi_*` secrets) to match the running device.
 
 If the configuration ever needs rebuilding, copy [`esphome/casita-battery-monitor.yaml`](esphome/casita-battery-monitor.yaml) into the Device Builder and fill in `secrets.yaml` (see [Secrets](#secrets)).
 
@@ -375,7 +397,7 @@ Observed so far (2026-10-13, trailer on shore power at home):
 | --- | --- | --- |
 | No device at `0x40` in the I2C scan | SDA/SCL swapped, no power to the breakout, or the address pads changed | Check `D4`=SDA, `D5`=SCL and 3.3 V on `VCC`. If the scan shows another address, either set `ina228_address` to it or re-bridge A0/A1 to `G` |
 | Logs say the device is not an INA228 | Clone module with an INA226 | Use a genuine INA228 breakout |
-| Current reads about 0 A under load | Sense wires not connected, or a filter resistor open | Check continuity from `Rs+`/`Rs-` to `VIN+`/`VIN-` through the 10 ohm resistors |
+| Current reads about 0 A under load | Onboard shunt still fitted, sense wires not connected, or a filter resistor open | Check continuity from `Rs+`/`Rs-` to `VIN+`/`VIN-` through the 10 ohm resistors |
 | Current is far too small and the Renogy display changed too | The breakout's onboard shunt is still fitted | Remove it (see Prepare the INA228) |
 | Current sign is backwards | `Rs+`/`Rs-` order | Flip `current_sign` |
 | Current off by a fixed percentage | `shunt_resistance` not calibrated | Repeat Step 7 |
@@ -384,6 +406,7 @@ Observed so far (2026-10-13, trailer on shore power at home):
 | SoC drifts high over days | XIAO and display draw are not metered | Expected; the full-charge resync corrects it |
 | XIAO resets or drops Wi-Fi | Supply sags during Wi-Fi bursts | Check the regulator and C1 |
 | XIAO not on the network after power-up | Still running firmware with the home Wi-Fi | Use its fallback hotspot (Step 6, item 2) |
+| Home Assistant discovers the device but **Add** fails with `connection_error` / `[Errno 113]` | AP isolation on the travel router, or the XIAO on a guest network | Turn AP Isolation off for the trailer network (Step 6) |
 
 ## Safety Notes
 
@@ -421,3 +444,4 @@ Add photos to `photos/` as the build progresses:
 | 2026-10-09 | Serial output proven absent on the TF03H V35. Redesigned around an INA228 measuring the shunt sense pair, with software state-of-charge tracking (not yet built) |
 | 2026-10-13 | ESPHome moved to the trailer's own Home Assistant; configuration set for the trailer Wi-Fi. INA228 board chosen: GODIYMODULES module (B0GX5HM4X3). Board preparation, wiring steps and diagrams updated for its `R002` shunt, pinout and address pads |
 | 2026-10-13 | INA228 wired and the firmware installed wirelessly; the device is live in the trailer's Home Assistant. Added the **Charging** binary sensor (hysteresis plus on/off delays). Trailer entities mirrored to the home Home Assistant with Remote Home-Assistant over Tailscale and a **Casita RV** sidebar page added there. Calibration (Step 7) still to do |
+| 2026-10-13 | Corrections: why the onboard shunt must go (with the 10 ohm resistors it makes the INA228 read about 0 A); genuine INA228 marking `228I`; C1 was never fitted in the serial-tap build, 220 uF 25 V added, 25 V minimum; travel-router AP isolation must be off; home Wi-Fi backup network; first Device Builder build time |
