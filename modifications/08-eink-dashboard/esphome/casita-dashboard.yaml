@@ -14,8 +14,9 @@ substitutions:
   friendly_name: Casita Dashboard
 
   # How often the panel redraws. Every redraw is a full refresh (about 3.5 s
-  # with a black/white flash), so keep this at a few minutes or more.
-  refresh_interval: 5min
+  # with a black/white flash). One minute keeps the current reading close to
+  # live; raise it if the flashing is a nuisance.
+  refresh_interval: 1min
 
   # --- Entities on the trailer's Home Assistant ---
   # Battery monitor (mod 04)

@@ -1,6 +1,6 @@
 # Casita E-ink Dashboard (TRMNL 7.5" OG DIY Kit + ESPHome)
 
-A 7.5-inch e-paper panel mounted inside the Casita that shows the trailer's state at a glance: battery state of charge, voltage, current and time to empty or full; propane in each cylinder; and fresh, grey and black water levels. It runs ESPHome on the kit's XIAO ESP32-S3 Plus, reads the values from the trailer's Home Assistant over Wi-Fi, and redraws every five minutes. E-paper keeps the last image with no power, so the panel is readable in full sun and draws almost nothing between refreshes.
+A 7.5-inch e-paper panel mounted inside the Casita that shows the trailer's state at a glance: battery state of charge, voltage, current and time to empty or full; propane in each cylinder; and fresh, grey and black water levels. It runs ESPHome on the kit's XIAO ESP32-S3 Plus, reads the values from the trailer's Home Assistant over Wi-Fi, and redraws every minute. E-paper keeps the last image with no power, so the panel is readable in full sun and draws almost nothing between refreshes.
 
 ![Overview page layout](images/screen-layout.svg)
 
@@ -32,7 +32,7 @@ Seeed Studio [TRMNL 7.5" (OG) DIY Kit](https://www.seeedstudio.com/TRMNL-7-5-Inc
 
 **Power: 12 V through USB-C, battery left out.** The dashboard is mounted permanently, so there is no reason to run it on the kit's battery and recharge it. Always-on it draws about 0.5 W, roughly 1 Ah per day from a 600 Ah bank. More important, a lithium battery held at full charge inside a parked trailer that can reach 50 C in summer is a fire risk and ages quickly; the battery is best left disconnected (or kept only as a backup, see [Safety](#safety-notes)). [Running on the battery](#running-on-the-battery-instead) covers the deep-sleep alternative if the panel is ever used somewhere without 12 V.
 
-**Five-minute refresh.** Each refresh is a visible flash, so the panel is not redrawn on every value change. Battery and tank levels move slowly; five minutes is plenty, and **Button 1** or the Home Assistant **Refresh Display** button forces a redraw at any time.
+**One-minute refresh.** Each refresh is a full refresh with a visible black-and-white flash lasting about 3.5 s, and this panel has no partial-refresh mode in ESPHome, so the panel is not redrawn on every value change. Once a minute keeps the current and power readings close to live while the flash stays occasional; **Button 1** or the Home Assistant **Refresh Display** button forces a redraw at any time. E-paper panels are typically rated for about a million refreshes, which is roughly two years at one per minute around the clock; `refresh_interval` in the configuration can be raised (for example to `5min`) if that matters, or made longer at night with an automation later.
 
 ## How it works
 
@@ -40,7 +40,7 @@ Seeed Studio [TRMNL 7.5" (OG) DIY Kit](https://www.seeedstudio.com/TRMNL-7-5-Inc
 
 1. The battery monitor, propane monitor and (later) water-tank monitor report to the trailer's Home Assistant as they do now.
 2. The dashboard is one more ESPHome device on the trailer Wi-Fi. Home Assistant pushes the state of each entity listed in the configuration to it over the ESPHome API, the moment it changes.
-3. Every five minutes (or on a button press) the ESP32 draws the page into a memory buffer and sends it to the panel, which refreshes in about 3.5 s.
+3. Every minute (or on a button press) the ESP32 draws the page into a memory buffer and sends it to the panel, which refreshes in about 3.5 s.
 4. **Button 2** on the driver board switches to a details page (all values as numbers, plus the panel's own Wi-Fi signal and battery). Pressing it again returns to the overview.
 5. Values whose entity is missing or unavailable are drawn as `--` and empty gauges, so the propane and water sections are safe to leave in place before those projects exist.
 
@@ -149,7 +149,7 @@ Seeed quotes about three months at a six-hour refresh; expect a few weeks at 15 
 2. Tank sections show `--` and empty gauges while those projects do not exist.
 3. **Button 1** redraws within about 5 s; **Button 2** shows the details page and back.
 4. **Refresh Display** in Home Assistant redraws the panel.
-5. The header time matches Home Assistant; `Updated hh:mm` in the footer advances every five minutes.
+5. The header time matches Home Assistant; `Updated hh:mm` in the footer advances every minute.
 6. Unplug the travel router for a minute: the panel keeps its last image, and the dashboard reconnects on its own when the router returns (uptime keeps counting in Home Assistant).
 7. After an hour mounted, the board and adapter are no more than slightly warm.
 
