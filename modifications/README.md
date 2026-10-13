@@ -9,7 +9,7 @@ Each modification has its own folder with instructions, diagrams, parts, and a s
 | 03 | [Whole-panel inverter](03-whole-panel-inverter/README.md) | Done | Go Power TS-30 so the whole WFCO panel, including the A/C, runs from the inverter when unplugged, with the converter and water heater element on a shore-only breaker box |
 | 04 | [Battery monitor to Home Assistant](04-battery-monitor-esp32/README.md) | In progress (INA228 next) | XIAO ESP32-S3 and INA228 inside the Renogy display housing; publishes state of charge and power to Home Assistant |
 | 05 | [Starlink Mini on 12 V](05-starlink-12v-power/README.md) | Installed; fuse to add | Starlink Mini powered from the battery bank through a 12-36 V adapter and Casita's exterior Starlink port |
-| 07 | [Propane tank monitor to Home Assistant](07-propane-tank-monitor/README.md) | Designed, not built | Two DYP L06 ultrasonic sensors in magnetic collars under the 20 lb cylinders, read by a XIAO ESP32-S3 on trailer 12 V (no batteries); publishes propane % and pounds remaining to Home Assistant |
+| 07 | [Propane tank monitor to Home Assistant](07-propane-tank-monitor/README.md) ([what to order](07-propane-tank-monitor/README.md#what-to-order)) | Designed, not built | Two DYP L06 ultrasonic sensors in magnetic collars under the 20 lb cylinders, read by a XIAO ESP32-S3 on trailer 12 V (no batteries); publishes propane % and pounds remaining to Home Assistant |
 
 ## Template for a new modification
 

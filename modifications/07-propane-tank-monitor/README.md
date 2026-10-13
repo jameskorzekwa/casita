@@ -5,9 +5,55 @@ Two DYP L06 ultrasonic liquid-level sensors, one held magnetically against the b
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
-> **Status: designed, not purchased or built (October 2026).** The ESPHome configuration validates and compiles with ESPHome 2026.9.1 but has not run on hardware, and no L06 has been tried on a Casita cylinder yet. Buy one sensor first and bench-test it (Step 1) before ordering the second.
+> **Status: designed, not purchased or built (October 2026).** The ESPHome configuration validates and compiles with ESPHome 2026.9.1 but has not run on hardware, and no L06 has been tried on a Casita cylinder yet. **Start at [What to order](#what-to-order):** buy one sensor first and bench-test it (Step 1) before ordering the second.
 >
 > **Mounting:** DYP's documented method is epoxy, which ties the sensor to one cylinder. This project mounts the sensor in a small **magnetic collar** with silicone grease as the couplant instead, the same way Mopeka and Safiery hold their ultrasonic sensors on the same spot, so a sensor moves to a new cylinder in a minute. The collar is **not tested on an L06 yet**; the epoxy method stays as the fallback (Step 3b).
+
+**Contents:** [What to order](#what-to-order) · [Build order](#build-order) · [Why this design](#why-this-design) · [How it works](#how-it-works) · [Known limitations](#known-limitations) · [Parts](#parts) · [Wiring](#wiring) · [Steps](#steps) · [ESPHome configuration](#esphome-configuration) · [Home Assistant setup](#home-assistant-setup) · [Testing](#testing-checklist) · [Troubleshooting](#troubleshooting) · [Safety](#safety-notes)
+
+## What to order
+
+### The sensor: DYP-L062MTW-V1.0, and only that model
+
+The L06 comes in four versions that look identical. Only one is right for this project:
+
+| Model | Interface | Order? |
+| --- | --- | --- |
+| **DYP-L062MTW-V1.0** | **UART, controlled** (sleeps until the ESP32 sends a byte) | **Yes. This one.** |
+| DYP-L062MUW-V1.0 | UART, automatic (streams readings all the time) | No |
+| DYP-L062MCW-V1.0 | I2C | No: I2C is not reliable over the 3 m cable runs, and both sensors would share one bus with the same default address |
+| DYP-L062M4W-V1.0 | RS-485 Modbus | No: needs transceivers; nothing here speaks RS-485 |
+
+**Why UART controlled:** each sensor gets its own UART on the ESP32 (one failing cannot affect the other), the 115200 baud serial is fine over 3 m of shielded cable, the protocol is one byte out and ten bytes back, and the sensor sleeps at under 15 uA between readings.
+
+### Ordering checklist
+
+Order **one sensor first**, bench-test it (Step 1), then order the second if it works.
+
+1. Go to the [DYP product page](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) and use **Send email to us**, or order from DYP's Alibaba store (`dypsensor.en.alibaba.com`) or a distributor such as [Evelta](https://evelta.com/l06-ip67-waterproof-ultrasonic-lpg-gas-level-measuring-sensor-3-100cm/). Expect roughly US$25-40 per sensor plus shipping (to confirm).
+2. Ask for everything in this message, copied as-is:
+
+   > Hello, I would like to order **1 x DYP-L062MTW-V1.0** (L06 liquefied gas level sensor, **UART controlled output**, TTL level, 115200 baud). Please confirm:
+   >
+   > 1. Measuring medium configured for **propane (LPG)**, steel cylinder wall 2-3 mm thick.
+   > 2. Include the **installation kit** (ultrasonic couplant, double-sided EVA ring, AB glue).
+   > 3. Include **2 x mating cables** for the sensor's white 1.25 mm 4-pin connector, at least 30 cm long with bare wire ends (or tell me the connector part number so I can buy them).
+   > 4. A link to the current L06 datasheet and the Windows "Sensor Assistant" software.
+   >
+   > Shipping to the USA. Thank you.
+
+3. When it arrives, check the label on the sensor says **L062MTW** (not MUW, MCW or M4W) before doing anything else. If it is the wrong model, do not try to make it work; ask for an exchange.
+4. Order the rest of the [Parts](#parts) list at the same time, except the second sensor and the second collar's magnets.
+
+## Build order
+
+The short version of the [Steps](#steps), so nothing is done out of sequence:
+
+1. **Measure** the recess under one cylinder (Step 1.1). Under about 15 mm deep: stop and rethink.
+2. **Wire one sensor to the XIAO on the bench** and flash the firmware (Steps 4 and 5). Nothing is glued or printed yet.
+3. **Hold the sensor on a part-full cylinder with grease** and watch the web page (Step 1). Good echo strength and a steady level: carry on. Otherwise stop; the sensor does not suit the cylinder.
+4. **Order the second sensor** and print the collars (Step 3a).
+5. **Mount both sensors**, install the ESP32 in the trailer, calibrate with **Mark Full** on the next fill (Steps 3-6).
 
 ## Why this design
 
@@ -50,7 +96,7 @@ Everything is powered from the trailer: 12 V from a fused circuit to a 5 V buck 
 
 | Component | Qty | Notes | Purchase link |
 | --- | ---: | --- | --- |
-| DYP-L062MTW-V1.0 LPG level sensor (UART controlled) | 2 | The **MTW** (UART controlled) model, not MUW (auto), MCW (I2C) or M4W (RS-485). Ask for the installation kit (couplant, EVA ring, AB epoxy, kept as the fallback) and two mating 1.25 mm 4-pin pigtails or extension leads. Roughly US$25-40 each plus shipping, to confirm | [DYP product page](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) (order via DYP's Alibaba store or [Evelta](https://evelta.com/l06-ip67-waterproof-ultrasonic-lpg-gas-level-measuring-sensor-3-100cm/)) |
+| DYP-L062MTW-V1.0 LPG level sensor (UART controlled) | 2 | **See [What to order](#what-to-order): the exact model and what to ask DYP for.** Roughly US$25-40 each plus shipping, to confirm | [DYP product page](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) (order via DYP's Alibaba store or [Evelta](https://evelta.com/l06-ip67-waterproof-ultrasonic-lpg-gas-level-measuring-sensor-3-100cm/)) |
 | Magnetic collar (3D-printed, ASA or PETG, 100% infill) | 2 | Ring around the sensor's 33.8 mm flange with three magnet pockets and a cable notch; drawing below. Print one and test-fit before printing the second | |
 | Neodymium disc magnets, 8 mm x 3 mm, N42-N52 | 6 (3 per collar) | About 1 kg pull each; nickel plated. Glued into the collar pockets with CA or epoxy, faces flush with the collar | |
 | Silicone dielectric grease (couplant) | 1 tube | Any silicone dielectric grease; Mopeka's "Sonic Grease" is the same idea in sachets. Not DYP's water-based gel, which dries out | [Mopeka Sonic Grease](https://mopeka.com/product/mopeka-sonic-grease-4-pack/) |
@@ -59,7 +105,7 @@ Everything is powered from the trailer: 12 V from a fused circuit to a 5 V buck 
 | 470 uF 25 V electrolytic capacitor | 1 | Across the regulator input, close to it | |
 | Inline ATO/ATC fuse holder and 2 A fuse | 1 | On the 12 V feed, or use a spare position in the WFCO 12 V fuse panel | |
 | 4-conductor shielded cable, 22-24 AWG | About 2 x 3 m | Sensor leads are only 140 mm; this runs from the ESP32 to each tank. Shield grounded at the ESP32 end only | |
-| 1.25 mm pitch 4-pin pigtails to match the sensor connector | 2 | Buy from DYP with the sensors to be sure of the mate; "Micro JST 1.25 mm" pigtails are the usual match, to confirm | |
+| 1.25 mm pitch 4-pin mating cables for the sensor connector | 2 | Ask DYP for these with the sensors (see [What to order](#what-to-order)); "Micro JST 1.25 mm" pigtails are the usual match, to confirm | |
 | Small ABS enclosure (about 80 x 60 x 30 mm) | 1 | For the XIAO and regulator inside the trailer | |
 | Cable grommet or gland and sealant | 1-2 | Where the sensor cables pass through to the tongue | |
 | Heat-shrink, zip ties, Kapton tape, dielectric grease | As needed | | |
@@ -101,10 +147,10 @@ Sensor lead colors from the DYP datasheet: red `VCC`, black `GND`, yellow `RX` (
 
 ### Step 1: Bench-test one sensor on a cylinder
 
-Before gluing anything, prove that the sensor reads through the Casita's cylinders and fits under them.
+Before printing or gluing anything, prove that the sensor reads through the Casita's cylinders and fits under them. Lift the cylinder out of the tray and set it on blocks so you can work under it with the valve closed.
 
 1. Measure the cylinder: the depth of the recess from the lowest point of the foot ring up to the center of the dome. The sensor is 33.8 mm across and 12.1 mm tall, with the cable leaving the side; the collar adds 54 mm across but no height. It needs at least about 15 mm of recess so the tank still sits on its foot ring and nothing presses on the sensor. Note the value in Revisions.
-2. Wire one sensor to the XIAO on the bench (table above, tank 1 pins), flash the firmware (Step 4) and open the device's web page.
+2. Wire one sensor to the XIAO on the bench (table above, tank 1 pins), flash the firmware (Step 5) and open the device's web page. The regulator is not needed on the bench: power the XIAO from its USB port.
 3. With the cylinder at least a third full (the sensor needs more than 10 cm of liquid to validate an installation), clean the center of the dome and put a blob of silicone grease (the same couplant the collar uses) on the sensor face. Press the sensor onto the center of the dome by hand. This is the same coupling the magnetic collar provides, so a good reading here means the collar will work. Within a few readings (press **Read Tanks Now**), **Tank 1 Liquid Level** should show a plausible height and **Echo Strength** should be well above zero; DYP's examples show about 1,500 mV at a good spot.
 4. Slide the sensor around the center a few millimeters at a time. The spot with the highest echo strength and a steady level is the installation spot. If the echo is weak or the level jumps around everywhere, try a cleaner spot; if it never settles, the sensor does not suit this cylinder and the project stops here.
 5. Check the reading changes with level: weigh the cylinder (propane weight = scale weight - the tare weight stamped `TW` on the collar) and compare with the height. Record both.
