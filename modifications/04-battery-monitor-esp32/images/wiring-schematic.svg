@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="760" viewBox="0 0 1100 760" role="img" aria-labelledby="title desc">
   <title id="title">Wiring inside the RBM500 display housing with an INA228</title>
-  <desc id="desc">The B plus and B minus pins of the display's shunt connector feed a 470 microfarad capacitor and a 12 to 5 volt buck regulator, whose output powers the XIAO ESP32-S3 5V and GND pins. The GODIYMODULES INA228 module is powered from the XIAO 3V3 pin to its VCC pin and GND, its ALE pin unconnected, with SDA to XIAO D4 (GPIO5) and SCL to XIAO D5 (GPIO6). The INA228 VBUS pin connects to B plus. The connector's Rs plus and Rs minus pins connect through 10 ohm resistors to INA228 VIN plus and VIN minus, with a 0.1 microfarad capacitor across VIN plus and VIN minus at the breakout. The breakout's onboard shunt resistor must be removed.</desc>
+  <desc id="desc">The B plus and B minus pins of the display's shunt connector feed a 220 to 470 microfarad, 25 volt or higher electrolytic capacitor and a 12 to 5 volt buck regulator, whose output powers the XIAO ESP32-S3 5V and GND pins. The GODIYMODULES INA228 module is powered from the XIAO 3V3 pin to its VCC pin and GND, its ALE pin unconnected, with SDA to XIAO D4 (GPIO5) and SCL to XIAO D5 (GPIO6). The INA228 VBUS pin connects to B plus. The connector's Rs plus and Rs minus pins connect through 10 ohm resistors to INA228 VIN plus and VIN minus, with a 0.1 microfarad capacitor across VIN plus and VIN minus at the breakout. The breakout's onboard shunt resistor must be removed.</desc>
   <defs>
     <style>
       .batt{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
@@ -40,7 +40,7 @@
   <path class="w vp" d="M400 130 V95"/><path class="w gnd" d="M440 180 V95"/>
   <rect x="385" y="60" width="70" height="35" rx="8" fill="#fff" stroke="#243b53" stroke-width="3"/>
   <text class="sb" x="420" y="83" text-anchor="middle">C1</text>
-  <text class="s" x="470" y="70">470 uF, 25 V</text>
+  <text class="s" x="470" y="70">220-470 uF, 25 V+</text>
   <rect class="reg" x="560" y="105" width="180" height="100" rx="14"/>
   <text class="sb" x="575" y="135">VIN</text><text class="sb" x="575" y="185">GND</text>
   <text class="sb" x="725" y="135" text-anchor="end">VOUT 5V</text><text class="sb" x="725" y="185" text-anchor="end">GND</text>
