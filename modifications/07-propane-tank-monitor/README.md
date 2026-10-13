@@ -30,8 +30,8 @@ The L06 comes in four versions that look identical. Only one is right for this p
 
 Order **one sensor first**, bench-test it (Step 1), then order the second if it works.
 
-1. Go to the [DYP product page](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) and use **Send email to us**, or order from DYP's Alibaba store (`dypsensor.en.alibaba.com`) or a distributor such as [Evelta](https://evelta.com/l06-ip67-waterproof-ultrasonic-lpg-gas-level-measuring-sensor-3-100cm/). Expect roughly US$25-40 per sensor plus shipping (to confirm).
-2. Ask for everything in this message, copied as-is:
+1. **Easiest: Amazon.** [DYP-L06 ... (UART Controlled, 1)](https://www.amazon.com/dp/B0C1GHF2M8), about $25 (seen 2026-10-13). On the listing, the **Size** option must say **UART Controlled**, not **IIC**. The listing carries DYP's own spec text (sleep current under 15 uA, 115200 baud, 3 cm blind zone), which is the UART-controlled model, but it does not say whether the couplant/EVA/epoxy kit or mating cables are included, and the brand shows as "Generic". Message the seller to ask, or just buy the [mating cables](#parts) and grease separately (both are on the parts list; the kit is only needed for the epoxy fallback).
+2. **Or direct from DYP** (confirms the exact model and the propane setting, slower): the [DYP product page](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) has a **Send email to us** button, or use DYP's Alibaba store (`dypsensor.en.alibaba.com`) or a distributor such as [Evelta](https://evelta.com/l06-ip67-waterproof-ultrasonic-lpg-gas-level-measuring-sensor-3-100cm/). Send this message, copied as-is:
 
    > Hello, I would like to order **1 x DYP-L062MTW-V1.0** (L06 liquefied gas level sensor, **UART controlled output**, TTL level, 115200 baud). Please confirm:
    >
@@ -42,8 +42,8 @@ Order **one sensor first**, bench-test it (Step 1), then order the second if it 
    >
    > Shipping to the USA. Thank you.
 
-3. When it arrives, check the label on the sensor says **L062MTW** (not MUW, MCW or M4W) before doing anything else. If it is the wrong model, do not try to make it work; ask for an exchange.
-4. Order the rest of the [Parts](#parts) list at the same time, except the second sensor and the second collar's magnets.
+3. When it arrives, check the label on the sensor says **L062MTW** (not MUW, MCW or M4W) before doing anything else. If it is the wrong model, do not try to make it work; return or exchange it.
+4. Order the rest of the [Parts](#parts) list at the same time; every row has an Amazon link. Skip the second sensor until the first has passed the bench test.
 
 ## Build order
 
@@ -96,26 +96,28 @@ Everything is powered from the trailer: 12 V from a fused circuit to a 5 V buck 
 
 | Component | Qty | Notes | Purchase link |
 | --- | ---: | --- | --- |
-| DYP-L062MTW-V1.0 LPG level sensor (UART controlled) | 2 | **See [What to order](#what-to-order): the exact model and what to ask DYP for.** Roughly US$25-40 each plus shipping, to confirm | [DYP product page](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) (order via DYP's Alibaba store or [Evelta](https://evelta.com/l06-ip67-waterproof-ultrasonic-lpg-gas-level-measuring-sensor-3-100cm/)) |
+| DYP-L062MTW-V1.0 LPG level sensor (UART controlled) | 2 | **See [What to order](#what-to-order): the exact model and what to check.** About $25 each on Amazon; choose the **UART Controlled** size option, not IIC | [Amazon](https://www.amazon.com/dp/B0C1GHF2M8), or [DYP direct](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) |
 | Magnetic collar (3D-printed, ASA or PETG, 100% infill) | 2 | Ring around the sensor's 33.8 mm flange with three magnet pockets and a cable notch; drawing below. Print one and test-fit before printing the second | |
-| Neodymium disc magnets, 8 mm x 3 mm, N42-N52 | 6 (3 per collar) | About 1 kg pull each; nickel plated. Glued into the collar pockets with CA or epoxy, faces flush with the collar | |
-| Silicone dielectric grease (couplant) | 1 tube | Any silicone dielectric grease; Mopeka's "Sonic Grease" is the same idea in sachets. Not DYP's water-based gel, which dries out | [Mopeka Sonic Grease](https://mopeka.com/product/mopeka-sonic-grease-4-pack/) |
-| Seeed Studio XIAO ESP32-S3 | 1 | Same board as the battery monitor. Built-in or external antenna; the external U.FL antenna helps inside a metal-framed front compartment | [Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html) |
-| 12 V to 5 V buck regulator, 500 mA or more | 1 | Pololu D24V5F5 (same as mod 04) or D24V10F5 | [Pololu](https://www.pololu.com/product/2843) |
-| 470 uF 25 V electrolytic capacitor | 1 | Across the regulator input, close to it | |
-| Inline ATO/ATC fuse holder and 2 A fuse | 1 | On the 12 V feed, or use a spare position in the WFCO 12 V fuse panel | |
-| 4-conductor shielded cable, 22-24 AWG | About 2 x 3 m | Sensor leads are only 140 mm; this runs from the ESP32 to each tank. Shield grounded at the ESP32 end only | |
-| 1.25 mm pitch 4-pin mating cables for the sensor connector | 2 | Ask DYP for these with the sensors (see [What to order](#what-to-order)); "Micro JST 1.25 mm" pigtails are the usual match, to confirm | |
-| Small ABS enclosure (about 80 x 60 x 30 mm) | 1 | For the XIAO and regulator inside the trailer | |
-| Cable grommet or gland and sealant | 1-2 | Where the sensor cables pass through to the tongue | |
-| Heat-shrink, zip ties, Kapton tape, dielectric grease | As needed | | |
-| USB to TTL serial adapter (3.3 V, CP2102 or FTDI) | 1, optional | For DYP's Windows "Sensor Assistant" tool during installation (Step 2). The ESPHome web page can substitute | |
+| Neodymium disc magnets, 8 mm x 3 mm, N42-N52 | 6 (3 per collar) | About 1 kg pull each; nickel plated. Glued into the collar pockets with CA or epoxy, faces flush with the collar. Smallest sensible pack is far more than 6 | [Amazon: LiftSun N42 8x3 mm, 100 pack](https://www.amazon.com/dp/B0GFCBFKKQ) |
+| Silicone dielectric grease (couplant) | 1 tube | Any silicone dielectric grease; Mopeka's "Sonic Grease" is the same idea in single-use sachets. Not DYP's water-based gel, which dries out | [Amazon: Permatex 22058, 3 oz](https://www.amazon.com/dp/B000AL8VD2) or [Amazon: Mopeka Sonic Grease, 4 packets](https://www.amazon.com/dp/B0CVQVGMWB) |
+| Seeed Studio XIAO ESP32-S3 | 1 | Same board as the battery monitor. The plain board (not the "Sense" camera version); the U.FL antenna comes in the box | [Amazon](https://www.amazon.com/dp/B0BYSB66S5) or [Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html) |
+| 12 V to 5 V buck regulator, 500 mA or more | 1 | Pololu D24V5F5 (same as mod 04), input up to 36 V | [Amazon (reseller)](https://www.amazon.com/dp/B012QE3MNE) or [Pololu](https://www.pololu.com/product/2843) |
+| 470 uF 25 V electrolytic capacitor | 1 | Across the regulator input, close to it | [Amazon: 15 pack](https://www.amazon.com/dp/B0CMQ8GMCF) |
+| Inline ATO/ATC fuse holder and 2 A fuse | 1 | On the 12 V feed, or use a spare position in the WFCO 12 V fuse panel. The holder kit's fuses start at 7.5 A, so buy the 2 A fuses separately | [Amazon: 14 AWG waterproof holders, 4 pack](https://www.amazon.com/dp/B0F6T8X81M) and [Amazon: Bussmann 2 A ATC, 5 pack](https://www.amazon.com/dp/B008QDH9VQ) |
+| 4-conductor shielded cable, 22 AWG | About 2 x 3 m (25 ft roll) | Sensor leads are only 140 mm; this runs from the ESP32 to each tank. Shield grounded at the ESP32 end only | [Amazon: 22/4 shielded, tinned stranded, 25 ft](https://www.amazon.com/dp/B0D9JY3MC4) |
+| 1.25 mm pitch 4-pin mating cables for the sensor connector | 2 (pack of 20 pairs) | "Micro JST 1.25 mm" pigtails are the usual match for the sensor's white 1.25 mm connector, to confirm on the first sensor. The pack gives male and female halves, so the same parts make the inline connector at each tank | [Amazon: Micro JST 1.25 mm 4-pin, 20 pairs, 150 mm](https://www.amazon.com/dp/B09DYLY95R) |
+| Small ABS enclosure (about 80 x 60 x 30 mm) | 1 | For the XIAO and regulator inside the trailer | [Amazon: 83 x 58 x 33 mm IP65, 2 pack](https://www.amazon.com/dp/B0FDQCHNQP) |
+| Cable gland (PG7) and sealant | 1-2 | Where the sensor cables pass through to the tongue, and into the enclosure | [Amazon: PG7 nylon glands, 50 pack](https://www.amazon.com/dp/B0CTCG4HMM) |
+| Heat-shrink (adhesive-lined), Kapton tape, zip ties | As needed | | [Amazon: 3:1 adhesive-lined heat-shrink kit](https://www.amazon.com/dp/B0DC5YN5CD), [Amazon: Kapton tape 10 mm, 4 rolls](https://www.amazon.com/dp/B07S227ZLH) |
+| USB to TTL serial adapter (3.3 V, CP2102 or FTDI) | 1, optional | For DYP's Windows "Sensor Assistant" tool during installation (Step 2). The ESPHome web page can substitute | [Amazon: DSD TECH CP2102, 2 pack](https://www.amazon.com/dp/B078W5L8W1) |
+
+Amazon links checked on 2026-10-13; prices then were roughly: sensor $25, XIAO $17, regulator $11, magnets $18, grease $10, cable $17, pigtails $9, enclosure $9, glands $10, fuse holders $9 + fuses $7, capacitors $7, heat-shrink $10, Kapton $10, USB-TTL $12. About **$200** for everything including both sensors, most of it in packs with plenty left over.
 
 ## Tools and Supplies
 
 - Fine-tip soldering iron, solder, flux
 - Multimeter with continuity
-- Isopropyl alcohol and lint-free cloths for cleaning the tank bottom
+- Isopropyl alcohol (99%, [Amazon](https://www.amazon.com/dp/B08CGVVYWV)) and lint-free cloths for cleaning the tank bottom
 - Small digital scale or bathroom scale (to weigh cylinders for calibration)
 - A level for checking the tank
 
