@@ -1,24 +1,24 @@
 # Renogy Battery Monitor to Home Assistant (XIAO ESP32-S3 + INA228)
 
-A Seeed Studio XIAO ESP32-S3 and a TI INA228 current/voltage monitor, built into the display housing of the Renogy 500 A Battery Monitor with Shunt (RBM500) in the Casita travel trailer. The INA228 measures the existing 500 A shunt and the battery voltage. The ESP32 counts amp-hours to track state of charge, then publishes voltage, current, power, state of charge, remaining amp-hours, time to empty or full, and daily charged/discharged energy to Home Assistant. It also serves a local web page so a phone on the trailer's Wi-Fi can check the battery without Home Assistant.
+A Seeed Studio XIAO ESP32-S3 and a TI INA228 current/voltage monitor, built into the display housing of the Renogy 500 A Battery Monitor with Shunt (RBM500) in the Casita travel trailer. The INA228 measures the existing 500 A shunt and the battery voltage. The ESP32 counts amp-hours to track state of charge, then publishes voltage, current, power, state of charge, remaining amp-hours, time to empty or full, a charging indicator, and daily charged/discharged energy to Home Assistant. It also serves a local web page so a phone on the trailer's Wi-Fi can check the battery without Home Assistant.
 
 The Renogy display keeps working exactly as before. The INA228 reads the same shunt in parallel through the display cable's sense wires, so you end up with two independent monitors.
 
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
-> **Status (2026-10-13): in progress. The INA228 wiring is next.**
+> **Status (2026-10-13): installed and running. Calibration (Step 7) still to confirm.**
 >
 > | Item | State |
 > | --- | --- |
-> | XIAO, buck regulator, C1 and power wiring | Installed in the display housing (from the earlier serial-tap attempt) |
-> | Firmware on the XIAO | Old diagnostic firmware, still set for the home Wi-Fi. The XIAO is currently offline |
-> | INA228 board | GODIYMODULES INA228 module on hand; not yet prepared or wired |
-> | ESPHome configuration | Validates and compiles with ESPHome 2026.9.1. Loaded in the ESPHome Device Builder on the trailer's own Home Assistant, set for the trailer Wi-Fi. Not yet installed |
-> | Home Assistant | The device will be adopted in the trailer's Home Assistant (it was removed from the home one) |
+> | XIAO, buck regulator, C1, INA228 and wiring | Installed in the display housing. The INA228 answers at `0x40` and reports plausible readings (13.8-14.6 V on shore power; -6 A discharging to +32 A charging seen on 2026-10-13) |
+> | Firmware on the XIAO | [`esphome/casita-battery-monitor.yaml`](esphome/casita-battery-monitor.yaml) as committed here, installed wirelessly from the trailer Home Assistant's ESPHome Device Builder (ESPHome 2026.9.1) on 2026-10-13. The XIAO is on the trailer Wi-Fi |
+> | Calibration | `shunt_resistance` is still the default `0.00015 ohm`. The current sign is right (+32 A at 14.1 V while charging, -6 A while discharging). The reading has not yet been compared with a clamp meter or the Renogy display at a known current |
+> | Trailer Home Assistant | Device adopted; all entities listed under [Entities](#entities) exist with the IDs shown. State of charge was set to 100% with **Mark Battery Full** on 2026-10-13 after the bank was on shore power |
+> | Home Home Assistant | The trailer's entities are mirrored to the home Home Assistant over Tailscale and shown on a **Casita RV** sidebar page there; see [Mirroring to the home Home Assistant](#mirroring-to-the-home-home-assistant) |
 > | Renogy display | Reads correctly since the WFCO converter's negative was moved from the shunt's `B-` to `P-` (see [mod 01](../01-second-battery/README.md#wiring-as-built)) |
 >
-> **Remaining work:** follow [Build](#build) Steps 1-8 in order, then [Home Assistant Setup](#home-assistant-setup) and the [Testing Checklist](#testing-checklist). Step 3 (preparing the INA228) can be done on the bench at any time.
+> **Remaining work:** [Step 7](#step-7-calibrate) (measure the shunt and set `shunt_resistance`), the rest of the [Testing Checklist](#testing-checklist), and [photos](#photos). The [Build](#build) steps are kept below as the record of how it was done and for rebuilding.
 
 ## How It Works
 
@@ -174,10 +174,10 @@ With the shunt cable still unplugged:
 
 ### Step 6: Install the firmware
 
-The firmware is installed wirelessly from the ESPHome Device Builder on the trailer's Home Assistant (**Settings > Add-ons > ESPHome Device Builder**, or **ESPHome** in the sidebar). `casita-battery-monitor.yaml` is already there, set for the trailer Wi-Fi with the device's existing API key and OTA password.
+The firmware is installed wirelessly from the ESPHome Device Builder on the trailer's Home Assistant (**Settings > Add-ons > ESPHome Device Builder**, or **ESPHome** in the sidebar). `casita-battery-monitor.yaml` is already there, set for the trailer Wi-Fi with the device's existing API key and OTA password. This is how the running firmware was installed on 2026-10-13; repeat items 4-5 after any configuration change.
 
 1. Plug the shunt cable back into the display. The XIAO powers up.
-2. **Move the XIAO to the trailer Wi-Fi.** Its old firmware only knows the home Wi-Fi, so away from home it starts its fallback hotspot after about a minute. On a phone, join the **Casita Battery Fallback** hotspot (password: `fallback_ap_password` from the configuration). A setup page opens; if not, browse to `192.168.4.1`, ESPHome's standard hotspot address. Choose the trailer Wi-Fi network, enter its password and save. The XIAO restarts and joins it. If the trailer is parked at home, the XIAO may join the home Wi-Fi instead and no hotspot appears; do this step away from home's Wi-Fi range.
+2. **Move the XIAO to the trailer Wi-Fi** (done 2026-10-13; needed again only if the XIAO is ever flashed with firmware that knows a different network). Firmware that only knows the home Wi-Fi starts its fallback hotspot after about a minute away from home. On a phone, join the **Casita Battery Fallback** hotspot (password: `fallback_ap_password` from the configuration). A setup page opens; if not, browse to `192.168.4.1`, ESPHome's standard hotspot address. Choose the trailer Wi-Fi network, enter its password and save. The XIAO restarts and joins it. If the trailer is parked at home, the XIAO may join the home Wi-Fi instead and no hotspot appears; do this step away from home's Wi-Fi range.
 3. In the travel router's admin page, give the XIAO a DHCP reservation so its address never changes.
 4. In the Device Builder, open `casita-battery-monitor` and select **Install**, then **Wirelessly**.
 5. Open **Logs**. The I2C scan should report a device at `0x40`, and the INA228 component should log `Supported device found: INA228`.
@@ -220,6 +220,8 @@ The configuration is [`esphome/casita-battery-monitor.yaml`](esphome/casita-batt
 | `empty_voltage` | `"11.8"` | Low-voltage floor; `"0"` disables it |
 | `empty_max_current` | `"20.0"` | Floor applies only under a light discharge load (A) |
 | `empty_soc` | `"5.0"` | SoC (%) the floor caps to |
+| `charging_on_current` | `"0.5"` | Net current into the bank (A) at or above which **Charging** turns on (after 10 s) |
+| `charging_off_current` | `"0.2"` | Current (A) at or below which **Charging** turns off (after 30 s). The gap between the two stops it flickering around zero |
 | `sda_pin`, `scl_pin` | `GPIO5`, `GPIO6` | XIAO `D4`, `D5` |
 | `ina228_address` | `"0x40"` | A0 and A1 tied to GND (GODIYMODULES as shipped; Adafruit with A0/A1 open) |
 
@@ -231,8 +233,9 @@ How state of charge is calculated:
 2. Each second, the change in that accumulator (multiplied by `current_sign`) is added to `remaining_ah`. Charging amp-hours are multiplied by `charge_efficiency`. The value is clamped between 0 and `battery_capacity_ah`.
 3. `remaining_ah` is saved to flash at most every 10 minutes (`preferences: flash_write_interval: 10min`) and restored after a reboot.
 4. Full-charge resync and the low-voltage floor run every 5 seconds.
+5. **Charging** is a template binary sensor on the published current with hysteresis (`charging_on_current` / `charging_off_current`) and `delayed_on: 10s` / `delayed_off: 30s`, so a brief load or charge pulse does not toggle it.
 
-Validation on bee2 with ESPHome 2026.9.1 on 2026-10-09: `esphome config` passed and `esphome compile` succeeded (RAM 30.4%, flash 48.6%). This proves only that the configuration builds. It has not run on hardware.
+The committed configuration is the one running on the XIAO: it was compiled by the trailer Home Assistant's ESPHome Device Builder (ESPHome 2026.9.1) and installed wirelessly on 2026-10-13. The Device Builder copy and this file were compared on the same day and match apart from the secrets.
 
 ### Secrets
 
@@ -248,12 +251,15 @@ The device belongs in the trailer's Home Assistant, which runs on the trailer ne
 
 ### Entities
 
-| Entity name | Likely entity ID | Unit |
+These are the entity IDs as created in the trailer's Home Assistant (confirmed 2026-10-13).
+
+| Entity name | Entity ID | Unit |
 | --- | --- | --- |
 | State of Charge | `sensor.casita_battery_monitor_state_of_charge` | % |
 | Voltage | `sensor.casita_battery_monitor_voltage` | V |
 | Current | `sensor.casita_battery_monitor_current` | A (negative = discharging) |
 | Power | `sensor.casita_battery_monitor_power` | W (negative = discharging) |
+| Charging | `binary_sensor.casita_battery_monitor_charging` | on while net current flows into the bank |
 | Remaining Capacity | `sensor.casita_battery_monitor_remaining_capacity` | Ah |
 | Time to Empty | `sensor.casita_battery_monitor_time_to_empty` | h (unknown unless discharging) |
 | Time to Full | `sensor.casita_battery_monitor_time_to_full` | h (unknown unless charging) |
@@ -261,11 +267,12 @@ The device belongs in the trailer's Home Assistant, which runs on the trailer ne
 | Daily Discharged Energy | `sensor.casita_battery_monitor_daily_discharged_energy` | kWh |
 | Set State of Charge | `number.casita_battery_monitor_set_state_of_charge` | % (configuration) |
 | Mark Battery Full | `button.casita_battery_monitor_mark_battery_full` | (configuration) |
-| Shunt Voltage, INA228 Temperature, Wi-Fi Signal, Uptime | diagnostic entities | |
-
-Home Assistant generates entity IDs from the device and entity names. Confirm the actual IDs on the device page and adjust the examples below if they differ.
+| Restart | `button.casita_battery_monitor_restart` | (configuration) |
+| Shunt Voltage, INA228 Temperature, Wi-Fi Signal, Uptime | `sensor.casita_battery_monitor_shunt_voltage`, `..._ina228_temperature`, `..._wi_fi_signal`, `..._uptime` | diagnostic |
 
 ### Dashboard card
+
+This is the card used on the home Home Assistant's **Casita RV** page (there the entity IDs carry the `rv_` prefix described below). On the trailer's own Home Assistant use the IDs as shown.
 
 ```yaml
 type: vertical-stack
@@ -280,13 +287,17 @@ cards:
       yellow: 25
       red: 0
   - type: entities
+    title: Battery
     entities:
+      - entity: binary_sensor.casita_battery_monitor_charging
       - entity: sensor.casita_battery_monitor_voltage
       - entity: sensor.casita_battery_monitor_current
       - entity: sensor.casita_battery_monitor_power
       - entity: sensor.casita_battery_monitor_remaining_capacity
       - entity: sensor.casita_battery_monitor_time_to_empty
       - entity: sensor.casita_battery_monitor_time_to_full
+      - entity: sensor.casita_battery_monitor_daily_charged_energy
+      - entity: sensor.casita_battery_monitor_daily_discharged_energy
 ```
 
 ### Low-battery alert (optional)
@@ -314,13 +325,26 @@ mode: single
 
 On the trailer's Wi-Fi, open `http://casita-battery-monitor.local` (or the device's IP address) and log in with the `web_server` username and password. It shows every entity and the **Set State of Charge** and **Mark Battery Full** controls, without Home Assistant.
 
+### Mirroring to the home Home Assistant
+
+Set up 2026-10-13. The trailer's Home Assistant is linked to the home one with the [Remote Home-Assistant](https://github.com/custom-components/remote_homeassistant) custom integration (version 4.6, installed through HACS on both ends) over Tailscale. The home side opens the connection, so it works wherever the trailer has internet; no port forwarding is involved.
+
+- **What is mirrored:** everything in the trailer's Home Assistant except an exclude list. Excluded are the `sun`, `weather`, `zone`, `person`, `device_tracker`, `conversation`, `tts`, `todo`, `notify` and `event` domains, the four backup sensors, the six sun-time sensors, the Raspberry Pi power-status sensor, and this device's **Restart** button. Anything added to the trailer's Home Assistant later appears at home on its own.
+- **Naming at home:** entity IDs get an `rv_` prefix and friendly names an `RV ` prefix, so the state of charge is `sensor.rv_casita_battery_monitor_state_of_charge` ("RV Casita Battery Monitor State of Charge") at home. 30 entities were mirrored on 2026-10-13: this device, the Matter test plug, and the trailer's 12 `update.*` entities (core, OS, Supervisor, add-ons, HACS, Pi and ZBT-1 firmware).
+- **Control works both ways for what is mirrored:** pressing **Mark Battery Full** or changing **Set State of Charge** at home is forwarded to the trailer. (A switch command was verified end to end; a battery-monitor control from home has not been exercised yet.)
+- **Casita RV sidebar page at home:** a dashboard with an **Open Casita Home Assistant** button (opens the trailer's own Home Assistant in a new tab; only devices on the Tailscale network can reach it), the state-of-charge gauge and battery card above, and the 12 trailer update entities. Installing a trailer update from the home page has not been tried; nothing was pending when the page was built.
+- **Why a button and not an embedded page:** Home Assistant refuses to be shown inside another site's frame (`X-Frame-Options`) unless that protection is turned off, which was left on.
+- **Why the ESPHome device itself is not in the home Home Assistant:** see below.
+
+The trailer's Home Assistant remains the place to manage the device (ESPHome Device Builder, firmware installs, logs). The home copy is a mirror.
+
 ## Reading the Battery Away From Home
 
 ESPHome's Home Assistant connection is opened **by Home Assistant** to the device on port 6053, so the Home Assistant must be on the same network as the XIAO. That is why the device lives in the trailer's own Home Assistant: the trailer's travel router, its Home Assistant and the XIAO travel together, and the readings keep recording wherever the trailer is.
 
-- **From a phone away from the trailer:** open the trailer's Home Assistant over Tailscale.
-- **At the campsite:** use the trailer's Home Assistant, or the local web page below, on the trailer Wi-Fi.
-- **In the home Home Assistant (optional, not yet set up):** link the trailer's Home Assistant to the home one, for example with the Remote Home Assistant integration over Tailscale, so the battery entities also appear at home.
+- **From a phone away from the trailer:** open the trailer's Home Assistant over Tailscale, or use the home Home Assistant's **Casita RV** page.
+- **At the campsite:** use the trailer's Home Assistant, or the local web page above, on the trailer Wi-Fi.
+- **In the home Home Assistant:** the entities are mirrored there; see [Mirroring to the home Home Assistant](#mirroring-to-the-home-home-assistant). This has only been exercised with the trailer parked at home on the home Wi-Fi; a Starlink or cellular uplink has not been tested yet.
 
 ## Testing Checklist
 
@@ -333,6 +357,17 @@ ESPHome's Home Assistant connection is opened **by Home Assistant** to the devic
 7. After a full charge, the log shows `Full charge detected` and SoC reads 100%.
 8. The Renogy display's current reading is the same as before the INA228 was added.
 9. After an hour, the housing, regulator and breakout are no more than slightly warm.
+
+Observed so far (2026-10-13, trailer on shore power at home):
+
+| Item | Result |
+| --- | --- |
+| 3 | The device is up and reporting; the INA228 is read at `0x40` (the readings would be `unknown` otherwise). The boot log itself was not kept |
+| 5 (sign only) | Discharge reads negative, charge positive (+32 A at 14.1 V while the converter was charging). Agreement with a reference meter not yet checked |
+| 7 (manual) | **Mark Battery Full** set the state of charge to 100% after the bank had been on shore power. The automatic `Full charge detected` resync has not been observed yet |
+| Charging indicator | Turned on with charge current and off again as it tapered, without flicker |
+| INA228 Temperature | About 66 °F inside the housing at low current; no long high-current run yet |
+| 1, 2, 4, 6, 8, 9 | Not recorded |
 
 ## Troubleshooting
 
@@ -385,3 +420,4 @@ Add photos to `photos/` as the build progresses:
 | 2026-10-08 | Serial-tap design: XIAO inside the display housing reading the display's serial output (built; did not work) |
 | 2026-10-09 | Serial output proven absent on the TF03H V35. Redesigned around an INA228 measuring the shunt sense pair, with software state-of-charge tracking (not yet built) |
 | 2026-10-13 | ESPHome moved to the trailer's own Home Assistant; configuration set for the trailer Wi-Fi. INA228 board chosen: GODIYMODULES module (B0GX5HM4X3). Board preparation, wiring steps and diagrams updated for its `R002` shunt, pinout and address pads |
+| 2026-10-13 | INA228 wired and the firmware installed wirelessly; the device is live in the trailer's Home Assistant. Added the **Charging** binary sensor (hysteresis plus on/off delays). Trailer entities mirrored to the home Home Assistant with Remote Home-Assistant over Tailscale and a **Casita RV** sidebar page added there. Calibration (Step 7) still to do |
