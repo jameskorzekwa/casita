@@ -1,0 +1,216 @@
+# One DYP-L062MTW-V1.0 propane tank sensor on its own UART.
+#
+# Included once per tank from casita-propane-monitor.yaml with these vars:
+#   tank    - "1" or "2"; used in ids and entity names
+#   tx_pin  - ESP32 pin wired to the sensor's yellow RX lead
+#   rx_pin  - ESP32 pin wired to the sensor's green TX lead
+#
+# Protocol (DYP L06 datasheet, section 2.2 "UART controlled output"):
+#   - 115200 baud, 8N1, 3.3 V TTL.
+#   - Any byte on the sensor's RX wakes it and triggers one measurement.
+#     Trigger period must be more than 750 ms.
+#   - About 730 ms later the sensor sends 10 bytes:
+#       FF, LEVEL_H, LEVEL_L, TEMP_H, TEMP_L, RSSI_H, RSSI_L, ANGLE_H, ANGLE_L, SUM
+#     LEVEL  liquid height above the sensor, mm (0xFFFD = no liquid detected)
+#     TEMP   signed, 0.1 degC
+#     RSSI   echo strength, mV, 0-1500 (bigger is better)
+#     ANGLE  sensor tilt from horizontal, 0.1 degrees
+#     SUM    low 8 bits of the sum of the previous 9 bytes
+#   Example: FF 00 A0 01 38 05 DB 00 30 E8 = 160 mm, 31.2 degC, 1499 mV, 4.8 deg
+
+uart:
+  - id: uart_tank${tank}
+    tx_pin: ${tx_pin}
+    rx_pin:
+      number: ${rx_pin}
+      mode:
+        input: true
+        pullup: true
+    baud_rate: 115200
+    data_bits: 8
+    parity: NONE
+    stop_bits: 1
+    rx_buffer_size: 256
+
+globals:
+  # Consecutive reads without a valid frame. After 3 the tank's sensors are
+  # set to unknown so a dead sensor or cable is obvious in Home Assistant.
+  - id: tank${tank}_fail_count
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+number:
+  - platform: template
+    name: "Tank ${tank} Full Level"
+    id: tank${tank}_full_level
+    icon: mdi:ruler
+    unit_of_measurement: mm
+    min_value: 50
+    max_value: 1000
+    step: 1
+    initial_value: ${full_level_mm}
+    restore_value: true
+    optimistic: true
+    entity_category: config
+    mode: box
+    on_value:
+      # Recompute the percentage right away with the new calibration.
+      - lambda: |-
+          if (id(tank${tank}_level).has_state() && !std::isnan(id(tank${tank}_level).state) && x > 0) {
+            float pct = id(tank${tank}_level).state / x * 100.0f;
+            pct = std::max(0.0f, std::min(100.0f, pct));
+            id(tank${tank}_percent).publish_state(pct);
+            id(tank${tank}_remaining).publish_state(pct / 100.0f * ${tank_capacity_lb});
+          }
+
+button:
+  - platform: template
+    name: "Tank ${tank} Mark Full"
+    icon: mdi:propane-tank
+    entity_category: config
+    on_press:
+      - lambda: |-
+          float level = id(tank${tank}_level).state;
+          if (!id(tank${tank}_level).has_state() || std::isnan(level) || level < 50.0f) {
+            ESP_LOGW("tank${tank}", "Mark Full ignored: no valid level reading (%.0f mm)", level);
+            return;
+          }
+          ESP_LOGI("tank${tank}", "Full level set to %.0f mm", level);
+          auto call = id(tank${tank}_full_level).make_call();
+          call.set_value(level);
+          call.perform();
+
+binary_sensor:
+  - platform: template
+    name: "Tank ${tank} Liquid Detected"
+    id: tank${tank}_liquid
+    icon: mdi:water-check
+    entity_category: diagnostic
+
+sensor:
+  - platform: template
+    name: "Tank ${tank} Propane"
+    id: tank${tank}_percent
+    icon: mdi:propane-tank
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    state_class: measurement
+  - platform: template
+    name: "Tank ${tank} Propane Remaining"
+    id: tank${tank}_remaining
+    icon: mdi:weight-pound
+    unit_of_measurement: lb
+    accuracy_decimals: 1
+    state_class: measurement
+  - platform: template
+    name: "Tank ${tank} Liquid Level"
+    id: tank${tank}_level
+    icon: mdi:waves-arrow-up
+    unit_of_measurement: mm
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+  - platform: template
+    name: "Tank ${tank} Temperature"
+    id: tank${tank}_temperature
+    device_class: temperature
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    state_class: measurement
+  - platform: template
+    name: "Tank ${tank} Echo Strength"
+    id: tank${tank}_echo
+    icon: mdi:signal
+    unit_of_measurement: mV
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+  - platform: template
+    name: "Tank ${tank} Tilt"
+    id: tank${tank}_tilt
+    icon: mdi:angle-acute
+    unit_of_measurement: "°"
+    accuracy_decimals: 1
+    state_class: measurement
+    entity_category: diagnostic
+
+script:
+  - id: read_tank${tank}
+    mode: single
+    then:
+      # Drop anything left in the receive buffer from a previous reading.
+      - lambda: |-
+          uint8_t b;
+          while (id(uart_tank${tank}).available()) id(uart_tank${tank}).read_byte(&b);
+      # Any byte wakes the sensor and starts one measurement.
+      - uart.write:
+          id: uart_tank${tank}
+          data: [0x55]
+      # The sensor answers about 730 ms after the trigger.
+      - delay: 900ms
+      - lambda: |-
+          std::vector<uint8_t> buf;
+          uint8_t b;
+          while (id(uart_tank${tank}).available()) {
+            id(uart_tank${tank}).read_byte(&b);
+            buf.push_back(b);
+          }
+
+          // Find the last frame that starts with 0xFF and has a good checksum.
+          int start = -1;
+          for (int i = (int) buf.size() - 10; i >= 0; i--) {
+            if (buf[i] != 0xFF) continue;
+            uint8_t sum = 0;
+            for (int j = i; j < i + 9; j++) sum += buf[j];
+            if (sum == buf[i + 9]) { start = i; break; }
+          }
+
+          if (start < 0) {
+            id(tank${tank}_fail_count) += 1;
+            ESP_LOGW("tank${tank}", "No valid frame (%u bytes received, %d failures in a row)",
+                     (unsigned) buf.size(), id(tank${tank}_fail_count));
+            if (id(tank${tank}_fail_count) >= 3) {
+              id(tank${tank}_level).publish_state(NAN);
+              id(tank${tank}_percent).publish_state(NAN);
+              id(tank${tank}_remaining).publish_state(NAN);
+              id(tank${tank}_temperature).publish_state(NAN);
+              id(tank${tank}_echo).publish_state(NAN);
+              id(tank${tank}_tilt).publish_state(NAN);
+              id(tank${tank}_liquid).publish_state(false);
+            }
+            return;
+          }
+          id(tank${tank}_fail_count) = 0;
+
+          const uint8_t *f = &buf[start];
+          uint16_t level_raw = ((uint16_t) f[1] << 8) | f[2];
+          int16_t temp_raw = (int16_t) (((uint16_t) f[3] << 8) | f[4]);
+          uint16_t rssi = ((uint16_t) f[5] << 8) | f[6];
+          uint16_t angle_raw = ((uint16_t) f[7] << 8) | f[8];
+
+          // 0xFFFD means no liquid detected: either less than the 30 mm blind
+          // zone of propane above the sensor, or no echo at all (bad coupling,
+          // sensor off the tank). Echo strength tells the two apart.
+          bool liquid = level_raw < 0xFFF0;
+          float level_mm = liquid ? (float) level_raw : 0.0f;
+          float temp_c = temp_raw / 10.0f;
+          float tilt_deg = angle_raw / 10.0f;
+
+          float full = id(tank${tank}_full_level).state;
+          float pct = NAN;
+          if (!std::isnan(full) && full > 0) {
+            pct = level_mm / full * 100.0f;
+            pct = std::max(0.0f, std::min(100.0f, pct));
+          }
+
+          id(tank${tank}_liquid).publish_state(liquid);
+          id(tank${tank}_level).publish_state(level_mm);
+          id(tank${tank}_temperature).publish_state(temp_c);
+          id(tank${tank}_echo).publish_state((float) rssi);
+          id(tank${tank}_tilt).publish_state(tilt_deg);
+          id(tank${tank}_percent).publish_state(pct);
+          id(tank${tank}_remaining).publish_state(std::isnan(pct) ? NAN : pct / 100.0f * ${tank_capacity_lb});
+
+          ESP_LOGI("tank${tank}", "level=%s mm (%.0f%%) temp=%.1f C echo=%u mV tilt=%.1f deg",
+                   liquid ? std::to_string(level_raw).c_str() : "none", pct, temp_c, rssi, tilt_deg);

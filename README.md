@@ -23,6 +23,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | 03 | [Whole-panel inverter with automatic transfer switch](modifications/03-whole-panel-inverter/README.md) | Done |
 | 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | In progress (INA228 wiring next) |
 | 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
+| 07 | [Propane tank monitor to Home Assistant (DYP L06 + XIAO ESP32-S3)](modifications/07-propane-tank-monitor/README.md) | Designed, not built |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
 

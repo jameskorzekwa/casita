@@ -13,7 +13,7 @@ What is installed on the trailer, with the source of each fact. "To confirm" mea
 | Dry tongue weight | Not published; owners report 350-450 lb loaded | To measure |
 | Length / width | 204 in (17 ft) / 80 in | Dealer listings |
 | Fresh water | About 16 gal | To confirm |
-| Propane | 2 x 20 lb tanks | |
+| Propane | 2 x 20 lb tanks | Level monitor planned: [mod 07](../modifications/07-propane-tank-monitor/README.md) (designed, not built) |
 | Microwave | None | Owner |
 
 ## Tow Vehicle
