@@ -353,8 +353,10 @@ Set up 2026-10-13. The trailer's Home Assistant is linked to the home one with t
 
 - **What is mirrored:** everything in the trailer's Home Assistant except an exclude list. Excluded are the `sun`, `weather`, `zone`, `person`, `device_tracker`, `conversation`, `tts`, `todo`, `notify` and `event` domains, the four backup sensors, the six sun-time sensors, the Raspberry Pi power-status sensor, and this device's **Restart** button. Anything added to the trailer's Home Assistant later appears at home on its own.
 - **Naming at home:** entity IDs get an `rv_` prefix and friendly names an `RV ` prefix, so the state of charge is `sensor.rv_casita_battery_monitor_state_of_charge` ("RV Casita Battery Monitor State of Charge") at home. 30 entities were mirrored on 2026-10-13: this device, the Matter test plug, and the trailer's 12 `update.*` entities (core, OS, Supervisor, add-ons, HACS, Pi and ZBT-1 firmware).
-- **Control works both ways for what is mirrored:** pressing **Mark Battery Full** or changing **Set State of Charge** at home is forwarded to the trailer. (A switch command was verified end to end; a battery-monitor control from home has not been exercised yet.)
-- **Casita RV sidebar page at home:** a dashboard with an **Open Casita Home Assistant** button (opens the trailer's own Home Assistant in a new tab; only devices on the Tailscale network can reach it), the state-of-charge gauge and battery card above, and the 12 trailer update entities. Installing a trailer update from the home page has not been tried; nothing was pending when the page was built.
+- **Control works both ways for what is mirrored:** pressing **Mark Battery Full** or changing **Set State of Charge** at home is forwarded to the trailer. Verified 2026-10-13: a **Mark Battery Full** press at home reached the trailer in about half a second and the new timestamp mirrored back.
+- **Rounding at home:** ESPHome's `accuracy_decimals` does not travel with the mirrored entities, so at home each `sensor.rv_casita_battery_monitor_*` entity has its display precision set by hand in the entity settings (voltage 2, current 2, power 0, state of charge 1, capacity 1, hours 1, energy 3, shunt voltage 4). Without this the page shows 13-digit floats. Repeat for any new sensor.
+- **Casita RV sidebar page at home:** a dashboard with an **Open Casita Home Assistant** button (opens the trailer's own Home Assistant in a new tab; only devices on the Tailscale network can reach it), the state-of-charge gauge and battery card above, and the 12 trailer update entities. Checked in a browser on 2026-10-13: everything renders and the button opens the trailer's Home Assistant. Installing a trailer update from the home page has not been tried; nothing has been pending yet.
+- **Trailer Home Assistant restart:** a controlled Core restart on the trailer (2026-10-13) took about 30 s; the home link reconnected about 50 s after the restart and this device was reporting again at about 60 s, without the XIAO rebooting.
 - **Why a button and not an embedded page:** Home Assistant refuses to be shown inside another site's frame (`X-Frame-Options`) unless that protection is turned off, which was left on.
 - **Why the ESPHome device itself is not in the home Home Assistant:** see below.
 
@@ -388,6 +390,7 @@ Observed so far (2026-10-13, trailer on shore power at home):
 | 5 (sign only) | Discharge reads negative, charge positive (+32 A at 14.1 V while the converter was charging). Agreement with a reference meter not yet checked |
 | 7 (manual) | **Mark Battery Full** set the state of charge to 100% after the bank had been on shore power. The automatic `Full charge detected` resync has not been observed yet |
 | Charging indicator | Turned on with charge current and off again as it tapered, without flicker |
+| Home mirror | Entities, control and the Casita RV page checked from the home Home Assistant; survived a trailer Home Assistant restart (see [Mirroring](#mirroring-to-the-home-home-assistant)) |
 | INA228 Temperature | About 66 °F inside the housing at low current; no long high-current run yet |
 | 1, 2, 4, 6, 8, 9 | Not recorded |
 
