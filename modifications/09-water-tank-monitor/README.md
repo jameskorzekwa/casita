@@ -23,7 +23,7 @@ Two sensors, and only these models:
 | Fresh | **Garnet SeeLeveL II 710-ES3** 12 in sender, sold by RecPro as "SeeLevel 710 RV Tank Level Sensor (12")": [Amazon B0GWJR52N8](https://www.amazon.com/dp/B0GWJR52N8), about $70. Also from [Garnet direct](https://shopusa.garnetinstruments.com/solutions/holding-tanks/710-es3-710-es3-12-sender) | The board is 12.15 x 2.20 in with **9 segmented pads** and four programming tabs across the top (`2/GRY`, `3/BLK`, `4`, `TOP`). Two wires: blue and black. **Do not cut anything yet.** |
 | Grey | **DYP-L023MUW-V1.0** ("DYP-L02, UART Automatic"): [Amazon B0C1GFJKMV](https://www.amazon.com/dp/B0C1GFJKMV), about $22. The listing's **Size** option must say **UART Automatic**, not UART Controlled | A 27.7 mm round puck 17 mm tall with a 450 mm lead ending in a white 4-pin 2.54 mm (XH) plug. Wire colors red, black, yellow, white. The Amazon listing does not say whether the plug's mating cable is included; the pigtails in [Parts](#parts) cover it |
 
-Everything else is in [Parts](#parts). From earlier mods you already have the XIAO ESP32-S3, the Pololu regulator and 470 uF capacitor, the shielded 22 AWG cable, and the resistors for the interface. The three transistors must be bought.
+Everything else is in [Parts](#parts). From earlier mods you already have the XIAO ESP32-S3, the Pololu regulator and 470 uF capacitor, the shielded 22 AWG cable, and the resistors for the interface. The three transistors (one 2N3906, two 2N3904) come from one assortment kit.
 
 ## Build order
 
@@ -84,9 +84,9 @@ The 710-ES3 and the L02 come from different worlds: one is a Garnet RV part with
 | Seeed Studio XIAO ESP32-S3 | 1 | **On hand.** Plain board, with its U.FL antenna | [Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html) |
 | Pololu D24V5F5 12 V to 5 V regulator | 1 | **On hand** | [Pololu](https://www.pololu.com/product/2843) |
 | 470 uF 25 V electrolytic capacitor | 1 | **On hand.** Across the regulator input | |
-| BS250 P-channel MOSFET (TO-92) | 1 | Interface Q101. Any P-channel TO-92 MOSFET rated 30 V or more substitutes (BS250P, TP2104, ZVP2106). Pin order differs between makers: check the datasheet of the part received | [Amazon search: BS250](https://www.amazon.com/s?k=BS250+P-channel+MOSFET+TO-92) |
-| 2N3904 NPN transistor (TO-92) | 2 | Interface Q102, Q103. 2N2222, PN2222 or BC547 substitute (BC547 pin order is C-B-E, reversed) | [Amazon search: 2N3904](https://www.amazon.com/s?k=2N3904+NPN+transistor+TO-92) |
-| Resistors, 1/4 W: 2.2 k, 1 k x2, 220, 22 k, 10 k | 6 | **On hand.** Interface R101-R106 | |
+| 2N3906 PNP transistor (TO-92) | 1 | Interface Q101, the high-side switch. 2N2907, S8550 or BC557 substitute (BC557 pin order is C-B-E, reversed). Comes in the kit below | [Amazon: MOKMMKIT 32-value TO-92 assortment, B0DGT7RTZC](https://www.amazon.com/dp/B0DGT7RTZC) |
+| 2N3904 NPN transistor (TO-92) | 2 | Interface Q102, Q103. 2N2222, S8050 or BC547 substitute (BC547 pin order is C-B-E, reversed). Same kit | (same kit) |
+| Resistors, 1/4 W: 2.2 k x2, 1 k x2, 220, 22 k, 10 k | 7 | **On hand.** Interface R101-R107 | |
 | Perfboard, about 30 x 40 mm, and a 5-pin screw terminal or header | 1 | For the interface | [Amazon: perfboard assortment](https://www.amazon.com/dp/B07ZYNWJ1S) |
 | 4-conductor shielded cable, 22 AWG | about 4 m | **On hand** (25 ft roll from mod 07). About 3 m to the grey tank, 1 m to the sender | |
 | JST-XH 2.54 mm 4-pin pigtails | 1 pack | Mates with the L02's plug; the joint to the long cable is the disconnect point at the tank. **Confirm the plug on the first sensor**: if it is the smaller 1.25 mm type, use the mod 07 pigtails instead | [Amazon search: JST XH 2.54 mm 4-pin pigtail](https://www.amazon.com/s?k=JST+XH+2.54mm+4+pin+connector+pigtail+cable) |
@@ -142,10 +142,12 @@ L02 lead colors are from DYP's datasheet photo (red, black, yellow, white, top t
 
 ![SeeLeveL interface schematic](images/seelevel-interface.svg)
 
-This is [j9brown's interface](https://github.com/j9brown/esphome-seelevel/tree/main/seelevel-interface) (CERN-OHL-W), built on perfboard. The sender wants 12 V pulses on its blue wire and answers with short pulls to ground on the same wire; the ESP32 only has 3.3 V pins, so:
+This is [j9brown's interface](https://github.com/j9brown/esphome-seelevel/tree/main/seelevel-interface) (CERN-OHL-W), built on perfboard, with one change: the high-side switch is a **2N3906 PNP transistor** instead of the original BS250 P-channel MOSFET, because the BS250 is hard to buy in small quantities while the 2N3906 is in every TO-92 assortment kit. The sender wants 12 V pulses on its blue wire and answers with short pulls to ground on the same wire; the ESP32 only has 3.3 V pins, so:
 
-- **Transmit:** `TX` high turns on Q102 (2N3904), which pulls the gate of Q101 (BS250, P-channel) low against R101 (2.2 k) and so connects +12 V through R103 (220 ohm) to the blue wire. `TX` low releases the wire.
+- **Transmit:** `TX` high turns on Q102 (2N3904), which pulls current out of the base of Q101 (2N3906, PNP) through R107 (2.2 k); R101 (2.2 k) from base to +12 V holds Q101 off otherwise. Q101's emitter is on +12 V and its collector connects, through R103 (220 ohm), to the blue wire. So `TX` high puts about 11.8 V on the blue wire (the sender accepts 9-15 V); `TX` low releases it. About 5 mA of base drive saturates the 2N3906 for the sender's 55 mA maximum, and it switches in well under a microsecond, fast enough for the 85 us addressing pulses.
 - **Receive:** the blue wire feeds the base of Q103 (2N3904) through R105 (22 k) with R106 (10 k) to ground. While the sender is powered the wire is high, Q103 is on and `RX` reads low. When the sender pulls the wire low, Q103 turns off and `RX` is pulled up to 3.3 V by the ESP32's internal pull-up. The ESP32 never sees 12 V, and the reply is inverted, which the component expects.
+
+If you do have a BS250 (or any P-channel MOSFET rated 30 V or more), j9brown's original works unchanged: source to +12 V, gate to the R101/Q102 node (omit R107), drain to R103. Check the pin order on its datasheet; it varies between makers.
 
 Build it with the five connections brought out to a header or terminal: `+12V`, `GND`, `TX`, `RX`, `SENSOR_DATA`. Before connecting it to anything, check with the meter that `SENSOR_DATA` is open to `+12V` (Q101 off) and that `RX` to `GND` is tens of kilohms, not a short.
 
@@ -179,9 +181,9 @@ Photograph both tanks and put the photos in `photos/`.
 
 ### Step 2: Build the SeeLeveL interface
 
-1. Lay out the [schematic](#seelevel-interface-circuit) on perfboard. TO-92 pinouts, flat face toward you, legs down: **BS250** = D, G, S left to right (confirm against your part's datasheet; some BS250 suppliers differ); **2N3904** = E, B, C.
-2. Solder R101-R106 and the three transistors; bring `+12V`, `GND`, `TX`, `RX` and `SENSOR_DATA` to a header.
-3. Check: `+12V` to `SENSOR_DATA` open (megohms); `SENSOR_DATA` to `GND` about 32 k (R105 + R106); `RX` to `GND` open; `TX` to `GND` about 1 k plus a diode drop (through R102 and Q102's base).
+1. Lay out the [schematic](#seelevel-interface-circuit) on perfboard. All three transistors are TO-92 with the same pinout, flat face toward you, legs down: **E, B, C** left to right (2N3906 and 2N3904 alike). Check the kit's datasheet card anyway.
+2. Solder R101-R107 and the three transistors; bring `+12V`, `GND`, `TX`, `RX` and `SENSOR_DATA` to a header.
+3. Check: `+12V` to `SENSOR_DATA` open in one direction, a diode drop plus 220 ohm the other way (Q101's collector-base junction); `SENSOR_DATA` to `GND` about 32 k (R105 + R106); `RX` to `GND` open; `TX` to `GND` about 1 k plus a diode drop (through R102 and Q102's base).
 
 ### Step 3: Bench-wire the XIAO and flash the firmware
 
@@ -426,7 +428,7 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | Log: `interface is malfunctioning: RX is low while TX is low` | `RX` is being pulled low with the sender unpowered: Q103 wired wrong, or `RX` shorted to ground | Check Q103 pinout (E-B-C) and R104 |
-| Log: `sensor wiring short-circuits to ground` | After TX goes high, `RX` is still high: the blue wire is not reaching 12 V. Q101/Q102 wiring, no +12 V on the interface, blue shorted to ground, or Q101 pinout | Measure `SENSOR_DATA` while polling (should pulse to ~12 V); check the BS250's D-G-S against its datasheet |
+| Log: `sensor wiring short-circuits to ground` | After TX goes high, `RX` is still high: the blue wire is not reaching 12 V. Q101/Q102 wiring, no +12 V on the interface, blue shorted to ground, or a 2N3904 fitted where the 2N3906 goes | Measure `SENSOR_DATA` while polling (should pulse to ~12 V); check that Q101 is the PNP and its emitter is on +12 V |
 | Sender never replies (timeout, no segment data) | Blue/black swapped, black not sharing the ESP32 ground, sender damaged, or 12 V below 9 V | Swap wires; confirm one common ground; measure `+12V` |
 | Segment data all 255 | Sender powered but every pad saturated: metal behind the sender, or sender face against a wet or conductive surface | Move it; dry the wall |
 | Segment data all 0 with water present | Air gap under the pads, wall too thick (over 3/8 in), or sender stuck to a corner | Re-tape flat on a flat area |

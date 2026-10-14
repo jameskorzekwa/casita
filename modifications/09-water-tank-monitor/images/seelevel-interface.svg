@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640" role="img" aria-labelledby="title desc">
-  <title id="title">SeeLeveL sender interface circuit for the ESP32</title>
-  <desc id="desc">Three-transistor interface between the XIAO ESP32-S3 and the Garnet SeeLeveL sender's blue data wire, after j9brown's esphome-seelevel schematic. Transmit path: the ESP32 TX pin drives the base of NPN transistor Q102 (2N3904) through R102, 1 kilohm. Q102's collector pulls the gate of P-channel MOSFET Q101 (BS250) low; R101, 2.2 kilohm, pulls the gate up to plus 12 volts. Q101's source is on plus 12 volts and its drain feeds the sender's blue wire through R103, 220 ohms. So TX high puts 12 volts on the blue wire; TX low lets it float. Receive path: the blue wire goes through R105, 22 kilohm, to the base of NPN transistor Q103 (2N3904), with R106, 10 kilohm, from base to ground. Q103's emitter is grounded and its collector goes through R104, 1 kilohm, to the ESP32 RX pin, which has its internal pull-up to 3.3 volts enabled. The ESP32 never sees 12 volts. The sender's black wire and the 12 volt negative share the ESP32 ground.</desc>
+  <title id="title">SeeLeveL sender interface circuit for the ESP32 (PNP high-side switch)</title>
+  <desc id="desc">Three-transistor interface between the XIAO ESP32-S3 and the Garnet SeeLeveL sender's blue data wire, after j9brown's esphome-seelevel schematic. Transmit path: the ESP32 TX pin drives the base of NPN transistor Q102 (2N3904) through R102, 1 kilohm. Q102's collector pulls current from the base of PNP transistor Q101 (2N3906) through R107, 2.2 kilohm; R101, 2.2 kilohm, from base to plus 12 volts holds Q101 off otherwise. Q101's emitter is on plus 12 volts and its collector feeds the sender's blue wire through R103, 220 ohms. So TX high puts 12 volts on the blue wire; TX low lets it float. Receive path: the blue wire goes through R105, 22 kilohm, to the base of NPN transistor Q103 (2N3904), with R106, 10 kilohm, from base to ground. Q103's emitter is grounded and its collector goes through R104, 1 kilohm, to the ESP32 RX pin, which has its internal pull-up to 3.3 volts enabled. The ESP32 never sees 12 volts. The sender's black wire and the 12 volt negative share the ESP32 ground.</desc>
   <defs>
     <style>
       .t{font:600 20px system-ui,sans-serif;fill:#102a43}
@@ -39,16 +39,18 @@
   <!-- Q101 BS250 -->
   <circle class="tr" cx="640" cy="230" r="34"/>
   <text class="sb" x="640" y="226" text-anchor="middle">Q101</text>
-  <text class="s" x="640" y="246" text-anchor="middle">BS250</text>
-  <text class="s" x="655" y="180" text-anchor="start">S</text>
-  <text class="s" x="595" y="236" text-anchor="end">G</text>
-  <text class="s" x="655" y="290" text-anchor="start">D</text>
+  <text class="s" x="640" y="246" text-anchor="middle">2N3906</text>
+  <text class="s" x="655" y="180" text-anchor="start">E</text>
+  <text class="s" x="595" y="236" text-anchor="end">B</text>
+  <text class="s" x="655" y="290" text-anchor="start">C</text>
   <path class="v12" d="M640 140 V196"/>
   <!-- R101 -->
   <rect class="res" x="520" y="150" width="24" height="60" rx="4"/>
   <text class="s" x="505" y="185" text-anchor="end">R101 2.2 k</text>
   <path class="v12" d="M532 140 V150"/>
   <path class="wire" d="M532 210 V230 H606"/>
+  <rect class="res" x="440" y="238" width="60" height="24" rx="4"/>
+  <text class="s" x="470" y="230" text-anchor="middle">R107 2.2 k</text>
   <!-- Q102 -->
   <circle class="tr" cx="420" cy="330" r="34"/>
   <text class="sb" x="420" y="326" text-anchor="middle">Q102</text>
@@ -56,7 +58,8 @@
   <text class="s" x="432" y="282" text-anchor="start">C</text>
   <text class="s" x="375" y="336" text-anchor="end">B</text>
   <text class="s" x="432" y="412" text-anchor="start">E</text>
-  <path class="wire" d="M532 230 V250 H420 V296"/>
+  <path class="wire" d="M532 230 V250 H500"/>
+  <path class="wire" d="M440 250 H420 V296"/>
   <path class="gnd" d="M420 364 V560"/>
   <!-- R102 -->
   <rect class="res" x="270" y="318" width="60" height="24" rx="4"/>
@@ -106,5 +109,5 @@
   <circle cx="200" cy="560" r="5" fill="#334e68"/>
   <text class="sb" x="190" y="552" text-anchor="end">GND</text>
 
-  <text class="s" x="550" y="620" text-anchor="middle">TX high: Q102 on, Q101 gate low, +12 V on the blue wire through 220 ohm. Sender pulses the wire low: Q103 turns off, RX rises to 3.3 V (RX is inverted).</text>
+  <text class="s" x="550" y="620" text-anchor="middle">TX high: Q102 on, Q101 on via R107, +12 V on the blue wire through 220 ohm. Sender pulls the wire low: Q103 off, RX rises to 3.3 V (inverted).</text>
 </svg>
