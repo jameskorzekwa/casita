@@ -7,18 +7,18 @@ The Renogy display keeps working exactly as before. The INA228 reads the same sh
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
-> **Status (2026-10-13): installed and running. Calibration (Step 7) still to confirm.**
+> **Status (2026-10-14): installed, running and calibrated.**
 >
 > | Item | State |
 > | --- | --- |
 > | XIAO, buck regulator, C1, INA228 and wiring | Installed in the display housing. The INA228 answers at `0x40` and reports plausible readings (13.8-14.6 V on shore power; -6 A discharging to +32 A charging seen on 2026-10-13) |
 > | Firmware on the XIAO | [`esphome/casita-battery-monitor.yaml`](esphome/casita-battery-monitor.yaml) as committed here, installed wirelessly from the trailer Home Assistant's ESPHome Device Builder (ESPHome 2026.9.1) on 2026-10-13. The XIAO is on the trailer Wi-Fi |
-> | Calibration | `shunt_resistance` is still the default `0.00015 ohm`. The current sign is right (+32 A at 14.1 V while charging, -6 A while discharging). The reading has not yet been compared with a clamp meter or the Renogy display at a known current |
+> | Calibration | Done 2026-10-14 against the Renogy display: at a steady 67 A discharge (A/C on the inverter) the INA228 read 67.3 A from 10.09 mV across the shunt while the Renogy read 67.5 A, a 0.3% difference, inside the Renogy's own 1% rating. The shunt is therefore 500 A / 75 mV and `shunt_resistance` stays at `0.00015 ohm` (measured 0.000150). Sign confirmed: discharge negative |
 > | Trailer Home Assistant | Device adopted; all entities listed under [Entities](#entities) exist with the IDs shown. State of charge was set to 100% with **Mark Battery Full** on 2026-10-13 after the bank was on shore power |
 > | Home Home Assistant | The trailer's entities are mirrored to the home Home Assistant over Tailscale and shown on a **Casita RV** sidebar page there; see [Mirroring to the home Home Assistant](#mirroring-to-the-home-home-assistant) |
 > | Renogy display | Reads correctly since the WFCO converter's negative was moved from the shunt's `B-` to `P-` (see [mod 01](../01-second-battery/README.md#wiring-as-built)) |
 >
-> **Remaining work:** [Step 7](#step-7-calibrate) (measure the shunt and set `shunt_resistance`), the rest of the [Testing Checklist](#testing-checklist), and [photos](#photos). The [Build](#build) steps are kept below as the record of how it was done and for rebuilding.
+> **Remaining work:** the unrecorded items of the [Testing Checklist](#testing-checklist) and [photos](#photos). The [Build](#build) steps are kept below as the record of how it was done and for rebuilding.
 
 ## How It Works
 
@@ -208,7 +208,7 @@ If the configuration ever needs rebuilding, copy [`esphome/casita-battery-monito
 
 ### Step 7: Calibrate
 
-The configuration assumes a 500 A / 75 mV shunt (0.00015 ohm). Renogy does not publish the rating, so measure it.
+The configuration assumes a 500 A / 75 mV shunt (0.00015 ohm). Renogy does not publish the rating, so measure it. **Done 2026-10-14; the result is in the table below the steps.**
 
 1. **Sign.** Turn on a known discharge load. **Current** should be negative. If it is positive, change `current_sign` from `"-1"` to `"1"` and reinstall.
 2. **Shunt resistance.** With a steady load of at least 20 A, note the diagnostic **Shunt Voltage** (mV) and the true current: a DC clamp meter on the battery cable is best; the Renogy display (rated about 1%) is a reasonable reference. Calculate:
@@ -218,6 +218,17 @@ The configuration assumes a 500 A / 75 mV shunt (0.00015 ohm). Renogy does not p
    For example, 3.00 mV at 20.0 A gives 0.000150 ohm. About 0.00015 means a 75 mV shunt; about 0.0001 means a 50 mV shunt. Enter the value with the `ohm` unit, for example `shunt_resistance: 0.000150 ohm`, and reinstall. Check that **Current** now matches the reference within 1%.
 3. **Voltage.** Compare **Voltage** with a multimeter across the battery terminals. They should agree within about 0.05 V.
 4. **Zero.** With the trailer's loads off, **Current** should read close to 0 A (within about 0.05 A). Anything still powered behind the shunt, such as the fridge or monitors, will show up here as real current.
+
+Result, 2026-10-14, A/C running on the inverter with the trailer otherwise idle (readings are the published 5 s averages, logged every 5 s from Home Assistant):
+
+| Time (UTC) | Shunt Voltage | INA228 Current | Voltage | Renogy display |
+| --- | ---: | ---: | ---: | ---: |
+| 00:24:10 | 9.97 mV | -67.10 A | 13.43 V | |
+| 00:24:15 | 10.09 mV | -67.27 A | 13.40 V | **-67.5 A** |
+| 00:24:20 | 10.09 mV | -67.35 A | 13.37 V | |
+| 00:24:25 | 10.10 mV | -67.35 A | 13.36 V | |
+
+`10.09 mV / 1000 / 67.3 A = 0.000150 ohm`: a 75 mV shunt, matching the default. The INA228 and the Renogy agree within 0.3%, better than the Renogy's 1% rating can resolve, so `shunt_resistance` was left at `0.00015 ohm` rather than adjusted inside the reference's error. The compressor ran for only about 40 s before the thermostat stopped it; the plateau above was steady to 0.1 A, which is all the measurement needs. After the compressor stopped, the fan and inverter overhead drew about 15 A (200 W). A clamp-meter check at a higher current would tighten this further but is not required.
 
 ### Step 8: Set the starting state of charge
 
@@ -387,12 +398,13 @@ Observed so far (2026-10-13, trailer on shore power at home):
 | Item | Result |
 | --- | --- |
 | 3 | The device is up and reporting; the INA228 is read at `0x40` (the readings would be `unknown` otherwise). The boot log itself was not kept |
-| 5 (sign only) | Discharge reads negative, charge positive (+32 A at 14.1 V while the converter was charging). Agreement with a reference meter not yet checked |
+| 5 | Discharge reads negative, charge positive (+32 A at 14.1 V while the converter was charging). 2026-10-14: -67.3 A on the INA228 against -67.5 A on the Renogy display at a steady 67 A load, 0.3% apart (Step 7) |
 | 7 (manual) | **Mark Battery Full** set the state of charge to 100% after the bank had been on shore power. The automatic `Full charge detected` resync has not been observed yet |
 | Charging indicator | Turned on with charge current and off again as it tapered, without flicker |
 | Home mirror | Entities, control and the Casita RV page checked from the home Home Assistant; survived a trailer Home Assistant restart (see [Mirroring](#mirroring-to-the-home-home-assistant)) |
 | INA228 Temperature | About 66 °F inside the housing at low current; no long high-current run yet |
-| 1, 2, 4, 6, 8, 9 | Not recorded |
+| 8 | The Renogy display read -67.5 A with the INA228 connected, consistent with the load; no change in its behaviour noticed |
+| 1, 2, 4, 6, 9 | Not recorded |
 
 ## Troubleshooting
 
@@ -448,3 +460,4 @@ Add photos to `photos/` as the build progresses:
 | 2026-10-13 | ESPHome moved to the trailer's own Home Assistant; configuration set for the trailer Wi-Fi. INA228 board chosen: GODIYMODULES module (B0GX5HM4X3). Board preparation, wiring steps and diagrams updated for its `R002` shunt, pinout and address pads |
 | 2026-10-13 | INA228 wired and the firmware installed wirelessly; the device is live in the trailer's Home Assistant. Added the **Charging** binary sensor (hysteresis plus on/off delays). Trailer entities mirrored to the home Home Assistant with Remote Home-Assistant over Tailscale and a **Casita RV** sidebar page added there. Calibration (Step 7) still to do |
 | 2026-10-13 | Corrections: why the onboard shunt must go (with the 10 ohm resistors it makes the INA228 read about 0 A); genuine INA228 marking `228I`; C1 was never fitted in the serial-tap build, 220 uF 25 V added, 25 V minimum; travel-router AP isolation must be off; home Wi-Fi backup network; first Device Builder build time |
+| 2026-10-14 | Calibrated: 67.3 A (INA228) against 67.5 A (Renogy display) at a steady A/C load; shunt confirmed 500 A / 75 mV, `shunt_resistance` kept at `0.00015 ohm` |
