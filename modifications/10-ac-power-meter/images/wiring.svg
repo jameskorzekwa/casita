@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="700" viewBox="0 0 1300 700" role="img" aria-labelledby="title desc">
+  <title id="title">Shelly EM Gen3 on the Casita's 120 V wiring: where the clamps and the voltage tap go</title>
+  <desc id="desc">The shore cord enters the shore-only breaker box, which feeds the converter, the water heater element and, through its 30 amp breaker, the TS-30 transfer switch's SHORE input. The inverter feeds the TS-30's INVERTER input. The TS-30 PANEL output feeds the WFCO 30 amp main breaker. Clamp A, the first current transformer, goes on the black hot conductor of the TS-30 PANEL output: it measures every panel load from whichever source is live. Clamp B, the second current transformer, goes on the black shore cord conductor inside the shore-only box: it measures total shore draw, including the converter and water heater, and reads zero on the inverter. The Shelly's L terminal connects through a 2 amp inline fuse to the PANEL hot Wago, and its N terminal to the PANEL neutral Wago, so it is powered and measures voltage from whichever source is live. The Shelly sits in a small plastic box beside the TS-30 and reports to the trailer's Home Assistant over Wi-Fi.</desc>
+  <defs>
+    <style>
+      .t{font:600 16px system-ui,sans-serif;fill:#000}
+      .h{font:600 14px system-ui,sans-serif;fill:#000}
+      .s{font:13px system-ui,sans-serif;fill:#333}
+      .m{font:12px system-ui,sans-serif;fill:#555}
+      .box{fill:#f1f1f1;stroke:#000;stroke-width:3}
+      .hot{stroke:#000;stroke-width:4;fill:none}
+      .neu{stroke:#888;stroke-width:4;fill:none}
+      .ct{fill:#ffe08a;stroke:#b7791f;stroke-width:3}
+      .shelly{fill:#e0f2fe;stroke:#0369a1;stroke-width:3}
+      .tap{stroke:#0369a1;stroke-width:3;fill:none;stroke-dasharray:7 5}
+      .ctlead{stroke:#b7791f;stroke-width:3;fill:none;stroke-dasharray:3 6}
+      .warn{font:600 13px system-ui,sans-serif;fill:#b91c1c}
+      .b{font:12px system-ui,sans-serif;fill:#0369a1}
+    </style>
+  </defs>
+  <rect width="1300" height="700" fill="#fafafa"/>
+  <text class="t" x="20" y="32">AC power meter: Shelly EM Gen3 on the TS-30 output (120 V, 30 A)</text>
+
+  <!-- shore cord -->
+  <rect class="box" x="20" y="150" width="130" height="90" rx="8" style="fill:#e8eef7"/>
+  <text class="h" x="85" y="180" text-anchor="middle">SHORE CORD</text>
+  <text class="m" x="85" y="202" text-anchor="middle">30 A, TT-30</text>
+  <text class="m" x="85" y="220" text-anchor="middle">from the pedestal</text>
+
+  <!-- shore-only box -->
+  <rect class="box" x="230" y="80" width="300" height="200" rx="10"/>
+  <text class="h" x="380" y="108" text-anchor="middle">SHORE-ONLY BOX</text>
+  <text class="m" x="380" y="126" text-anchor="middle">30 A to TS-30, 20 A converter, 20 A water heater</text>
+  <path class="hot" d="M150,180 L320,180"/>
+  <path class="neu" d="M150,210 L320,210"/>
+  <rect class="ct" x="250" y="164" width="40" height="32" rx="8"/>
+  <text class="h" x="270" y="186" text-anchor="middle">B</text>
+  <rect x="320" y="160" width="60" height="70" rx="6" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text class="s" x="350" y="200" text-anchor="middle">30 A</text>
+  <path class="hot" d="M380,180 L640,180"/>
+  <path class="neu" d="M320,210 L640,210"/>
+  <text class="m" x="585" y="170" text-anchor="middle">10/2</text>
+  <text class="m" x="380" y="262" text-anchor="middle">converter and water heater branches not shown</text>
+  <!-- clamp B caption -->
+  <text class="s" x="190" y="300">Clamp B: total shore draw. Around the</text>
+  <text class="s" x="190" y="318">black shore conductor only, inside the box.</text>
+  <text class="m" x="190" y="336">Reads 0 A on the inverter.</text>
+
+  <!-- inverter -->
+  <rect class="box" x="400" y="330" width="150" height="80" rx="8" style="fill:#fff"/>
+  <text class="h" x="475" y="358" text-anchor="middle">Renogy 2000 W</text>
+  <text class="m" x="475" y="378" text-anchor="middle">inverter, hardwire</text>
+  <text class="m" x="475" y="394" text-anchor="middle">L / N / G</text>
+  <path class="hot" d="M550,355 L640,355"/>
+  <path class="neu" d="M550,385 L640,385"/>
+
+  <!-- TS-30 -->
+  <rect class="box" x="640" y="60" width="240" height="380" rx="10" style="fill:#e9f3ff"/>
+  <text class="h" x="760" y="88" text-anchor="middle">TS-30 TRANSFER SWITCH</text>
+  <text class="m" x="760" y="106" text-anchor="middle">shore wins after 20-45 s;</text>
+  <text class="m" x="760" y="121" text-anchor="middle">inverter otherwise</text>
+  <text class="s" x="655" y="170">SHORE in</text>
+  <text class="s" x="655" y="345">INVERTER in</text>
+  <text class="s" x="865" y="252" text-anchor="end">PANEL out</text>
+
+  <!-- PANEL out to WFCO -->
+  <path class="hot" d="M880,270 L1120,270"/>
+  <path class="neu" d="M880,300 L1120,300"/>
+  <rect class="ct" x="920" y="254" width="40" height="32" rx="8"/>
+  <text class="h" x="940" y="276" text-anchor="middle">A</text>
+  <rect x="1032" y="260" width="16" height="20" rx="3" fill="#ffe9a8" stroke="#000" stroke-width="1.5"/>
+  <rect x="1032" y="290" width="16" height="20" rx="3" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <text class="m" x="1040" y="335" text-anchor="middle">Wago joints</text>
+  <!-- clamp A caption -->
+  <text class="s" x="900" y="200">Clamp A: every panel load, from</text>
+  <text class="s" x="900" y="218">whichever source is live. Around the</text>
+  <text class="s" x="900" y="236">black PANEL conductor only.</text>
+
+  <!-- WFCO -->
+  <rect class="box" x="1120" y="225" width="160" height="120" rx="10"/>
+  <text class="h" x="1200" y="258" text-anchor="middle">WFCO</text>
+  <text class="m" x="1200" y="280" text-anchor="middle">30 A main</text>
+  <text class="m" x="1200" y="298" text-anchor="middle">A/C, outlets,</text>
+  <text class="m" x="1200" y="314" text-anchor="middle">everything on 120 V</text>
+
+  <!-- Shelly -->
+  <rect class="shelly" x="760" y="470" width="340" height="160" rx="10"/>
+  <text class="h" x="930" y="498" text-anchor="middle">SHELLY EM GEN3</text>
+  <text class="m" x="930" y="516" text-anchor="middle">in a small plastic box beside the TS-30</text>
+  <text class="s" x="780" y="548">L   from PANEL hot, through a 2 A fuse</text>
+  <text class="s" x="780" y="570">N   from PANEL neutral</text>
+  <text class="s" x="780" y="592">IA  clamp A        IB  clamp B</text>
+  <text class="m" x="780" y="614">O / I dry contact: unused</text>
+
+  <!-- voltage tap: hot via fuse -->
+  <path class="tap" d="M1040,280 L1040,400 L790,400 L790,470"/>
+  <rect x="1005" y="352" width="70" height="20" rx="4" fill="#fff" stroke="#0369a1" stroke-width="2"/>
+  <text class="b" x="1040" y="366" text-anchor="middle">2 A fuse</text>
+  <!-- voltage tap: neutral -->
+  <path class="tap" d="M1040,310 L1040,325 L1065,325 L1065,420 L820,420 L820,470"/>
+  <text class="b" x="1075" y="400">voltage tap, 14-16 AWG</text>
+  <!-- CT leads -->
+  <path class="ctlead" d="M940,286 L940,455 L900,455 L900,470"/>
+  <path class="ctlead" d="M270,196 L270,235 L200,235 L200,660 L1000,660 L1000,630"/>
+  <text class="m" x="600" y="652" text-anchor="middle">clamp B lead (route it away from the 12 V wiring)</text>
+
+  <text class="warn" x="20" y="455">Shore unplugged, inverter off, and proven dead with a meter before opening any of this.</text>
+  <text class="m" x="20" y="478">Hot = black, thick line. Neutral = white, grey line. Grounds not shown; nothing here touches them.</text>
+  <text class="m" x="20" y="496">Dashed blue = the Shelly's L and N wires. Dotted orange = clamp leads.</text>
+</svg>

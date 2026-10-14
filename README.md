@@ -25,6 +25,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
 | 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit ordered |
 | 09 | [Water tank monitor to Home Assistant (SeeLeveL + DYP L02 + XIAO ESP32-S3)](modifications/09-water-tank-monitor/README.md) | Designed; sensors ordered |
+| 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; not purchased |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
 
