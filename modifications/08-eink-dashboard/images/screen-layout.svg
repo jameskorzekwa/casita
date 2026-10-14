@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480" role="img" aria-labelledby="title desc">
   <title id="title">Casita e-ink dashboard: overview page layout, 800 by 480 pixels</title>
-  <desc id="desc">Mock-up of the dashboard's overview page at the panel's native 800 by 480 resolution, black on white. A header shows CASITA at the left, the day, date and time in the centre, and the panel's own battery at the right, above a rule. The left column is BATTERY: a very large state-of-charge percentage, a horizontal gauge with 0 and 100 labels, a row with voltage, signed current and power, a status line such as Discharging, empty in 2d 4h, and today's charged and discharged energy. A vertical divider separates the right column. Its top half is PROPANE with two vertical tank gauges labelled Tank 1 and Tank 2, each with a percentage and pounds remaining. Its bottom half is WATER with three horizontal gauges for Fresh, Grey and Black, each with a percentage. The footer shows the button hints at the left and Updated with the time at the right. Values that are unavailable are drawn as two dashes.</desc>
+  <desc id="desc">Mock-up of the dashboard's overview page at the panel's native 800 by 480 resolution, black on white. A header shows CASITA at the left, the day, date and time in the centre, and the panel's own battery at the right, above a rule. The left column is BATTERY: a very large state-of-charge percentage, a horizontal gauge with 0 and 100 labels, a row with voltage, signed current and power, a status line such as Discharging, empty in 2d 4h, today's charged and discharged energy, and an AC line with voltage, panel watts and the source. A vertical divider separates the right column. Its top half is PROPANE with two vertical tank gauges labelled Tank 1 and Tank 2, each with a percentage and pounds remaining. Its bottom half is WATER with three horizontal gauges for Fresh, Grey and Black, each with a percentage. The footer shows the button hints at the left and Updated with the time at the right. Values that are unavailable are drawn as two dashes.</desc>
   <defs>
     <style>
       text{font-family:Inter,"Segoe UI",Roboto,system-ui,sans-serif;fill:#000}
@@ -32,7 +32,8 @@
   <text class="value" x="208" y="346" text-anchor="middle">-8.4 A</text>
   <text class="value" x="400" y="346" text-anchor="end">110 W</text>
   <text class="label" x="16" y="392">Discharging  -  empty in 2d 4h</text>
-  <text class="small" x="16" y="426">Today: +1.84 kWh in, -0.92 kWh out</text>
+  <text class="small" x="16" y="418">Today: +1.84 kWh in, -0.92 kWh out</text>
+  <text class="label" x="16" y="448">AC  121 V  940 W  Inverter</text>
 
   <!-- divider -->
   <rect x="416" y="70" width="2" height="394"/>

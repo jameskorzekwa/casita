@@ -48,6 +48,7 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | Trailer network | GL.iNet Slate 7 (GL-BE3600) travel router; Home Assistant OS on a Raspberry Pi 4 Model B on the trailer network, with the ESPHome Device Builder, Tailscale, Matter Server and OpenThread Border Router add-ons and a Home Assistant Connect ZBT-1 (Thread) | Hosts the battery monitor ([mod 04](../modifications/04-battery-monitor-esp32/README.md)). Reachable remotely over Tailscale only. Its entities are mirrored to the home Home Assistant (Remote Home-Assistant integration) |
 | Home Assistant monitor | `casita-battery-monitor`: Seeed XIAO ESP32-S3 in the RBM500 housing, with a GODIYMODULES INA228 module (B0GX5HM4X3) reading the RBM500 shunt | ESPHome device in the trailer's Home Assistant, running since 2026-10-13 with plausible readings; shunt calibration to confirm; see [mod 04](../modifications/04-battery-monitor-esp32/README.md) |
 | E-ink dashboard | Seeed/TRMNL 7.5" (OG) DIY Kit: XIAO ESP32-S3 Plus driver board, 800 x 480 e-paper | Ordered, not built; ESPHome device `casita-dashboard` on the trailer's Home Assistant; see [mod 08](../modifications/08-eink-dashboard/README.md) |
+| AC meter | Shelly EM Gen3 on the TS-30 PANEL output, second clamp on the shore cord | Planned, not purchased; see [mod 10](../modifications/10-ac-power-meter/README.md) |
 
 ## Heating, Cooling and Appliances
 

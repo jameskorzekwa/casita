@@ -38,6 +38,10 @@ substitutions:
   water_fresh: sensor.casita_water_monitor_fresh_tank
   water_grey: sensor.casita_water_monitor_grey_tank
   water_black: sensor.casita_water_monitor_black_tank
+  # AC meter (mod 10). Shown as "--" until that project is built.
+  ac_voltage: sensor.casita_ac_meter_panel_voltage
+  ac_panel_power: sensor.casita_ac_meter_panel_power
+  ac_source: sensor.casita_ac_source
 
 esphome:
   name: ${name}
@@ -176,6 +180,14 @@ sensor:
     id: black
     entity_id: ${water_black}
     internal: true
+  - platform: homeassistant
+    id: ac_volts
+    entity_id: ${ac_voltage}
+    internal: true
+  - platform: homeassistant
+    id: ac_watts
+    entity_id: ${ac_panel_power}
+    internal: true
 
   # ---------------- The dashboard's own battery ----------------
   # Driver board: BAT_ADC on GPIO1 through a 100 k / 100 k divider, gated by
@@ -267,6 +279,10 @@ button:
     entity_category: diagnostic
 
 text_sensor:
+  - platform: homeassistant
+    id: ac_src
+    entity_id: ${ac_source}
+    internal: true
   - platform: wifi_info
     ip_address:
       name: "IP Address"
@@ -366,7 +382,21 @@ display:
 
         float din = id(daily_in).state, dout = id(daily_out).state;
         if (ok(din) && ok(dout))
-          it.printf(LX, 410, id(f_small), "Today: +%.2f kWh in, -%.2f kWh out", din, dout);
+          it.printf(LX, 402, id(f_small), "Today: +%.2f kWh in, -%.2f kWh out", din, dout);
+
+        // AC line (mod 10): voltage, panel watts, source
+        {
+          float av = id(ac_volts).state, aw = id(ac_watts).state;
+          std::string src = id(ac_src).state;
+          std::string label = "AC  ";
+          if (ok(av)) { char b[16]; snprintf(b, sizeof b, "%.0f V  ", av); label += b; } else label += "-- V  ";
+          if (ok(aw)) { char b[16]; snprintf(b, sizeof b, "%.0f W  ", aw); label += b; } else label += "-- W  ";
+          if (src == "shore") label += "Shore";
+          else if (src == "inverter") label += "Inverter";
+          else if (src == "none") label += "No AC";
+          else label += "--";
+          it.print(LX, 428, id(f_label), label.c_str());
+        }
 
         // ---- divider ----
         it.filled_rectangle(416, 70, 2, H - 86);
@@ -418,7 +448,10 @@ display:
         row(X1, "Time to empty", hours_str(id(time_to_empty).state)); y += 32;
         row(X1, "Time to full", hours_str(id(time_to_full).state)); y += 32;
         row(X1, "Charged today", num(id(daily_in).state, "%.2f kWh")); y += 32;
-        row(X1, "Discharged today", num(id(daily_out).state, "%.2f kWh")); y += 32;
+        row(X1, "Discharged today", num(id(daily_out).state, "%.2f kWh")); y += 48;
+        it.print(X1, y, id(f_value), "AC");  y += 44;
+        row(X1, "Voltage", num(id(ac_volts).state, "%.1f V")); y += 32;
+        row(X1, "Panel power", num(id(ac_watts).state, "%.0f W")); y += 32;
 
         y = 76;
         it.print(X2, y, id(f_value), "Tanks");  y += 44;
