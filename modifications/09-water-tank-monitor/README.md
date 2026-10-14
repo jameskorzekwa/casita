@@ -23,7 +23,7 @@ Two sensors, and only these models:
 | Fresh | **Garnet SeeLeveL II 710-ES3** 12 in sender, sold by RecPro as "SeeLevel 710 RV Tank Level Sensor (12")": [Amazon B0GWJR52N8](https://www.amazon.com/dp/B0GWJR52N8), about $70. Also from [Garnet direct](https://shopusa.garnetinstruments.com/solutions/holding-tanks/710-es3-710-es3-12-sender) | The board is 12.15 x 2.20 in with **9 segmented pads** and four programming tabs across the top (`2/GRY`, `3/BLK`, `4`, `TOP`). Two wires: blue and black. **Do not cut anything yet.** |
 | Grey | **DYP-L023MUW-V1.0** ("DYP-L02, UART Automatic"): [Amazon B0C1GFJKMV](https://www.amazon.com/dp/B0C1GFJKMV), about $22. The listing's **Size** option must say **UART Automatic**, not UART Controlled | A 27.7 mm round puck 17 mm tall with a 450 mm lead ending in a white 4-pin 2.54 mm (XH) plug. Wire colors red, black, yellow, white. The Amazon listing does not say whether the plug's mating cable is included; the pigtails in [Parts](#parts) cover it |
 
-Everything else is in [Parts](#parts). From earlier mods you already have the XIAO ESP32-S3, the Pololu regulator and 470 uF capacitor, the shielded 22 AWG cable, and the BS250 and 2N3904 transistors and resistors for the interface.
+Everything else is in [Parts](#parts). From earlier mods you already have the XIAO ESP32-S3, the Pololu regulator and 470 uF capacitor, the shielded 22 AWG cable, and the resistors for the interface. The three transistors must be bought.
 
 ## Build order
 
@@ -84,8 +84,8 @@ The 710-ES3 and the L02 come from different worlds: one is a Garnet RV part with
 | Seeed Studio XIAO ESP32-S3 | 1 | **On hand.** Plain board, with its U.FL antenna | [Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html) |
 | Pololu D24V5F5 12 V to 5 V regulator | 1 | **On hand** | [Pololu](https://www.pololu.com/product/2843) |
 | 470 uF 25 V electrolytic capacitor | 1 | **On hand.** Across the regulator input | |
-| BS250 P-channel MOSFET (TO-92) | 1 | **On hand.** Interface Q101 | |
-| 2N3904 NPN transistor (TO-92) | 2 | **On hand.** Interface Q102, Q103 | |
+| BS250 P-channel MOSFET (TO-92) | 1 | Interface Q101. Any P-channel TO-92 MOSFET rated 30 V or more substitutes (BS250P, TP2104, ZVP2106). Pin order differs between makers: check the datasheet of the part received | [Amazon search: BS250](https://www.amazon.com/s?k=BS250+P-channel+MOSFET+TO-92) |
+| 2N3904 NPN transistor (TO-92) | 2 | Interface Q102, Q103. 2N2222, PN2222 or BC547 substitute (BC547 pin order is C-B-E, reversed) | [Amazon search: 2N3904](https://www.amazon.com/s?k=2N3904+NPN+transistor+TO-92) |
 | Resistors, 1/4 W: 2.2 k, 1 k x2, 220, 22 k, 10 k | 6 | **On hand.** Interface R101-R106 | |
 | Perfboard, about 30 x 40 mm, and a 5-pin screw terminal or header | 1 | For the interface | [Amazon: perfboard assortment](https://www.amazon.com/dp/B07ZYNWJ1S) |
 | 4-conductor shielded cable, 22 AWG | about 4 m | **On hand** (25 ft roll from mod 07). About 3 m to the grey tank, 1 m to the sender | |
