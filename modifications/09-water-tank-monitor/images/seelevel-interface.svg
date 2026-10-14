@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640" role="img" aria-labelledby="title desc">
+  <title id="title">SeeLeveL sender interface circuit for the ESP32</title>
+  <desc id="desc">Three-transistor interface between the XIAO ESP32-S3 and the Garnet SeeLeveL sender's blue data wire, after j9brown's esphome-seelevel schematic. Transmit path: the ESP32 TX pin drives the base of NPN transistor Q102 (2N3904) through R102, 1 kilohm. Q102's collector pulls the gate of P-channel MOSFET Q101 (BS250) low; R101, 2.2 kilohm, pulls the gate up to plus 12 volts. Q101's source is on plus 12 volts and its drain feeds the sender's blue wire through R103, 220 ohms. So TX high puts 12 volts on the blue wire; TX low lets it float. Receive path: the blue wire goes through R105, 22 kilohm, to the base of NPN transistor Q103 (2N3904), with R106, 10 kilohm, from base to ground. Q103's emitter is grounded and its collector goes through R104, 1 kilohm, to the ESP32 RX pin, which has its internal pull-up to 3.3 volts enabled. The ESP32 never sees 12 volts. The sender's black wire and the 12 volt negative share the ESP32 ground.</desc>
+  <defs>
+    <style>
+      .t{font:600 20px system-ui,sans-serif;fill:#102a43}
+      .s{font:15px system-ui,sans-serif;fill:#334e68}
+      .sb{font:600 15px system-ui,sans-serif;fill:#102a43}
+      .wire{fill:none;stroke:#334e68;stroke-width:3}
+      .v12{fill:none;stroke:#c53030;stroke-width:3}
+      .gnd{fill:none;stroke:#334e68;stroke-width:3}
+      .blue{fill:none;stroke:#186faf;stroke-width:4}
+      .res{fill:#fff;stroke:#334e68;stroke-width:3}
+      .tr{fill:#efe9ff;stroke:#6b46c1;stroke-width:3}
+      .side{fill:#f5f7fa;stroke:#243b53;stroke-width:2;stroke-dasharray:8 6}
+    </style>
+  </defs>
+  <rect width="1100" height="640" rx="24" fill="#fff"/>
+
+  <!-- side boxes -->
+  <rect class="side" x="30" y="60" width="170" height="440" rx="14"/>
+  <text class="t" x="115" y="92" text-anchor="middle">XIAO ESP32-S3</text>
+  <text class="s" x="115" y="114" text-anchor="middle">3.3 V logic</text>
+  <rect class="side" x="900" y="60" width="170" height="440" rx="14"/>
+  <text class="t" x="985" y="92" text-anchor="middle">Sender</text>
+  <text class="s" x="985" y="114" text-anchor="middle">710-ES3, two wires</text>
+
+  <!-- +12V rail -->
+  <path class="v12" d="M260 140 H840"/>
+  <text class="sb" x="550" y="130" text-anchor="middle" fill="#c53030">+12 V (fused, from the buck regulator input)</text>
+
+  <!-- GND rail -->
+  <path class="gnd" d="M200 560 H900"/>
+  <text class="sb" x="550" y="585" text-anchor="middle">GND: ESP32 GND, 12 V negative and the sender's black wire</text>
+  <path class="gnd" d="M900 560 H940 V440"/>
+  <text class="s" x="985" y="430" text-anchor="middle">black</text>
+  <circle cx="940" cy="440" r="5" fill="#334e68"/>
+
+  <!-- Q101 BS250 -->
+  <circle class="tr" cx="640" cy="230" r="34"/>
+  <text class="sb" x="640" y="226" text-anchor="middle">Q101</text>
+  <text class="s" x="640" y="246" text-anchor="middle">BS250</text>
+  <text class="s" x="655" y="180" text-anchor="start">S</text>
+  <text class="s" x="595" y="236" text-anchor="end">G</text>
+  <text class="s" x="655" y="290" text-anchor="start">D</text>
+  <path class="v12" d="M640 140 V196"/>
+  <!-- R101 -->
+  <rect class="res" x="520" y="150" width="24" height="60" rx="4"/>
+  <text class="s" x="505" y="185" text-anchor="end">R101 2.2 k</text>
+  <path class="v12" d="M532 140 V150"/>
+  <path class="wire" d="M532 210 V230 H606"/>
+  <!-- Q102 -->
+  <circle class="tr" cx="420" cy="330" r="34"/>
+  <text class="sb" x="420" y="326" text-anchor="middle">Q102</text>
+  <text class="s" x="420" y="346" text-anchor="middle">2N3904</text>
+  <text class="s" x="432" y="282" text-anchor="start">C</text>
+  <text class="s" x="375" y="336" text-anchor="end">B</text>
+  <text class="s" x="432" y="412" text-anchor="start">E</text>
+  <path class="wire" d="M532 230 V250 H420 V296"/>
+  <path class="gnd" d="M420 364 V560"/>
+  <!-- R102 -->
+  <rect class="res" x="270" y="318" width="60" height="24" rx="4"/>
+  <text class="s" x="300" y="308" text-anchor="middle">R102 1 k</text>
+  <path class="wire" d="M200 330 H270"/>
+  <path class="wire" d="M330 330 H386"/>
+  <text class="sb" x="190" y="322" text-anchor="end">TX (D4)</text>
+  <circle cx="200" cy="330" r="5" fill="#334e68"/>
+
+  <!-- R103 and blue wire -->
+  <path class="wire" d="M640 264 V300"/>
+  <rect class="res" x="628" y="300" width="24" height="60" rx="4"/>
+  <text class="s" x="665" y="335" text-anchor="start">R103 220</text>
+  <path class="blue" d="M640 360 V400 H940 V380"/>
+  <circle cx="940" cy="380" r="5" fill="#186faf"/>
+  <text class="s" x="985" y="372" text-anchor="middle">blue (data)</text>
+  <text class="sb" x="790" y="392" text-anchor="middle" fill="#186faf">SENSOR_DATA</text>
+
+  <!-- Receive path -->
+  <rect class="res" x="700" y="430" width="60" height="24" rx="4"/>
+  <text class="s" x="730" y="476" text-anchor="middle">R105 22 k</text>
+  <path class="blue" d="M780 400 V442 H760"/>
+  <path class="wire" d="M700 442 H584"/>
+  <!-- Q103 -->
+  <circle class="tr" cx="550" cy="442" r="34"/>
+  <text class="sb" x="550" y="438" text-anchor="middle">Q103</text>
+  <text class="s" x="550" y="458" text-anchor="middle">2N3904</text>
+  <text class="s" x="562" y="396" text-anchor="start">C</text>
+  <text class="s" x="505" y="448" text-anchor="end">B</text>
+  <text class="s" x="562" y="504" text-anchor="start">E</text>
+  <path class="gnd" d="M550 476 V560"/>
+  <!-- R106 -->
+  <rect class="res" x="608" y="470" width="24" height="60" rx="4"/>
+  <text class="s" x="645" y="505" text-anchor="start">R106 10 k</text>
+  <path class="wire" d="M620 442 V470"/>
+  <path class="gnd" d="M620 530 V560"/>
+  <!-- R104 to RX -->
+  <path class="wire" d="M550 408 V380 H428 A8 8 0 0 0 412 380 H330"/>
+  <rect class="res" x="270" y="368" width="60" height="24" rx="4"/>
+  <text class="s" x="300" y="410" text-anchor="middle">R104 1 k</text>
+  <path class="wire" d="M270 380 H200"/>
+  <circle cx="200" cy="380" r="5" fill="#334e68"/>
+  <text class="sb" x="190" y="372" text-anchor="end">RX (D5)</text>
+  <text class="s" x="115" y="400" text-anchor="middle">internal pull-up</text>
+  <text class="s" x="115" y="420" text-anchor="middle">to 3.3 V enabled</text>
+  <!-- ESP GND -->
+  <circle cx="200" cy="560" r="5" fill="#334e68"/>
+  <text class="sb" x="190" y="552" text-anchor="end">GND</text>
+
+  <text class="s" x="550" y="620" text-anchor="middle">TX high: Q102 on, Q101 gate low, +12 V on the blue wire through 220 ohm. Sender pulses the wire low: Q103 turns off, RX rises to 3.3 V (RX is inverted).</text>
+</svg>
