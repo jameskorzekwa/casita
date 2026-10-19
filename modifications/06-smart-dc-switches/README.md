@@ -1,6 +1,6 @@
-# Four Smart DC Switches — Carling Rockers + KinCony KC868-A4S
+# Four Smart DC Switches — BANDC Rockers + KinCony KC868-A4S
 
-> **Status: Planned / bench-validation required (2026-10-13).** The owner selected four **Carling V8D1-S00B** bodies and one **KinCony KC868-A4S**. Not purchased or installed. This project contains a control design and firmware candidate, not approval to connect the trailer's unidentified loads. The candidate compiled successfully with ESPHome 2026.9.1 using synthetic build-only credentials; physical tests remain pending.
+> **Status: Planned / bench-validation required (updated 2026-10-19).** The owner plans to buy four **BANDC three-pin momentary SPDT** rockers ([Amazon listing, selected 2026-10-19](https://www.amazon.com/dp/B0CNS17ZMK)) instead of the originally selected Carling V8D1-S00B bodies. The KinCony KC868-A4S remains the planned controller. No purchase or installation has been confirmed. This project contains a control design and firmware candidate, not approval to connect the trailer's unidentified loads. The candidate compiled successfully with ESPHome 2026.9.1 using synthetic build-only credentials; physical tests remain pending.
 
 Replace four existing illuminated DC rockers with unlit, two-direction momentary rockers. One controller handles four independent channels locally and exposes those same output switches to Home Assistant. Background and alternatives remain in [the research record](../../docs/smart-dc-switch-research.md).
 
@@ -18,12 +18,12 @@ This is explicit ON/OFF, never toggle. The rocker resting position is not a stat
 
 ## Parts / planning BOM
 
-Quantities below are for four channels. Only bodies and controller are owner-selected; remaining exact parts and ratings are TBD. No purchases are recorded.
+Quantities below are for four channels. The BANDC listing is the owner's intended purchase, not a verified mechanical/electrical fit; the controller selection is unchanged. Remaining exact parts and ratings are TBD. No purchases are recorded.
 
 | Part | Qty | Selection / specification gate |
 | --- | ---: | --- |
-| Carling V8D1-S00B SPDT `(ON)-OFF-(ON)`, no lamp | 4 | [Carling V-Series manufacturer datasheet](https://www.carlingtech.com/sites/default/files/documents/V-Series_datasheet.pdf); [specific body / supplier](https://newwiremarine.com/product/v8d1-s00b-mom-off-mom-rocker-switch/) |
-| Compatible Carling actuators/caps with durable load labels | 4 | Select exact compatible series and legend after identifying loads. Existing Nilight caps are not assumed compatible. These bodies provide **no illumination** |
+| BANDC three-pin SPDT `(ON)-OFF-(ON)` rockers, no lamp | 4 | [Owner-selected Amazon listing (3Pin-Momentary variant)](https://www.amazon.com/dp/B0CNS17ZMK). Seller-described behavior only; confirm exact variant and received parts before wiring. Not Carling V8D1-S00B. |
+| Durable load and UP ON / DOWN OFF labels; compatible caps if needed | 4 sets, TBD | Check what is included with the received switches. Do not assume the existing Nilight caps fit. No lamp-state indication is planned. |
 | KinCony KC868-A4S | 1 | [Manufacturer I/O definition](https://www.kincony.com/forum/showthread.php?tid=2617), [manufacturer ESPHome mapping](https://www.kincony.com/forum/showthread.php?tid=2618), [manufacturer parameter sheet](https://www.kincony.com/images/KC868-A4S/KC868-A4S-1_05.jpg) |
 | Enclosure with standoffs, terminal covers and strain relief | 1 | Board is published as **146 x 105 mm**; allow extra depth, wiring bends, thermal clearance, antenna space and service access |
 | DC-rated controller input fuse and holder | 1 set | Rating TBD from electronics demand, conductor ampacity, voltage and interrupt rating; place at source of new supply branch |
@@ -33,7 +33,7 @@ Quantities below are for four channels. Only bodies and controller are owner-sel
 | Coil suppression and any load suppression | Per inductive circuit, TBD | Match relay/coil polarity and driver capability; follow manufacturer guidance, including release-time consequences |
 | Branch fuses / holders | Per circuit, TBD | Preserve existing protection and add protection for every new conductor as required; select by wire and load, not guesswork |
 
-Published nominal Carling panel cutout is **0.830 x 1.450 in (21.08 x 36.83 mm)**. This does not prove fit in the existing Nilight panel. Measure all four openings, thickness, actuator clearance, body depth and terminal clearance. Remote-mount the board if necessary. Do not order caps or alter the panel on assumed dimensions.
+The BANDC listing advertises an approximately **0.83 x 1.46 in** mounting opening, but its details also give **37.2 x 21.2 mm**; these seller dimensions and tolerances are not a fit guarantee. Measure all four existing Nilight openings, panel thickness, actuator clearance, body depth and terminal clearance; check the received parts before cutting or mounting anything. Remote-mount the board if necessary. Do not order extra caps or alter the panel on assumed dimensions.
 
 ## Control wiring — separate from load power
 
@@ -41,9 +41,9 @@ Published nominal Carling panel cutout is **0.830 x 1.450 in (21.08 x 36.83 mm)*
 
 ### Rocker continuity and orientation
 
-Carling's circuit uses **terminal 2 as common**, with **1 and 3 as the two throws**. Treat this as the documented pin assignment, **not a completed continuity measurement** on purchased parts. With each loose body disconnected from all power, verify 2–1 and 2–3 continuity through both presses and center. Record which throw closes when pressing the installed actuator's physical UP side. **Exact UP-to-1/3 orientation is not yet known.** Never infer it from the rear view or terminal position.
+The previous Carling terminal numbering **does not apply** to the BANDC selection. The Amazon listing describes three-pin momentary SPDT behavior, but does not establish a trustworthy pin map or physical UP orientation for the received parts. Off-trailer with each loose rocker disconnected from all power, use continuity to identify its common and both throws; confirm center opens both, each press closes only one, and spring return works in both directions. Record which throw closes for the installed actuator's physical UP side. If the received switch fails any check, stop and revise the wiring plan rather than guessing from terminal position or wire color.
 
-- Terminal **2** of each rocker goes to the board's documented **dry-input GND/common reference**, after verifying that terminal on the received board's schematic/silkscreen.
+- The **continuity-verified common** of each rocker goes to the board's documented **dry-input GND/common reference**, after verifying that terminal on the received board's schematic/silkscreen.
 - The throw verified to close on **UP** goes to the odd DI input in the table below; the other throw goes to the even DI input.
 - Center must leave both circuits open. Pressing one direction must close only its intended circuit. Use fresh labeled signal conductors, or reuse conductors only after complete isolation and identification.
 - **Never connect the old 12 V switch-positive jumpers, illumination feed, or battery positive to any DI/GPIO or rocker common in this dry-contact circuit.** The old lamp harness is not an input harness. Keep load supply and dry signals separated.
@@ -105,7 +105,7 @@ The test never reads or provisions `secrets.yaml`. If PyYAML is missing, it exit
 ## Planned build sequence
 
 1. Photograph and label the original panel, every connector, fuse and conductor. Identify all four loads and complete the worksheet. Keep the original panel/harness intact for rollback.
-2. Measure mechanical fit; select compatible actuators, enclosure and rated protection/interface parts. Confirm exact received board revision against its schematic and terminal legends.
+2. Measure mechanical fit; inspect the received rockers and select labels/compatible actuators if needed, enclosure and rated protection/interface parts. Confirm exact received board revision against its schematic and terminal legends.
 3. Off-trailer, with **no battery connected**, perform the loose-rocker continuity/orientation checks. Label each UP/DOWN conductor and match the table.
 4. After separate firmware validation/compile, bench-test on a current-limited supply with low-energy, current-limited LED test loads; keep trailer loads disconnected. Verify relay contact polarity before any load trial.
 5. Complete the [commissioning checklist](TESTS.md), including extended network outages, power disturbances and both orders of HA/button control. Record actual observations and firmware version.
@@ -127,3 +127,4 @@ Keep the original panel, switches and labeled harness, plus before photos and a 
 | Date | Change / evidence |
 | --- | --- |
 | 2026-10-13 | Owner-selected bodies/controller; planned four-channel project, source-checked mapping, firmware candidate, diagram and acceptance checklist. Five static tests passed; SVG rendered and visually reviewed; ESPHome 2026.9.1 compilation passed using synthetic credentials. Independent review completed and I2C-failure acceptance gate added. No purchases, physical tests, firmware upload or installation recorded. |
+| 2026-10-19 | Owner changed planned rocker purchase to four BANDC three-pin momentary SPDT switches (Amazon B0CNS17ZMK), replacing the previously selected Carling bodies. Pin map, fit and received-part behavior remain unverified; no purchase or physical test confirmed. Controller/firmware choice unchanged. |

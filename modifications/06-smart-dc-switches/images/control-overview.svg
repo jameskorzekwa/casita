@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
-  <title id="title">Planned four-channel Carling and KC868-A4S control architecture</title>
-  <desc id="desc">Four spring-return rockers connect only dry contacts to DI1 through DI8. Terminal 2 is common; continuity determines which throw is UP. The independently fused controller commands four relay channels. Dashed arrows show conditional external DC-rated interfaces, not approved direct load wiring. All current returns use the system side of the shunt.</desc>
+  <title id="title">Planned four-channel BANDC and KC868-A4S control architecture</title>
+  <desc id="desc">Four planned BANDC spring-return rockers connect only continuity-verified dry contacts to DI1 through DI8. The common pin and UP throw must be identified on each received switch. The independently fused controller commands four relay channels. Dashed arrows show conditional external DC-rated interfaces, not approved direct load wiring. All current returns use the system side of the shunt.</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#334155"/></marker>
   </defs>
@@ -13,14 +13,14 @@
     <text x="50" y="148" font-size="16">Unswitched by these four outputs; controller remains powered. Published board supply: 9–24 V DC.</text>
     <text x="50" y="175" font-size="16">Fuse, wire and transient protection: TBD. Returns → system negative / shunt P-; never bypass the shunt.</text>
     <rect x="30" y="230" width="330" height="326" rx="8" fill="#dbeafe" stroke="#2563eb"/>
-    <text x="48" y="259" font-size="20" font-weight="bold">4 × Carling V8D1-S00B</text>
-    <text x="48" y="286" font-size="16">Unlit; new compatible actuators</text>
+    <text x="48" y="259" font-size="20" font-weight="bold">4 × BANDC 3-pin SPDT</text>
+    <text x="48" y="286" font-size="16">Momentary; fit / pinout unverified</text>
     <text x="48" y="318" font-size="16">Rocker 1: UP / DOWN → DI1 / DI2</text>
     <text x="48" y="356" font-size="16">Rocker 2: UP / DOWN → DI3 / DI4</text>
     <text x="48" y="394" font-size="16">Rocker 3: UP / DOWN → DI5 / DI6</text>
     <text x="48" y="432" font-size="16">Rocker 4: UP / DOWN → DI7 / DI8</text>
-    <text x="48" y="471" font-size="16">Each terminal 2 → input common</text>
-    <text x="48" y="498" font-size="16">Throws 1 / 3: verify UP by continuity</text>
+    <text x="48" y="471" font-size="16">Verified common → input GND</text>
+    <text x="48" y="498" font-size="16">Verify UP / DOWN throws by continuity</text>
     <text x="48" y="530" font-size="16" font-weight="bold">NO 12 V feed on dry contacts</text>
     <rect x="425" y="230" width="340" height="326" rx="8" fill="#dcfce7" stroke="#15803d"/>
     <text x="443" y="259" font-size="20" font-weight="bold">KC868-A4S / ESPHome</text>
