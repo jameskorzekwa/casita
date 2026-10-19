@@ -30,7 +30,7 @@
   <g>
     <circle class="pin use" cx="470" cy="150" r="12"/><text class="p" x="510" y="155">5V</text><text class="g" x="560" y="155">buck 5V OUT</text>
     <circle class="pin use" cx="470" cy="200" r="12"/><text class="p" x="510" y="205">GND</text><text class="g" x="560" y="205">buck GND, INA GND</text>
-    <circle class="pin use" cx="470" cy="250" r="12"/><text class="p" x="510" y="255">3V3</text><text class="g" x="560" y="255">INA228 VIN/VS</text>
+    <circle class="pin use" cx="470" cy="250" r="12"/><text class="p" x="510" y="255">3V3</text><text class="g" x="560" y="255">INA228 VCC</text>
     <circle class="pin" cx="470" cy="300" r="10"/><text class="p" x="510" y="305">D10</text><text class="g" x="570" y="305">GPIO9</text>
     <circle class="pin" cx="470" cy="350" r="10"/><text class="p" x="510" y="355">D9</text><text class="g" x="570" y="355">GPIO8</text>
     <circle class="pin" cx="470" cy="400" r="10"/><text class="p" x="510" y="405">D8</text><text class="g" x="570" y="405">GPIO7</text>

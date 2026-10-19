@@ -1,56 +1,89 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="600" viewBox="0 0 1100 600" role="img" aria-labelledby="title desc">
   <title id="title">Preparing the INA228 breakout for an external shunt</title>
-  <desc id="desc">On the Adafruit INA228 breakout (product 5832), the onboard 15 milliohm shunt resistor R1, a large 2512 part between the chip and the three-pin terminal block, connects directly across VIN plus and VIN minus. It must be desoldered. Afterwards the resistance from VIN plus to VIN minus should be tens of kilohms, not near zero. On the back, the VBUS jumper SJ1 must stay open so VBUS can be wired to battery positive separately, and the A0 and A1 address jumpers stay open for address 0x40. Generic INA228 modules also carry an onboard shunt, often marked R002, R010 or R100, which must be removed the same way.</desc>
+  <desc id="desc">On the GODIYMODULES INA228 module, the onboard 2 milliohm shunt resistor marked R002 sits next to the three-screw terminal block (VIN plus, VBUS, VIN minus) and connects directly across VIN plus and VIN minus. It must be desoldered. Afterwards the resistance from VIN plus to VIN minus should be tens of kilohms, not near zero. The V plus solder jumper beside the shunt must stay open so VBUS can be wired to battery positive separately; VBUS to VIN plus must read open. The address pad grid has a column for A1 and A0 and rows G, V, SDA and SCL; bridging only the G row for both gives I2C address 0x40. The five-pin header is GND, ALE, SCL, SDA, VCC. On the Adafruit 5832 the shunt is R1 marked R015, the VBUS jumper is SJ1, and A0 and A1 are left open for 0x40.</desc>
   <defs>
     <style>
-      .pcb{fill:#1e3a8a;stroke:#0b1f4d;stroke-width:4}
+      .pcb{fill:#b91c1c;stroke:#7f1d1d;stroke-width:4}
       .silk{font:600 15px ui-monospace,monospace;fill:#f8fafc}
-      .silks{font:13px ui-monospace,monospace;fill:#cbd5e1}
+      .silks{font:13px ui-monospace,monospace;fill:#fee2e2}
       .t{font:600 20px system-ui,sans-serif;fill:#102a43}
       .s{font:15px system-ui,sans-serif;fill:#334e68}
       .warn{font:600 15px system-ui,sans-serif;fill:#b91c1c}
-      .x{stroke:#ef4444;stroke-width:6}
+      .x{stroke:#111827;stroke-width:5;opacity:0.6}
       .ok{fill:none;stroke:#16a34a;stroke-width:3;stroke-dasharray:6 5}
+      .pad{fill:#d1d5db}
+      .bridge{fill:#9ca3af;stroke:#f8fafc;stroke-width:2}
     </style>
   </defs>
-  <rect width="1100" height="560" rx="24" fill="#fff"/>
+  <rect width="1100" height="600" rx="24" fill="#fff"/>
 
-  <text class="t" x="40" y="44">Front (Adafruit 5832 shown)</text>
-  <rect class="pcb" x="40" y="70" width="440" height="330" rx="18"/>
-  <rect x="80" y="110" width="90" height="70" rx="6" fill="#0f172a"/>
-  <text class="silks" x="125" y="200" text-anchor="middle">INA228 (IC1)</text>
-  <rect x="210" y="125" width="110" height="45" rx="4" fill="#111827" stroke="#9ca3af" stroke-width="2"/>
-  <text class="silk" x="265" y="153" text-anchor="middle">R015</text>
-  <line class="x" x1="200" y1="115" x2="330" y2="180"/><line class="x" x1="330" y1="115" x2="200" y2="180"/>
-  <text class="silks" x="265" y="200" text-anchor="middle">R1 15 mOhm shunt</text>
-  <rect x="360" y="100" width="90" height="120" rx="6" fill="#16a34a" opacity="0.85"/>
-  <text class="silks" x="405" y="130" text-anchor="middle">VIN-</text>
-  <text class="silks" x="405" y="165" text-anchor="middle">VBUS</text>
-  <text class="silks" x="405" y="200" text-anchor="middle">VIN+</text>
-  <text class="silks" x="405" y="240" text-anchor="middle">terminal block</text>
+  <text class="t" x="40" y="44">GODIYMODULES INA228 module (top)</text>
+  <rect class="pcb" x="40" y="70" width="560" height="360" rx="18"/>
+
+  <!-- header -->
+  <rect x="60" y="110" width="40" height="230" rx="6" fill="#111827"/>
+  <text class="silk" x="112" y="135">GND</text>
+  <text class="silk" x="112" y="180">ALE</text>
+  <text class="silk" x="112" y="225">SCL</text>
+  <text class="silk" x="112" y="270">SDA</text>
+  <text class="silk" x="112" y="315">VCC</text>
+
+  <!-- address pads -->
+  <text class="silk" x="185" y="100">A1</text>
+  <text class="silk" x="235" y="100">A0</text>
   <g>
-    <rect x="70" y="330" width="380" height="40" rx="6" fill="#0b1f4d"/>
-    <text class="silks" x="260" y="355" text-anchor="middle">header: VIN GND SCL SDA ALRT VIN- VBUS VIN+</text>
-    <text class="silks" x="260" y="390" text-anchor="middle">(check your board's silkscreen for the order)</text>
+    <rect class="bridge" x="180" y="112" width="34" height="22" rx="8"/>
+    <rect class="bridge" x="230" y="112" width="34" height="22" rx="8"/>
+    <rect class="pad" x="180" y="142" width="34" height="18" rx="3"/><rect class="pad" x="230" y="142" width="34" height="18" rx="3"/>
+    <rect class="pad" x="180" y="168" width="34" height="18" rx="3"/><rect class="pad" x="230" y="168" width="34" height="18" rx="3"/>
+    <rect class="pad" x="180" y="194" width="34" height="18" rx="3"/><rect class="pad" x="230" y="194" width="34" height="18" rx="3"/>
   </g>
+  <text class="silks" x="272" y="128">G</text>
+  <text class="silks" x="272" y="156">V</text>
+  <text class="silks" x="272" y="182">SDA</text>
+  <text class="silks" x="272" y="208">SCL</text>
+  <rect class="ok" x="172" y="106" width="100" height="34" rx="6"/>
 
-  <text class="t" x="560" y="44">Back</text>
-  <rect class="pcb" x="560" y="70" width="300" height="230" rx="18"/>
-  <rect x="610" y="120" width="40" height="22" rx="4" fill="#d4a017"/><rect x="660" y="120" width="40" height="22" rx="4" fill="#d4a017"/>
-  <text class="silk" x="655" y="170" text-anchor="middle">A0  A1</text>
-  <rect class="ok" x="600" y="110" width="110" height="42" rx="6"/>
-  <rect x="760" y="200" width="40" height="22" rx="4" fill="#d4a017"/>
-  <text class="silk" x="780" y="250" text-anchor="middle">VBUS (SJ1)</text>
-  <rect class="ok" x="750" y="190" width="60" height="42" rx="6"/>
+  <!-- chip -->
+  <rect x="200" y="250" width="80" height="60" rx="6" fill="#0f172a"/>
+  <text class="silks" x="240" y="330" text-anchor="middle">INA228</text>
 
-  <text class="t" x="560" y="350">Checklist</text>
-  <text class="warn" x="560" y="382">1. Desolder R1 (the onboard shunt).</text>
-  <text class="s" x="580" y="406">Then VIN+ to VIN- must read tens of kOhm, not near 0.</text>
-  <text class="s" x="560" y="440">2. Leave VBUS jumper SJ1 open (default).</text>
-  <text class="s" x="580" y="464">VBUS to VIN+ must read open.</text>
-  <text class="s" x="560" y="498">3. Leave A0/A1 open: I2C address 0x40.</text>
-  <text class="s" x="40" y="440">Generic modules: the shunt is usually a large resistor marked</text>
-  <text class="s" x="40" y="462">R002, R010 or R100 between the screw terminals. Remove it</text>
-  <text class="s" x="40" y="484">and confirm the chip is marked INA228 (some clones are INA226).</text>
-  <text class="s" x="40" y="530">Drawing is schematic, not to scale.</text>
+  <!-- V+ jumper -->
+  <rect class="pad" x="320" y="150" width="18" height="26" rx="3"/><rect class="pad" x="342" y="150" width="18" height="26" rx="3"/>
+  <text class="silks" x="340" y="140" text-anchor="middle">V+</text>
+  <rect class="ok" x="312" y="144" width="56" height="38" rx="6"/>
+
+  <!-- shunt -->
+  <rect x="380" y="190" width="70" height="120" rx="4" fill="#78716c" stroke="#e7e5e4" stroke-width="2"/>
+  <text class="silk" x="415" y="255" text-anchor="middle">R002</text>
+  <line class="x" x1="370" y1="180" x2="460" y2="320"/><line class="x" x1="460" y1="180" x2="370" y2="320"/>
+  <text class="silks" x="415" y="345" text-anchor="middle">R002: 2 mOhm shunt</text>
+
+  <!-- terminal -->
+  <rect x="480" y="100" width="100" height="250" rx="6" fill="#f97316"/>
+  <circle cx="530" cy="150" r="24" fill="#fdba74"/><circle cx="530" cy="225" r="24" fill="#fdba74"/><circle cx="530" cy="300" r="24" fill="#fdba74"/>
+  <text class="silk" x="530" y="155" text-anchor="middle" style="fill:#111827">VIN+</text>
+  <text class="silk" x="530" y="230" text-anchor="middle" style="fill:#111827">VBUS</text>
+  <text class="silk" x="530" y="305" text-anchor="middle" style="fill:#111827">VIN-</text>
+  <text class="silks" x="530" y="375" text-anchor="middle">terminal block</text>
+
+  <text class="s" x="40" y="470">Address grid: one column per address pin. Bridge only the G row for</text>
+  <text class="s" x="40" y="492">both A1 and A0 (address 0x40); many modules ship this way.</text>
+  <text class="s" x="40" y="526">Adafruit 5832: shunt is R1 marked R015; VBUS jumper is SJ1 on the</text>
+  <text class="s" x="40" y="548">back; leave A0/A1 open for 0x40. Power pin is VIN, alert is ALRT.</text>
+  <text class="s" x="40" y="582">Drawing is schematic, not to scale.</text>
+
+  <text class="t" x="640" y="44">Checklist</text>
+  <text class="s" x="640" y="84">1. Chip marking includes 228 (not 226).</text>
+  <text class="warn" x="640" y="122">2. Desolder R002 (the onboard shunt).</text>
+  <text class="s" x="660" y="146">Hot air, or two irons. Do not cut it off.</text>
+  <text class="s" x="660" y="170">Then VIN+ to VIN- must read tens of kOhm,</text>
+  <text class="s" x="660" y="194">not near 0.</text>
+  <text class="s" x="640" y="232">3. VBUS to VIN+ must read open.</text>
+  <text class="s" x="660" y="256">If not, open the V+ jumper.</text>
+  <text class="s" x="640" y="294">4. A1 and A0 bridged to G only: 0x40.</text>
+  <text class="s" x="640" y="332">5. Solder the 5-pin header. ALE stays</text>
+  <text class="s" x="660" y="356">unconnected.</text>
+  <text class="s" x="640" y="394">6. Add 10 Ohm in series with VIN+ and VIN-</text>
+  <text class="s" x="660" y="418">and 0.1 uF across them at the terminal.</text>
 </svg>

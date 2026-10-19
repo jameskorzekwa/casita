@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520" role="img" aria-labelledby="title desc">
+  <title id="title">Casita e-ink dashboard: how the data gets to the panel</title>
+  <desc id="desc">The battery monitor, the propane monitor and a future water-tank monitor are ESPHome devices on the trailer Wi-Fi that report to the trailer's Home Assistant. The dashboard is another ESPHome device on the same Wi-Fi: a XIAO ESP32-S3 Plus on the TRMNL driver board. Home Assistant pushes the chosen entity states to it over the ESPHome API, and the ESP32 draws them on the 7.5 inch 800 by 480 e-paper panel every minute. The dashboard is powered from the trailer's 12 volt system through a USB-C adapter, with the kit's 2000 mAh battery as an optional backup. Everything works at the campsite without internet; the trailer's Home Assistant also mirrors the entities to the home Home Assistant over Tailscale.</desc>
+  <defs>
+    <style>
+      .box{fill:#f8fafc;stroke:#334e68;stroke-width:3}
+      .dev{fill:#e6f4ea;stroke:#2f855a;stroke-width:3}
+      .ha{fill:#e0f2fe;stroke:#0369a1;stroke-width:3}
+      .panel{fill:#fff;stroke:#111;stroke-width:4}
+      .t{font:600 20px system-ui,sans-serif;fill:#102a43}
+      .s{font:15px system-ui,sans-serif;fill:#334e68}
+      .w{stroke:#0369a1;stroke-width:3;fill:none}
+      .p{stroke:#c53030;stroke-width:3;fill:none}
+      .arrow{fill:#0369a1}
+    </style>
+    <marker id="ah" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow"/></marker>
+  </defs>
+  <rect width="1100" height="520" rx="24" fill="#fff"/>
+
+  <!-- sources -->
+  <rect class="dev" x="40" y="60" width="230" height="90" rx="12"/>
+  <text class="t" x="155" y="96" text-anchor="middle">Battery monitor</text>
+  <text class="s" x="155" y="122" text-anchor="middle">mod 04, ESPHome</text>
+
+  <rect class="dev" x="40" y="190" width="230" height="90" rx="12"/>
+  <text class="t" x="155" y="226" text-anchor="middle">Propane monitor</text>
+  <text class="s" x="155" y="252" text-anchor="middle">mod 07, ESPHome</text>
+
+  <rect class="dev" x="40" y="320" width="230" height="90" rx="12" stroke-dasharray="8 6"/>
+  <text class="t" x="155" y="356" text-anchor="middle">Water tanks</text>
+  <text class="s" x="155" y="382" text-anchor="middle">future project</text>
+
+  <!-- HA -->
+  <rect class="ha" x="400" y="150" width="260" height="170" rx="14"/>
+  <text class="t" x="530" y="195" text-anchor="middle">Trailer Home Assistant</text>
+  <text class="s" x="530" y="222" text-anchor="middle">Raspberry Pi 4, on the</text>
+  <text class="s" x="530" y="244" text-anchor="middle">trailer Wi-Fi (travel router)</text>
+  <text class="s" x="530" y="280" text-anchor="middle">ESPHome API pushes entity</text>
+  <text class="s" x="530" y="302" text-anchor="middle">states to the dashboard</text>
+
+  <!-- arrows sources -> HA -->
+  <path class="w" d="M270,105 C340,105 340,200 400,200" marker-end="url(#ah)"/>
+  <path class="w" d="M270,235 L400,235" marker-end="url(#ah)"/>
+  <path class="w" d="M270,365 C340,365 340,270 400,270" marker-end="url(#ah)"/>
+  <text class="s" x="335" y="60">Wi-Fi</text>
+
+  <!-- dashboard -->
+  <rect class="box" x="760" y="60" width="300" height="400" rx="14"/>
+  <text class="t" x="910" y="96" text-anchor="middle">Casita Dashboard</text>
+  <rect class="panel" x="790" y="118" width="240" height="144"/>
+  <text class="s" x="910" y="160" text-anchor="middle">7.5" e-paper, 800 x 480</text>
+  <text class="s" x="910" y="184" text-anchor="middle">redrawn every minute</text>
+  <text class="s" x="910" y="208" text-anchor="middle">or on a button press</text>
+  <rect class="dev" x="790" y="284" width="240" height="70" rx="10"/>
+  <text class="t" x="910" y="313" text-anchor="middle">XIAO ESP32-S3 Plus</text>
+  <text class="s" x="910" y="338" text-anchor="middle">TRMNL driver board, ESPHome</text>
+  <text class="s" x="910" y="390" text-anchor="middle">Power: 12 V to USB-C adapter</text>
+  <text class="s" x="910" y="412" text-anchor="middle">(kit battery optional backup)</text>
+  <text class="s" x="910" y="440" text-anchor="middle">Buttons: refresh, details page</text>
+
+  <path class="w" d="M660,235 L760,235" marker-end="url(#ah)"/>
+  <text class="s" x="710" y="222" text-anchor="middle">Wi-Fi</text>
+
+  <!-- home -->
+  <rect class="ha" x="400" y="400" width="260" height="70" rx="14" stroke-dasharray="8 6"/>
+  <text class="t" x="530" y="430" text-anchor="middle">Home Home Assistant</text>
+  <text class="s" x="530" y="454" text-anchor="middle">mirror over Tailscale (optional)</text>
+  <path class="w" d="M530,320 L530,400" marker-end="url(#ah)" stroke-dasharray="6 5"/>
+
+  <text class="s" x="40" y="490">Everything on this page works at the campsite with no internet. The dashboard only needs the trailer Wi-Fi and the trailer's Home Assistant.</text>
+</svg>

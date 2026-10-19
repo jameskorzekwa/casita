@@ -22,9 +22,12 @@ This repository is the maintained record. The Google Docs that some of this star
 | 01 | [Second 300 Ah battery (600 Ah bank)](modifications/01-second-battery/README.md) | Done |
 | 02 | [A/C soft start (SpartanStart)](modifications/02-ac-soft-start/README.md) | Done |
 | 03 | [Whole-panel inverter with automatic transfer switch](modifications/03-whole-panel-inverter/README.md) | Done |
-| 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | In progress (INA228 wiring next) |
+| 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | Installed, running and calibrated; mirrored to the home Home Assistant |
 | 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
 | 06 | [Four smart DC switches (BANDC + Waveshare)](modifications/06-smart-dc-switches/README.md) | Planned / bench-validation required; four BANDC rockers delivered 2026-10-19, Waveshare controller ordered 2026-10-19, not installed |
+| 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit ordered |
+| 09 | [Water tank monitor to Home Assistant (SeeLeveL + DYP L02 + XIAO ESP32-S3)](modifications/09-water-tank-monitor/README.md) | Designed; sensors ordered |
+| 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; not purchased |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
 
