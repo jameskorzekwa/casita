@@ -1,15 +1,15 @@
 # Commissioning and acceptance — four smart DC switches
 
-**All physical checks below are pending.** This checklist is a plan, not evidence of tests performed. Record date, board revision, firmware version/hash, instruments, observations and pass/fail for each channel. Resolve failures before progressing to trailer loads. See [design and wiring boundaries](README.md).
+**All physical checks below are pending.** This checklist is a plan, not evidence of tests performed. Record date, board version (Waveshare ESP32-S3-POE-ETH-8DI-8RO as purchased), firmware version/hash, instruments, observations and pass/fail for each channel. Resolve failures before progressing to trailer loads. See [design and wiring boundaries](README.md).
 
 ## 1. Unpowered inspection and continuity (no battery)
 
 - [ ] Preserve original panel/harness; photograph and label every connector, shared feed, illumination wire, load and fuse. Identify all four loads and any interlocks.
 - [ ] Isolate battery, shore, solar, tow and all possible backfeeds before opening the trailer panel; verify dead. Loose-body continuity work is off-trailer, with no battery or bench supply attached.
 - [ ] Confirm all four received parts match the owner-selected BANDC three-pin momentary SPDT listing variant; confirm spring return in both directions and inspect included actuators. Existing Nilight caps and panel fit are unverified. A listing alone is not a pinout test.
-- [ ] Measure all cutouts, panel thickness, rear clearance and enclosure location; allow for the 146 x 105 mm board, terminals, cable bends and access.
+- [ ] Measure all cutouts, panel thickness, rear clearance and enclosure location; allow for the 175 x 90 x 40 mm rail-mount case, 35 mm DIN rail, terminals, cable bends, antenna routing and access.
 - [ ] On each of four loose bodies, continuity-identify the common and two throws (do not assume Carling terminal numbering); prove center opens both common-to-throw paths and each press closes only one. Record which throw corresponds to installed UP. Mark UP → odd DI and DOWN → even DI.
-- [ ] Confirm no dry-input conductor is connected to old positive jumpers, lamp supply or load power. Identify the received board's input GND/common from its matching schematic and legends.
+- [ ] Confirm no dry-input conductor is connected to old positive jumpers, lamp supply or load power. Identify the received board's digital-input common terminal for passive (dry-contact) wiring from its silkscreen and the Waveshare wiki diagram. Confirm the external antenna is present and connected to the module's antenna socket.
 - [ ] Confirm durable load names and UP ON / DOWN OFF instructions on or beside the actuators. The selected BANDC listing describes **no LED**; confirm on received parts. Center position does not indicate output state.
 
 | Channel | Verified common pin | UP closes common–? | DOWN closes common–? | Center both open | Label / fit | Date / result |
@@ -30,8 +30,8 @@
 
 Use a current-limited bench supply in the board's operating range and appropriately current-limited LED test loads. No trailer battery or appliance load is connected. Verify board revision/terminal labeling and safe programming power arrangements before applying power; avoid USB backfeeding.
 
-- [ ] I2C shows 0x22 and 0x24 on SDA GPIO4 / SCL GPIO16. Verify all eight DI channels and their active-low polarity. Unused DI9–DI12 stay unwired.
-- [ ] Verify each software switch energizes the intended relay, and logical OFF leaves its verified COM–NO path open. Prove `inverted: true` is correct for the received hardware. Check all four channels independently and together; no cross-coupling.
+- [ ] I2C scan shows the TCA9554 at 0x20 on SDA GPIO42 / SCL GPIO41 (the board also has an RTC on this bus). Verify all eight DI channels (GPIO4–GPIO11) and their active-low polarity with dry contacts to the input common. There are no spare inputs.
+- [ ] Verify each software switch energizes the intended relay, and logical OFF leaves its verified COM–NO path open. Prove `inverted: false` is correct for the received hardware. Check all four channels independently and together; no cross-coupling. Confirm unused relays 5–8 stay open at all times, including during boot.
 - [ ] For each channel: UP gives ON, release retains ON; DOWN gives OFF, release retains OFF. Repeat UP at least ten times while ON and DOWN at least ten times while OFF; no toggle. Test brief presses, long holds and bounce with 25 ms filtering.
 - [ ] Verify a held button does not continuously override remote commands: these are press events, not a maintained position. Releasing must do nothing; a subsequent press commands its direction again.
 - [ ] Confirm controller stays powered with all four outputs OFF. Measure idle and all-relays-on power draw and temperature.
@@ -49,17 +49,18 @@ For every channel, observe both physical test load and the corresponding native 
 
 ## 5. Boot, reset and failure behavior
 
+- [ ] Before any load: power the board from the screw terminal and from USB-C separately, and watch all eight relays (LEDs and an ohmmeter or test lamp on COM–NO) from power-on until ESPHome finishes booting. The TCA9554 starts with its pins as inputs; record any relay click or contact closure during that window. A closure is a blocking failure for every load until a hardware inhibit is designed.
 - [ ] Start with all outputs OFF, then ON, then mixed; power-cycle. With rockers centered, every output initializes OFF. Observe physical contacts/test loads during the entire power ramp, not just after logs appear.
 - [ ] Repeat reset and controlled supply brownout/recovery on the bench. Look for transient pulses/chatter with suitable instrumentation. Document voltage envelope and whether hardware inhibition is required. `ALWAYS_OFF` is not proof of glitch-free startup.
 - [ ] Boot with each UP or DOWN contact held; release and re-press. Record whether initialization creates a press event. Do not claim a held UP cannot energize the load after boot. Resolve acceptability per load.
 - [ ] Evaluate firmware-update and failed-boot/safe-mode behavior on the bench. Safe mode may disable normal inputs/outputs; no offline-control guarantee applies during safe mode, hung firmware, power loss or hardware failure.
 - [ ] Review disconnected/shorted control conductors and both-inputs-active faults with test loads only. There is no OFF-priority or fault interlock in this candidate. Add hardware/firmware protection if a selected load requires it.
-- [ ] Test loss of communication with each I2C expander and its recovery, with trailer loads disconnected. First agree a reversible, non-destructive fault-injection method for the received board revision with a qualified bench tester; isolate power before changing a test fixture. Do not short the live bus, cut traces or lift soldered pins. If no suitable fixture/method is available, record this gate as **unverified**, not passed. Observe contacts/test loads with outputs previously OFF and ON, exercise physical DOWN during the fault, and record stale output state, loss of manual OFF, recovery pulses and whether restart or independent power isolation is required. An I2C fault can defeat local button control; network independence is not fault tolerance.
+- [ ] Test loss of communication with the TCA9554 relay expander and its recovery (inputs are direct GPIO and should keep reporting), with trailer loads disconnected. First agree a reversible, non-destructive fault-injection method for the received board revision with a qualified bench tester; isolate power before changing a test fixture. Do not short the live bus, cut traces or lift soldered pins. If no suitable fixture/method is available, record this gate as **unverified**, not passed. Observe contacts/test loads with outputs previously OFF and ON, exercise physical DOWN during the fault, and record stale output state, loss of manual OFF, recovery pulses and whether restart or independent power isolation is required. An I2C fault can defeat local button control; network independence is not fault tolerance.
 
 ## 6. DC-load and installation gates
 
 - [ ] Complete the README load worksheet: models, switched power versus control signal, existing interlocks, voltage, operating current, measured startup/inrush and motor stall requirement. Do not deliberately stall a motor without an approved procedure; use manufacturer limits where appropriate.
-- [ ] Obtain appropriate **DC** contact/terminal/PCB ratings for direct switching, or select external DC-rated relays/interfaces. An AC 10 A marking does not pass this gate. Check external coil load compatibility and correctly polarized suppression too.
+- [ ] Obtain appropriate **DC** contact/terminal/PCB ratings for direct switching, or select external DC-rated relays/interfaces. The board's published ≤10 A / 30 V DC contact rating is a starting point, not motor or inrush approval; compare it to each load's measured running and startup current and switching type. Check external coil load compatibility and correctly polarized suppression too.
 - [ ] Size each conductor, fuse, terminal and relay for its own circuit, environment and duty. Preserve branch protection; no guessed gauge/fuse rating, unprotected battery feed or shunt bypass.
 - [ ] Confirm independently fused unswitched controller supply, surge/reverse-polarity protection and any regulation against measured RV supply conditions. All new returns remain on shunt P-/system side.
 - [ ] Qualified installer verifies enclosure, clearances, secure terminations, strain relief, labels, source isolation and load schematic before installation. Capture final as-built diagram and photographs.
@@ -78,8 +79,12 @@ For every channel, observe both physical test load and the corresponding native 
 
 | Evidence | Date / version / observations | Result |
 | --- | --- | --- |
-| Static tests | 2026-10-13: Python/PyYAML contract tests, relative link targets, SVG XML/title/description and source whitespace | Passed; not ESPHome validation/compile |
-| SVG visual render | 2026-10-13: rendered with librsvg/Cairo to 1200 x 820 PNG; visually checked for clipping, readable labels and correct arrows | Passed; conceptual control diagram, not an approved load schematic |
-| ESPHome config / compile | 2026-10-13: `ghcr.io/esphome/esphome:2026.9.1`, ESP-IDF, isolated copy with synthetic build-only credentials | Passed; no upload. Warning recommends replacing password-based OTA with required encrypted OTA; that optional change is not applied or claimed tested. The first synthetic all-zero API key was rejected; rerun with a nonzero synthetic key succeeded. Never deploy the validation artifact. |
+| Static tests | 2026-10-13 (KC868-A4S design, superseded): Python/PyYAML contract tests, relative link targets, SVG XML/title/description and source whitespace | Passed; not ESPHome validation/compile |
+| SVG visual render | 2026-10-13 (KC868-A4S design, superseded): rendered with librsvg/Cairo to 1200 x 820 PNG; visually checked for clipping, readable labels and correct arrows | Passed; conceptual control diagram, not an approved load schematic |
+| ESPHome config / compile | 2026-10-13 (KC868-A4S design, superseded): `ghcr.io/esphome/esphome:2026.9.1`, ESP-IDF, isolated copy with synthetic build-only credentials | Passed; no upload. Warning recommends replacing password-based OTA with required encrypted OTA; that optional change is not applied or claimed tested. The first synthetic all-zero API key was rejected; rerun with a nonzero synthetic key succeeded. Never deploy the validation artifact. |
+| Controller change | 2026-10-19: firmware rewritten for the Waveshare ESP32-S3-POE-ETH-8DI-8RO; earlier KC868-A4S results above apply to the superseded configuration only | See rows below |
+| Static tests (Waveshare) | 2026-10-19: five contract tests updated for GPIO4–GPIO11 inputs and TCA9554 0x20 relays | Passed; not ESPHome validation/compile |
+| ESPHome config / compile (Waveshare) | 2026-10-19: `ghcr.io/esphome/esphome:2026.9.1`, ESP-IDF, ESP32-S3, isolated copy with synthetic build-only credentials. RAM 29.8%, flash 9.4% | Passed; no upload. Same OTA-password warning as 2026-10-13 (recommends `ota` encryption instead); not applied. Never deploy the validation artifact. |
+| SVG visual render (Waveshare) | 2026-10-19: rendered with resvg and DejaVu Sans to 1200 x 820 PNG; checked for clipping, readable labels and correct arrows | Passed; conceptual control diagram, not an approved load schematic |
 | Continuity / bench / offline / boot | No hardware tests performed | Pending |
 | Load ratings / installed acceptance | Loads not yet identified | Pending |
