@@ -6,18 +6,18 @@
 
 - [ ] Preserve original panel/harness; photograph and label every connector, shared feed, illumination wire, load and fuse. Identify all four loads and any interlocks.
 - [ ] Isolate battery, shore, solar, tow and all possible backfeeds before opening the trailer panel; verify dead. Loose-body continuity work is off-trailer, with no battery or bench supply attached.
-- [ ] Confirm each part is V8D1-S00B, spring-return both ways; confirm compatible new actuators. Existing Nilight caps and panel fit are unverified.
+- [ ] Confirm all four received parts match the owner-selected BANDC three-pin momentary SPDT listing variant; confirm spring return in both directions and inspect included actuators. Existing Nilight caps and panel fit are unverified. A listing alone is not a pinout test.
 - [ ] Measure all cutouts, panel thickness, rear clearance and enclosure location; allow for the 146 x 105 mm board, terminals, cable bends and access.
-- [ ] On each of four loose bodies, prove terminal 2 is common; center opens 2–1 and 2–3; each press closes only one pair. Record which of 1/3 corresponds to installed UP. Mark UP → odd DI and DOWN → even DI.
+- [ ] On each of four loose bodies, continuity-identify the common and two throws (do not assume Carling terminal numbering); prove center opens both common-to-throw paths and each press closes only one. Record which throw corresponds to installed UP. Mark UP → odd DI and DOWN → even DI.
 - [ ] Confirm no dry-input conductor is connected to old positive jumpers, lamp supply or load power. Identify the received board's input GND/common from its matching schematic and legends.
-- [ ] Confirm caps have durable load names and UP ON / DOWN OFF instructions. These Carling bodies are **unlit**; no lamp-state indication is present. Center position does not indicate output state.
+- [ ] Confirm durable load names and UP ON / DOWN OFF instructions on or beside the actuators. The selected BANDC listing describes **no LED**; confirm on received parts. Center position does not indicate output state.
 
-| Channel | UP closes 2–? | DOWN closes 2–? | Center both open | Label / fit | Date / result |
-| --- | --- | --- | --- | --- | --- |
-| 1 | TBD | TBD | Pending | TBD | Pending |
-| 2 | TBD | TBD | Pending | TBD | Pending |
-| 3 | TBD | TBD | Pending | TBD | Pending |
-| 4 | TBD | TBD | Pending | TBD | Pending |
+| Channel | Verified common pin | UP closes common–? | DOWN closes common–? | Center both open | Label / fit | Date / result |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | TBD | TBD | TBD | Pending | TBD | Pending |
+| 2 | TBD | TBD | TBD | Pending | TBD | Pending |
+| 3 | TBD | TBD | TBD | Pending | TBD | Pending |
+| 4 | TBD | TBD | TBD | Pending | TBD | Pending |
 
 ## 2. Static source and separate build gates
 
