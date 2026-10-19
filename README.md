@@ -10,6 +10,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | --- | --- |
 | [`docs/trailer.md`](docs/trailer.md) | Specifications, factory equipment, model numbers, breakers, and weight limits |
 | [`docs/off-grid-upgrade-plan.md`](docs/off-grid-upgrade-plan.md) | The overall off-grid upgrade plan, including research and decisions |
+| [`docs/smart-dc-switch-research.md`](docs/smart-dc-switch-research.md) | Smart DC rocker research; BANDC rocker / Waveshare controller plan in mod 06; rockers delivered, controller ordered, not installed |
 | [`modifications/`](modifications/) | One folder per modification, each with its own instructions, diagrams and status |
 | [`manuals/`](manuals/) | Equipment manuals and datasheets, organized by system |
 | [`photos/`](photos/) | General trailer photos (modification photos live in each modification's folder) |
@@ -23,6 +24,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | 03 | [Whole-panel inverter with automatic transfer switch](modifications/03-whole-panel-inverter/README.md) | Done |
 | 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | Installed, running and calibrated; mirrored to the home Home Assistant |
 | 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
+| 06 | [Four smart DC switches (BANDC + Waveshare)](modifications/06-smart-dc-switches/README.md) | Planned / bench-validation required; four BANDC rockers delivered 2026-10-19, Waveshare controller ordered 2026-10-19, not installed |
 | 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit ordered |
 | 09 | [Water tank monitor to Home Assistant (SeeLeveL + DYP L02 + XIAO ESP32-S3)](modifications/09-water-tank-monitor/README.md) | Designed; sensors ordered |
 | 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; not purchased |

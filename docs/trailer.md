@@ -40,6 +40,7 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | Shore-only breaker box | SYIZYEN HT-5 DIN enclosure: 30 A US Breaker C60X1C30 (to TS-30), 2 x 20 A CHTAIXI C20 (converter, water heater element) | Next to the WFCO under the seat by the sink |
 | Former inverted outlets | 2 outlets, factory-wired from the inverter's hardwire terminal | Now on the WFCO's former water heater 20 A breaker (12 AWG), so they work on shore and inverter |
 | Power center | WFCO WF-8900-AD series (auto-detect lithium/lead-acid), 55 A converter | Exact model (for example WF-8955-AD) to confirm |
+| DC rocker panel | Nilight logo visible; exact model unknown | Owner confirmed DC rockers, 2026-10-13. Photo description: four illuminated rocker switches and digital readout apparently 13.5 V. Cutout, rear pinout, load identities, currents, and fuse sizes unknown. [Mod 06](../modifications/06-smart-dc-switches/README.md) plans four BANDC momentary rockers (delivered 2026-10-19) with a Waveshare ESP32-S3-POE-ETH-8DI-8RO controller (ordered 2026-10-19); not installed |
 | WFCO breakers | 30 A main (fed from the TS-30) and five 20 A branches | The former converter breaker now feeds only the sink and door outlets; the former water heater breaker feeds the former inverted outlets. A/C breaker size to confirm |
 | Shore power | 30 A, 25 ft 10-gauge cord | Casita FAQ |
 | Solar | 200 W portable suitcase panel with its own controller | Factory. Set the controller to lithium |
