@@ -40,6 +40,13 @@ Lesson learned on 2026-10-18: version 0.1.0 declared a Bluetooth `local_name` ma
 
 - The trailer's Home Assistant is only reachable over Tailscale on port 80 (HA itself). The **Terminal & SSH** add-on was installed on 2026-10-18 with bee2's key for future deployments, but its port 22 is not reachable from bee2 (Tailscale ACL or similar); everything so far was done through the Home Assistant WebSocket/REST API and HACS.
 
+### Operating rules learned on 2026-10-18
+
+- **Leave the remote panel's power key pressed in.** It is a latching switch that cuts the panel's own power: popping it out turns the inverter off *and* kills the panel's Bluetooth. The other three keys only navigate screens and settings 01-14/99; none of them turns the inverter off.
+- **Turn the inverter on/off from Home Assistant** (`switch.freedom_x_2000_inverter`, or `switch.rv_freedom_x_2000_inverter` at home). This is the app's software standby: the inverter idles (battery draw 0 A on the panel vs 1-2 A inverting with no load), the panel stays powered and Bluetooth stays up. Measured: command accepted in 0.4 s, inverter actually switching in about 30 s (on) / 20 s (off); HA shows the new mode within a few seconds of that.
+- **Keep the inverter's Power Save Timer (setting 05) at OFF.** Set to 3 h on 2026-10-18 it shut the inverter down at 20:27 local and the panel lost power two minutes later, taking Bluetooth with it until the key is cycled at the trailer. The automation **`automation.inverter_idle_standby`** on the trailer's Home Assistant replaces it: AC output power below 50 W for 3 h while inverting → inverter switch off (software standby). Power Save *Mode* (setting 06, load sensing) is a different feature and is fine to use.
+- With Home Assistant holding the Bluetooth connection (integration option, default on), the Xantrex phone app cannot connect; turn the option off in the trailer HA if the app is needed.
+
 ## To document
 
 - What happened to the Renogy inverter and how the Freedom X is wired: DC cables and fuse (the data sheet's full-load DC current is 192 A), AC output to the TS-30 "INVERTER" leads (or whether the Freedom X's built-in transfer relay now replaces the TS-30), ground/neutral bonding, and whether the two former inverted outlets are affected. Update [mod 03](../03-whole-panel-inverter/README.md) and the as-built diagram accordingly.
@@ -52,7 +59,9 @@ Lesson learned on 2026-10-18: version 0.1.0 declared a Bluetooth `local_name` ma
 - 2026-10-18 15:55: first connection. Identified as model id 3 = **817-2000**, serial `92642512700627`, main-board firmware v1.81, remote-panel firmware v1.28, protocol id "30". Live: battery 13.63 V, 2 A discharge (the integer the panel reports; the INA228 said 0.55 A), 25 W / 1 % load at 120.0 V 60.0 Hz, mode `B` (inverting), bus 215 V, no shore power. Settings read back: LBCO 10.5 V, delay 300 s, recovery 13.1 V, power save timer 25 h, 60 Hz / 120 V output, power limit raw 20 (= 2000 W), limit timer 300 s, transfer mode Appliance, utility under-voltage 90 V, ignition control Off, audible alarm on, auto-restart flag clear, inverter on/off byte = 1.
 - Write path: power-limit timer set to 290 s and back to 300 s from Home Assistant; each write was read back from the device (bytes 15-16 of block `2A0D`: `2c01` → `2201` → `2c01`), about 3.5 s per write.
 - Decode corrections from the live data (released as 0.1.2/0.1.3): the `line_fail` bit is set whenever shore power is absent, so it is reported but no longer counted as a fault; the output power limit is stored in hundreds of watts (the Xantrex app writes plain watts, an app bug). The "heat sink temperature" word read 578 and fell to ~510 over the following 45 minutes while the outdoor air stayed at 63 °F, so it is a temperature but not plain °C as the app assumes; it is exposed raw until the scaling is confirmed (best guess `(raw − 400) / 10` °C).
-- Not yet tested: the inverter on/off switch (write), by agreement, until it is known whether the trailer's Home Assistant Pi and router are on inverter AC.
+- 2026-10-18 16:44: inverter switch tested from Home Assistant with the owner's go-ahead: off → standby, 0 V output in about 30 s; on → inverting, 120 V in about 40 s. Repeated at 17:10 after the 0.2.0 held-connection change: 0.4 s command, 29 s on, 21 s off.
+- 2026-10-18 16:55: owner cycled the panel's power key; the panel's Bluetooth went down with it and, on return, Home Assistant kept getting a stale GATT table ("service 0x1910 not found") until 0.1.5 added automatic cache clearing.
+- 2026-10-18 20:27: the inverter's own Power Save Timer (set to 3 h at ~17:30) shut the inverter down and unpowered the panel; see the operating rules above.
 
 ## Safety notes
 
