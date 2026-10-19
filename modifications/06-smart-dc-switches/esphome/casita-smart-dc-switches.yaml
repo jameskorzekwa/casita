@@ -1,12 +1,16 @@
 # Planned bench candidate; no trailer load is approved by this configuration.
-# Mapping: KinCony forum threads 2617/2618 and ESPHome KC868-A4S device page.
+# Board: Waveshare ESP32-S3-POE-ETH-8DI-8RO (owner purchase 2026-10-19).
+# Mapping: ESPHome device page waveshare-esp32-s3-eth-8di-8ro and Waveshare wiki.
 # Verify received-board input/relay polarity and physical rocker orientation.
+# Ethernet/PoE, RS485, RTC, buzzer (GPIO46) and RGB LED (GPIO38) are unused.
 esphome:
   name: casita-smart-dc-switches
   friendly_name: Casita Smart DC Switches
 
 esp32:
-  board: esp32dev
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16MB
   framework:
     type: esp-idf
 
@@ -28,57 +32,55 @@ wifi:
 
 i2c:
   id: bus_a
-  sda: GPIO4
-  scl: GPIO16
+  sda: GPIO42
+  scl: GPIO41
   scan: true
+  frequency: 100kHz
 
-pcf8574:
-  - id: pcf_inputs
+pca9554:
+  - id: relay_hub
     i2c_id: bus_a
-    address: 0x22
-  - id: pcf_relays
-    i2c_id: bus_a
-    address: 0x24
+    address: 0x20
 
 # ALWAYS_OFF is deliberate pending per-load review; not a hardware glitch guarantee.
-# DI9-DI12 (0x24 P4-P7) are unused. No load feedback is provided.
+# Relays 5-8 (TCA9554 P4-P7) are unused. No load feedback is provided.
 switch:
   - platform: gpio
     id: load_1
     name: Load 1
     restore_mode: ALWAYS_OFF
     pin:
-      pcf8574: pcf_relays
+      pca9554: relay_hub
       number: 0
       mode: OUTPUT
-      inverted: true
+      inverted: false
   - platform: gpio
     id: load_2
     name: Load 2
     restore_mode: ALWAYS_OFF
     pin:
-      pcf8574: pcf_relays
+      pca9554: relay_hub
       number: 1
       mode: OUTPUT
-      inverted: true
+      inverted: false
   - platform: gpio
     id: load_3
     name: Load 3
     restore_mode: ALWAYS_OFF
     pin:
-      pcf8574: pcf_relays
+      pca9554: relay_hub
       number: 2
       mode: OUTPUT
-      inverted: true
+      inverted: false
   - platform: gpio
     id: load_4
     name: Load 4
     restore_mode: ALWAYS_OFF
     pin:
-      pcf8574: pcf_relays
+      pca9554: relay_hub
       number: 3
       mode: OUTPUT
-      inverted: true
+      inverted: false
 
 # Contact closure = pressed. Release has no action; never toggle or call HA.
 binary_sensor:
@@ -86,9 +88,8 @@ binary_sensor:
     id: load_1_up
     internal: true
     pin:
-      pcf8574: pcf_inputs
-      number: 0
-      mode: INPUT
+      number: GPIO4
+      mode: INPUT_PULLUP
       inverted: true
     filters:
       - delayed_on_off: 25ms
@@ -98,9 +99,8 @@ binary_sensor:
     id: load_1_down
     internal: true
     pin:
-      pcf8574: pcf_inputs
-      number: 1
-      mode: INPUT
+      number: GPIO5
+      mode: INPUT_PULLUP
       inverted: true
     filters:
       - delayed_on_off: 25ms
@@ -110,9 +110,8 @@ binary_sensor:
     id: load_2_up
     internal: true
     pin:
-      pcf8574: pcf_inputs
-      number: 2
-      mode: INPUT
+      number: GPIO6
+      mode: INPUT_PULLUP
       inverted: true
     filters:
       - delayed_on_off: 25ms
@@ -122,9 +121,8 @@ binary_sensor:
     id: load_2_down
     internal: true
     pin:
-      pcf8574: pcf_inputs
-      number: 3
-      mode: INPUT
+      number: GPIO7
+      mode: INPUT_PULLUP
       inverted: true
     filters:
       - delayed_on_off: 25ms
@@ -134,9 +132,8 @@ binary_sensor:
     id: load_3_up
     internal: true
     pin:
-      pcf8574: pcf_inputs
-      number: 4
-      mode: INPUT
+      number: GPIO8
+      mode: INPUT_PULLUP
       inverted: true
     filters:
       - delayed_on_off: 25ms
@@ -146,9 +143,8 @@ binary_sensor:
     id: load_3_down
     internal: true
     pin:
-      pcf8574: pcf_inputs
-      number: 5
-      mode: INPUT
+      number: GPIO9
+      mode: INPUT_PULLUP
       inverted: true
     filters:
       - delayed_on_off: 25ms
@@ -158,9 +154,8 @@ binary_sensor:
     id: load_4_up
     internal: true
     pin:
-      pcf8574: pcf_inputs
-      number: 6
-      mode: INPUT
+      number: GPIO10
+      mode: INPUT_PULLUP
       inverted: true
     filters:
       - delayed_on_off: 25ms
@@ -170,9 +165,8 @@ binary_sensor:
     id: load_4_down
     internal: true
     pin:
-      pcf8574: pcf_inputs
-      number: 7
-      mode: INPUT
+      number: GPIO11
+      mode: INPUT_PULLUP
       inverted: true
     filters:
       - delayed_on_off: 25ms

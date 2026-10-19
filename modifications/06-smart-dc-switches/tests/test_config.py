@@ -38,24 +38,21 @@ class ConfigurationContract(unittest.TestCase):
 
     def test_hardware_mapping(self):
         c = self.config
-        self.assertEqual(c["esp32"]["board"], "esp32dev")
-        self.assertEqual(c["i2c"]["sda"], "GPIO4")
-        self.assertEqual(c["i2c"]["scl"], "GPIO16")
-        self.assertEqual(
-            {hub["id"]: hub["address"] for hub in c["pcf8574"]},
-            {"pcf_inputs": 0x22, "pcf_relays": 0x24},
-        )
-        self.assertEqual(len(c["pcf8574"]), 2)
-        for hub in c["pcf8574"]:
-            self.assertEqual(hub["i2c_id"], c["i2c"]["id"])
+        self.assertEqual(c["esp32"]["variant"], "esp32s3")
+        self.assertEqual(c["esp32"]["flash_size"], "16MB")
+        self.assertEqual(c["i2c"]["sda"], "GPIO42")
+        self.assertEqual(c["i2c"]["scl"], "GPIO41")
+        self.assertEqual(c["pca9554"], [
+            {"id": "relay_hub", "i2c_id": c["i2c"]["id"], "address": 0x20},
+        ])
         self.assertEqual(len(c["switch"]), 4)
         for index, output in enumerate(c["switch"]):
             self.assertEqual(output["id"], f"load_{index + 1}")
             self.assertEqual(output["platform"], "gpio")
             self.assertEqual(output["restore_mode"], "ALWAYS_OFF")
             self.assertEqual(output["pin"], {
-                "pcf8574": "pcf_relays", "number": index,
-                "mode": "OUTPUT", "inverted": True,
+                "pca9554": "relay_hub", "number": index,
+                "mode": "OUTPUT", "inverted": False,
             })
 
     def test_local_idempotent_press_actions_only(self):
@@ -72,8 +69,7 @@ class ConfigurationContract(unittest.TestCase):
             self.assertEqual(sensor["id"], f"{load}_{direction}")
             self.assertIs(sensor["internal"], True)
             self.assertEqual(sensor["pin"], {
-                "pcf8574": "pcf_inputs", "number": index,
-                "mode": "INPUT", "inverted": True,
+                "number": f"GPIO{4 + index}", "mode": "INPUT_PULLUP", "inverted": True,
             })
             self.assertEqual(sensor["filters"], [{"delayed_on_off": "25ms"}])
             self.assertEqual(sensor["on_press"], [{action: load}])
@@ -82,7 +78,7 @@ class ConfigurationContract(unittest.TestCase):
         c = self.config
         self.assertEqual(set(c), {
             "esphome", "esp32", "logger", "api", "ota", "wifi", "i2c",
-            "pcf8574", "switch", "binary_sensor",
+            "pca9554", "switch", "binary_sensor",
         })
         self.assertEqual(c["wifi"]["reboot_timeout"], "0s")
         self.assertEqual(c["api"]["reboot_timeout"], "0s")
@@ -134,7 +130,7 @@ class ConfigurationContract(unittest.TestCase):
     def test_project_whitespace(self):
         # Explicit source paths: never inspect a private secrets.yaml or build tree.
         paths = [
-            "README.md", "TESTS.md", ".gitignore", "tests/test_config.py",
+            "README.md", "TESTS.md", "components.md", ".gitignore", "tests/test_config.py",
             "esphome/casita-smart-dc-switches.yaml", "esphome/secrets.example.yaml",
             "images/control-overview.svg",
         ]

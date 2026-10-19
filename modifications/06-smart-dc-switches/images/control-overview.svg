@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
-  <title id="title">Planned four-channel BANDC and KC868-A4S control architecture</title>
-  <desc id="desc">Four planned BANDC spring-return rockers connect only continuity-verified dry contacts to DI1 through DI8. The common pin and UP throw must be identified on each received switch. The independently fused controller commands four relay channels. Dashed arrows show conditional external DC-rated interfaces, not approved direct load wiring. All current returns use the system side of the shunt.</desc>
+  <title id="title">Planned four-channel BANDC and Waveshare ESP32-S3-ETH-8DI-8RO control architecture</title>
+  <desc id="desc">Four planned BANDC spring-return rockers connect only continuity-verified dry contacts to the isolated inputs DI1 through DI8 (GPIO4 to GPIO11). The common pin and UP throw must be identified on each received switch. The independently fused controller commands relays 1 to 4 through a TCA9554 expander at 0x20; relays 5 to 8 are unused. Dashed arrows show conditional external DC-rated interfaces, not approved direct load wiring. All current returns use the system side of the shunt.</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#334155"/></marker>
   </defs>
@@ -10,7 +10,7 @@
     <text x="30" y="64" font-size="16">Control mapping only. No direct DC load approval; load ratings, fuses and power terminals remain TBD.</text>
     <rect x="30" y="94" width="1140" height="102" rx="8" fill="#fef3c7" stroke="#b45309"/>
     <text x="50" y="121" font-size="17">Protected RV DC distribution → independent source fuse → protection / regulation as required → board supply</text>
-    <text x="50" y="148" font-size="16">Unswitched by these four outputs; controller remains powered. Published board supply: 9–24 V DC.</text>
+    <text x="50" y="148" font-size="16">Unswitched by these four outputs; controller remains powered. Published board supply: 7–36 V DC.</text>
     <text x="50" y="175" font-size="16">Fuse, wire and transient protection: TBD. Returns → system negative / shunt P-; never bypass the shunt.</text>
     <rect x="30" y="230" width="330" height="326" rx="8" fill="#dbeafe" stroke="#2563eb"/>
     <text x="48" y="259" font-size="20" font-weight="bold">4 × BANDC 3-pin SPDT</text>
@@ -19,18 +19,18 @@
     <text x="48" y="356" font-size="16">Rocker 2: UP / DOWN → DI3 / DI4</text>
     <text x="48" y="394" font-size="16">Rocker 3: UP / DOWN → DI5 / DI6</text>
     <text x="48" y="432" font-size="16">Rocker 4: UP / DOWN → DI7 / DI8</text>
-    <text x="48" y="471" font-size="16">Verified common → input GND</text>
+    <text x="48" y="471" font-size="16">Verified common → DI common</text>
     <text x="48" y="498" font-size="16">Verify UP / DOWN throws by continuity</text>
     <text x="48" y="530" font-size="16" font-weight="bold">NO 12 V feed on dry contacts</text>
     <rect x="425" y="230" width="340" height="326" rx="8" fill="#dcfce7" stroke="#15803d"/>
-    <text x="443" y="259" font-size="20" font-weight="bold">KC868-A4S / ESPHome</text>
-    <text x="443" y="287" font-size="16">SDA GPIO4 / SCL GPIO16</text>
-    <text x="443" y="318" font-size="16">DI1 / DI2 = 0x22 P0 / P1</text>
-    <text x="443" y="356" font-size="16">DI3 / DI4 = 0x22 P2 / P3</text>
-    <text x="443" y="394" font-size="16">DI5 / DI6 = 0x22 P4 / P5</text>
-    <text x="443" y="432" font-size="16">DI7 / DI8 = 0x22 P6 / P7</text>
-    <text x="443" y="471" font-size="16">Relay 1–4 = 0x24 P0–P3</text>
-    <text x="443" y="498" font-size="16">Inputs / relays inverted: true</text>
+    <text x="443" y="259" font-size="20" font-weight="bold">Waveshare 8DI-8RO</text>
+    <text x="443" y="287" font-size="16">ESP32-S3 / ESPHome, Wi-Fi</text>
+    <text x="443" y="318" font-size="16">DI1 / DI2 = GPIO4 / GPIO5</text>
+    <text x="443" y="356" font-size="16">DI3 / DI4 = GPIO6 / GPIO7</text>
+    <text x="443" y="394" font-size="16">DI5 / DI6 = GPIO8 / GPIO9</text>
+    <text x="443" y="432" font-size="16">DI7 / DI8 = GPIO10 / GPIO11</text>
+    <text x="443" y="471" font-size="16">Relay 1–4 = TCA9554 0x20 P0–P3</text>
+    <text x="443" y="498" font-size="16">Inputs inverted; relays not; 5–8 unused</text>
     <text x="443" y="530" font-size="16">25 ms debounce; release = no action</text>
     <rect x="830" y="230" width="340" height="326" rx="8" fill="#ffedd5" stroke="#c2410c" stroke-dasharray="7 5"/>
     <text x="848" y="259" font-size="20" font-weight="bold">CONDITIONAL load side</text>
@@ -40,7 +40,7 @@
     <text x="848" y="399" font-size="16">as required by each identified load</text>
     <text x="848" y="440" font-size="16">Separately fused load branches</text>
     <text x="848" y="477" font-size="16">Start / stall / DC ratings: TBD</text>
-    <text x="848" y="515" font-size="16" font-weight="bold">AC 10 A ≠ DC motor approval</text>
+    <text x="848" y="515" font-size="16" font-weight="bold">10 A / 30 V DC ≠ motor approval</text>
     <g stroke="#334155" stroke-width="2" fill="none" marker-end="url(#arrow)">
       <path d="M360 313 H425"/><path d="M360 351 H425"/><path d="M360 389 H425"/><path d="M360 427 H425"/>
       <path d="M595 196 V230"/>
