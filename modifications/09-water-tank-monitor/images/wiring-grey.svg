@@ -62,7 +62,7 @@
   <path class="w v33" d="M800 165 H840 V199 H860"/>
   <path class="w gnd" d="M800 195 H825 V225 H860"/>
   <path class="w uart" d="M800 255 H860"/>
-  <text class="s" x="830" y="88" text-anchor="middle">3.3 V (not 5 V)</text>
+  <text class="s" x="965" y="98" text-anchor="middle">VCC from 3V3: 3.3 V, not 5 V</text>
 
   <text class="s" x="1070" y="330" text-anchor="end">L02 lead (450 mm) via XH pigtail to 22 AWG 4-core shielded cable,</text>
   <text class="s" x="1070" y="352" text-anchor="end">up through a sealed floor gland into the closet;</text>
