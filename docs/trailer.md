@@ -12,10 +12,10 @@ What is installed on the trailer, with the source of each fact. "To confirm" mea
 | Dry weight | About 2,480 lb (17' Deluxe) | Dealer listings; weigh the actual trailer |
 | Dry tongue weight | Not published; owners report 350-450 lb loaded | To measure |
 | Length / width | 204 in (17 ft) / 80 in | Dealer listings |
-| Fresh water | 16 gal, tank 12 in tall (natural polyethylene, rear passenger side bay) | Owner manual (16 gal); height measured by owner 2026-10 |
+| Fresh water | 23 gal, the optional larger tank (standard is 16 gal); tank 12 in tall (natural polyethylene, rear passenger side bay) | Owner, 2026-10-20 (23 gal; to confirm against the build sheet); height measured by owner 2026-10 |
 | Grey water | 32 gal, belly tank under the floor, about 4 in tall, black polyethylene | Casita store (32 gal); height from an owner video, to confirm |
 | Black water | 15 gal, under the toilet | Owner manual |
-| Tank monitor | None from the factory; [mod 09](../modifications/09-water-tank-monitor/README.md) adds fresh and grey sensors | Owner reports |
+| Tank monitor | None from the factory; [mod 09](../modifications/09-water-tank-monitor/README.md) adds fresh and grey sensors, one ESPHome device per tank | Owner reports |
 | Propane | 2 x 20 lb tanks | Level monitor planned: [mod 07](../modifications/07-propane-tank-monitor/README.md) (designed; sensors ordered) |
 | Microwave | None | Owner |
 
