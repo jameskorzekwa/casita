@@ -115,6 +115,8 @@ Everything is powered from the trailer: 12 V from a fused circuit to a 5 V buck 
 | Cable gland (PG7) and sealant | 1-2 | Where the sensor cables pass through to the tongue, and into the enclosure | [Amazon: PG7 nylon glands, 50 pack](https://www.amazon.com/dp/B0CTCG4HMM) |
 | Heat-shrink (adhesive-lined), Kapton tape, zip ties | As needed | | [Amazon: 3:1 adhesive-lined heat-shrink kit](https://www.amazon.com/dp/B0DC5YN5CD), [Amazon: Kapton tape 10 mm, 4 rolls](https://www.amazon.com/dp/B07S227ZLH) |
 
+Ownership and purchase status, kept current as parts arrive: [components.md](components.md).
+
 Amazon links checked on 2026-10-13; prices then were roughly: sensor $25, XIAO $17, regulator $11, magnets $18, grease $10, cable $17, pigtails $9, enclosure $9, glands $10, fuse holders $9 + fuses $7, capacitors $7, heat-shrink $10, Kapton $10. About **$190** for everything including both sensors, most of it in packs with plenty left over.
 
 ## Tools and Supplies
@@ -418,3 +420,4 @@ Add photos to `photos/` as the build progresses:
 | --- | --- |
 | 2026-10-13 | Design written: two DYP-L062MTW sensors on a XIAO ESP32-S3, ESPHome configuration validated and compiled. Nothing purchased or built |
 | 2026-10-13 | Magnetic collar with silicone grease made the primary mount (sensor can move between cylinders); DYP's epoxy method kept as the fallback. Collar untested |
+| 2026-10-19 | Added [components.md](components.md). Both sensors ordered 2026-10-12 (arriving 2026-10-19 to 10-21); magnets, grease, XIAO, enclosure, glands, Kapton and the USB-TTL adapter delivered; owner confirmed regulator, capacitor, cable, pigtails, fuse holder, heat-shrink and collar filament on hand. Nothing left to buy. |
