@@ -5,7 +5,7 @@ A Shelly EM Gen3 energy meter on the output of the TS-30 transfer switch, so the
 ![Where the clamps and the voltage tap go](images/wiring.svg)
 
 > [!IMPORTANT]
-> **Status: designed, not purchased or built (October 2026).** The wiring plan is based on the as-built TS-30 and shore-only box in [mod 03](../03-whole-panel-inverter/README.md) and on Shelly's published specifications. Nothing has been installed. Entity names in [Home Assistant setup](#home-assistant-setup) are the expected ones; confirm them on the device page after adoption.
+> **Status: designed, parts ordered, not built (updated 2026-10-19).** The Shelly EM Gen3 and the 5 x 20 mm fuse kit were ordered 2026-10-19 and arrive 2026-10-21/22; the second 50 A clamp, ordered the same day, is not due until 2026-11-13 to 11-17 ([components.md](components.md)). The wiring plan is based on the as-built TS-30 and shore-only box in [mod 03](../03-whole-panel-inverter/README.md) and on Shelly's published specifications. Nothing has been installed. Entity names in [Home Assistant setup](#home-assistant-setup) are the expected ones; confirm them on the device page after adoption.
 
 **Contents:** [Why here](#why-the-ts-30-output) · [What you get](#what-you-get) · [Parts](#parts) · [Wiring](#wiring) · [Steps](#steps) · [Home Assistant setup](#home-assistant-setup) · [Dashboard](#e-ink-dashboard) · [Testing](#testing-checklist) · [Troubleshooting](#troubleshooting) · [Safety](#safety-notes)
 
@@ -40,6 +40,8 @@ The one thing that cable does **not** carry is the converter and the water heate
 | Wago lever connectors, 3- or 5-port, rated to 10 AWG | 2 | To add the tap to the PANEL hot and neutral joints if the existing connectors have no spare port | |
 | Ferrules for 14/16 AWG (optional) | 2 | Shelly's terminals accept bare stranded wire, but ferrules make a cleaner termination | |
 | Zip ties, labels | As needed | | |
+
+Ownership and purchase status, kept current as parts arrive: [components.md](components.md).
 
 The Shelly's rated ambient range is -20 to 40 C (105 F). Under the dinette seat beside the TS-30 is usually cooler than the trailer's air, but a closed trailer in summer can exceed that; the meter is low-power (under 1.2 W) and the risk is reduced accuracy or a Wi-Fi drop rather than damage. Mount it on the coolest wall of the compartment, not against the inverter.
 
@@ -224,3 +226,4 @@ Add photos to `photos/` as the build progresses:
 | Date | Change |
 | --- | --- |
 | 2026-10-14 | Project written: Shelly EM Gen3 on the TS-30 PANEL output with a second clamp on the shore cord; Home Assistant templates; dashboard entities reserved. Not purchased or built |
+| 2026-10-19 | Added [components.md](components.md). Shelly EM Gen3 (with one 50 A clamp), a second 50 A clamp and a 5 x 20 mm inline fuse kit ordered from Amazon; junction box and Wago 221 kit already delivered; owner confirmed 14/16 AWG wire on hand. Nothing left to buy. |

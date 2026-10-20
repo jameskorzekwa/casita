@@ -5,7 +5,7 @@ A 7.5-inch e-paper panel mounted inside the Casita that shows the trailer's stat
 ![Overview page layout](images/screen-layout.svg)
 
 > [!IMPORTANT]
-> **Status: designed, kit ordered, not built (October 2026).** The ESPHome configuration validates and compiles with ESPHome 2026.9.1 (RAM 31%, flash 55%) but has not run on hardware. The layout above is a drawing to the panel's 800 x 480 grid, not a photo.
+> **Status: designed, kit delivered, not built (updated 2026-10-19).** The TRMNL kit (Seeed order placed 2026-10-13) arrived 2026-10-19; the power adapter, cable and mounting hardware are on hand, so only the enclosure print remains before the build ([components.md](components.md)). The ESPHome configuration validates and compiles with ESPHome 2026.9.1 (RAM 31%, flash 55%) but has not run on hardware. The layout above is a drawing to the panel's 800 x 480 grid, not a photo.
 >
 > **What shows today:** the battery section, from [mod 04](../04-battery-monitor-esp32/README.md). **Propane** fills in when [mod 07](../07-propane-tank-monitor/README.md) is built, **water** when [mod 09](../09-water-tank-monitor/README.md) is built (fresh and grey first; black later), and the **AC** line when [mod 10](../10-ac-power-meter/README.md) is; until then those gauges draw empty with `--`. Nothing in the firmware needs changing for them to appear, as long as the new projects use the entity names in [Entities shown](#entities-shown).
 
@@ -55,6 +55,8 @@ The dashboard itself appears in Home Assistant as **Casita Dashboard** with a **
 | 12 V to USB-C power adapter, 5 V 1 A or more | 1 | Either a plug-in adapter for an existing 12 V socket, or a hardwired 12-24 V to USB-C buck module on a fused 12 V circuit (a 2 A or 3 A fuse). Must be a regulated 5 V output | |
 | USB-C cable, 0.3-1 m | 1 | Power only is fine; data is useful for the first flash from a laptop | |
 | Mounting | As needed | Command strips or screws for the case; cable clips for the USB lead | |
+
+Ownership and purchase status, kept current as parts arrive: [components.md](components.md).
 
 Optional: a short U.FL to SMA pigtail and a small external antenna if the mounting spot has a weak Wi-Fi signal; Seeed's notes suggest moving the antenna outside the case when the router is far away. In a 17-foot trailer with the travel router inside, the kit's antenna should be fine.
 
@@ -198,3 +200,4 @@ Add photos to `photos/` as the build progresses:
 | --- | --- |
 | 2026-10-13 | Project written: ESPHome design, layout, configuration validated and compiled (not run on hardware). Kit ordered |
 | 2026-10-14 | AC line added to both pages (voltage, panel watts, source) for mod 10; `--` until it is built |
+| 2026-10-19 | Added [components.md](components.md). Kit delivered; owner confirmed the 12 V to USB-C adapter, USB-C cable and mounting hardware on hand. Nothing left to buy. |

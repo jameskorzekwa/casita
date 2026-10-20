@@ -5,7 +5,7 @@ Fresh and grey water tank levels in the trailer's Home Assistant, with nothing i
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
-> **Status: designed, not built (October 2026).** The ESPHome configuration validates and compiles with ESPHome 2026.9.1 (RAM 31.5%, flash 59.3%) but has not run on hardware. Neither sensor has been tried on a Casita tank by this project. Two things decide whether it works and are checked early, before anything is glued down:
+> **Status: designed, sensors ordered, not built (updated 2026-10-19).** The SeeLeveL sender (ordered 2026-10-14) arrives 2026-10-22 and the DYP L02 (ordered 2026-10-14) 2026-10-21 to 10-23; everything else is delivered or on hand ([components.md](components.md)). The ESPHome configuration validates and compiles with ESPHome 2026.9.1 (RAM 31.5%, flash 59.3%) but has not run on hardware. Neither sensor has been tried on a Casita tank by this project. Two things decide whether it works and are checked early, before anything is glued down:
 >
 > 1. **Fresh tank:** the 710-ES3 needs a flat strip of tank wall 2.2 in wide by about 11 in tall, at least 2 in from any metal in front of it and 1 in from metal beside it ([Step 1](#step-1-measure-and-plan-the-sender-and-sensor-positions)).
 > 2. **Grey tank:** the L02 must get an echo through the tank's bottom wall. DYP rates it for walls up to 5 mm; rotomolded tanks are usually 4.5-6 mm. The tape-and-grease test in [Step 6](#step-6-test-the-l02-on-the-grey-tank-before-gluing-it) answers this with nothing permanent done.
@@ -99,6 +99,8 @@ The 710-ES3 and the L02 come from different worlds: one is a Garnet RV part with
 | Adhesive-lined heat-shrink, zip ties, painter's tape, Gorilla tape | | | [Amazon: heat-shrink kit](https://www.amazon.com/dp/B0DC5YN5CD) |
 | 18-20 AWG red and black wire, crimp butt splices | | 12 V tap to the enclosure | |
 | Cable gland (PG7) or grommet | 1-2 | Where the L02 cable goes through the floor and into the enclosure | [Amazon: PG7 glands](https://www.amazon.com/dp/B0CTCG4HMM) |
+
+Ownership and purchase status, kept current as parts arrive: [components.md](components.md).
 
 Prices seen 2026-10-14: sender about $70, L02 $22, the rest $5-15 each. Links marked "search" were not checked against a specific listing; pick the genuine 3M part. About **$150** for what is not already on hand.
 
@@ -482,3 +484,4 @@ Add photos to `photos/` as the build progresses:
 | Date | Change |
 | --- | --- |
 | 2026-10-14 | Project designed: 710-ES3 sender on the fresh tank through a perfboard interface, DYP L02 under the grey tank, one XIAO ESP32-S3 on the water pump circuit. ESPHome configuration compiles; nothing built |
+| 2026-10-19 | Added [components.md](components.md). Sender and L02 ordered 2026-10-14; transistor kit, perfboard, enclosure, glands, grease, Primer 94 and undercoating delivered; owner confirmed the regulator, capacitor, shielded cable, JST-XH pigtails, fuse holder and 2 A fuses, 3M 9495LE tape, heat-shrink and 18-20 AWG wire on hand. Nothing left to buy. |
