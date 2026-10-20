@@ -5,7 +5,7 @@ Two DYP L06 ultrasonic liquid-level sensors, one held magnetically against the b
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
-> **Status: designed, not purchased or built (October 2026).** The ESPHome configuration validates and compiles with ESPHome 2026.9.1 but has not run on hardware, and no L06 has been tried on a Casita cylinder yet. **Start at [What to order](#what-to-order):** buy one sensor first and bench-test it (Steps 1-4) before ordering the second.
+> **Status: designed, sensors ordered, not built (October 2026).** Both DYP-L06 (UART Controlled) sensors were ordered from Amazon on 2026-10-12 (arriving 2026-10-19 to 10-21); check the label on each says **L062MTW** on arrival. The ESPHome configuration validates and compiles with ESPHome 2026.9.1 but has not run on hardware, and no L06 has been tried on a Casita cylinder yet. **Start at [What to order](#what-to-order)** for what to check, then bench-test one sensor (Steps 1-4) before mounting either.
 >
 > **Mounting:** DYP's documented method is epoxy, which ties the sensor to one cylinder. This project mounts the sensor in a small **magnetic collar** with silicone grease as the couplant instead, the same way Mopeka and Safiery hold their ultrasonic sensors on the same spot, so a sensor moves to a new cylinder in a minute. The collar is **not tested on an L06 yet**; the epoxy method stays as the fallback (Step 5b).
 

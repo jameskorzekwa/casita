@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480" role="img" aria-labelledby="title desc">
+  <title id="title">Casita e-ink dashboard: overview page layout, 800 by 480 pixels</title>
+  <desc id="desc">Mock-up of the dashboard's overview page at the panel's native 800 by 480 resolution, black on white. A header shows CASITA at the left, the day, date and time in the centre, and the panel's own battery at the right, above a rule. The left column is BATTERY: a very large state-of-charge percentage, a horizontal gauge with 0 and 100 labels, a row with voltage, signed current and power, a status line such as Discharging, empty in 2d 4h, today's charged and discharged energy, and an AC line with voltage, panel watts and the source. A vertical divider separates the right column. Its top half is PROPANE with two vertical tank gauges labelled Tank 1 and Tank 2, each with a percentage and pounds remaining. Its bottom half is WATER with three horizontal gauges for Fresh, Grey and Black, each with a percentage. The footer shows the button hints at the left and Updated with the time at the right. Values that are unavailable are drawn as two dashes.</desc>
+  <defs>
+    <style>
+      text{font-family:Inter,"Segoe UI",Roboto,system-ui,sans-serif;fill:#000}
+      .small{font-size:18px}
+      .label{font-size:22px;font-weight:600}
+      .value{font-size:34px;font-weight:700}
+      .huge{font-size:110px;font-weight:800}
+      .ol{fill:none;stroke:#000;stroke-width:2}
+      .tick{stroke:#000;stroke-width:1}
+    </style>
+  </defs>
+  <rect width="800" height="480" fill="#fff"/>
+
+  <!-- header -->
+  <text class="value" x="16" y="40">CASITA</text>
+  <text class="label" x="400" y="36" text-anchor="middle">Tue Oct 14   14:05</text>
+  <text class="label" x="784" y="36" text-anchor="end">Panel 86%</text>
+  <rect x="0" y="56" width="800" height="2"/>
+
+  <!-- battery -->
+  <text class="label" x="16" y="90">BATTERY</text>
+  <text class="huge" x="208" y="220" text-anchor="middle">87%</text>
+  <rect class="ol" x="16" y="250" width="384" height="30"/>
+  <rect x="18" y="252" width="330" height="26"/>
+  <line class="tick" x1="112" y1="280" x2="112" y2="285"/><line class="tick" x1="208" y1="280" x2="208" y2="285"/><line class="tick" x1="304" y1="280" x2="304" y2="285"/>
+  <text class="small" x="16" y="302">0</text>
+  <text class="small" x="400" y="302" text-anchor="end">100</text>
+  <text class="value" x="16" y="346">13.2 V</text>
+  <text class="value" x="208" y="346" text-anchor="middle">-8.4 A</text>
+  <text class="value" x="400" y="346" text-anchor="end">110 W</text>
+  <text class="label" x="16" y="392">Discharging  -  empty in 2d 4h</text>
+  <text class="small" x="16" y="418">Today: +1.84 kWh in, -0.92 kWh out</text>
+  <text class="label" x="16" y="448">AC  121 V  940 W  Inverter</text>
+
+  <!-- divider -->
+  <rect x="416" y="70" width="2" height="394"/>
+
+  <!-- propane -->
+  <text class="label" x="440" y="90">PROPANE</text>
+  <rect class="ol" x="480" y="104" width="70" height="120"/>
+  <rect x="482" y="154" width="66" height="68"/>
+  <text class="value" x="564" y="142">62%</text>
+  <text class="small" x="564" y="176">12.4 lb</text>
+  <text class="small" x="515" y="246" text-anchor="middle">Tank 1</text>
+  <rect class="ol" x="652" y="104" width="70" height="120"/>
+  <text class="value" x="736" y="142">--</text>
+  <text class="small" x="687" y="246" text-anchor="middle">Tank 2</text>
+
+  <!-- water -->
+  <rect x="440" y="262" width="344" height="1"/>
+  <text class="label" x="440" y="294">WATER</text>
+  <text class="label" x="440" y="330">Fresh</text>
+  <rect class="ol" x="520" y="310" width="184" height="24"/>
+  <rect x="522" y="312" width="126" height="20"/>
+  <line class="tick" x1="566" y1="334" x2="566" y2="339"/><line class="tick" x1="612" y1="334" x2="612" y2="339"/><line class="tick" x1="658" y1="334" x2="658" y2="339"/>
+  <text class="label" x="784" y="330" text-anchor="end">70%</text>
+  <text class="label" x="440" y="384">Grey</text>
+  <rect class="ol" x="520" y="364" width="184" height="24"/>
+  <rect x="522" y="366" width="54" height="20"/>
+  <line class="tick" x1="566" y1="388" x2="566" y2="393"/><line class="tick" x1="612" y1="388" x2="612" y2="393"/><line class="tick" x1="658" y1="388" x2="658" y2="393"/>
+  <text class="label" x="784" y="384" text-anchor="end">30%</text>
+  <text class="label" x="440" y="438">Black</text>
+  <rect class="ol" x="520" y="418" width="184" height="24"/>
+  <line class="tick" x1="566" y1="442" x2="566" y2="447"/><line class="tick" x1="612" y1="442" x2="612" y2="447"/><line class="tick" x1="658" y1="442" x2="658" y2="447"/>
+  <text class="label" x="784" y="438" text-anchor="end">--</text>
+
+  <!-- footer -->
+  <text class="small" x="16" y="472">Button 1: refresh   Button 2: details</text>
+  <text class="small" x="784" y="472" text-anchor="end">Updated 14:05</text>
+</svg>

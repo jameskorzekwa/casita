@@ -37,6 +37,11 @@ substitutions:
   empty_voltage: "11.8"
   empty_max_current: "20.0"
   empty_soc: "5.0"
+  # Charging indicator: on when net current into the bank reaches
+  # charging_on_current (A) for 10 s; off when it falls to
+  # charging_off_current or less for 30 s.
+  charging_on_current: "0.5"
+  charging_off_current: "0.2"
 
   # --- Pins: XIAO D4 = GPIO5 (SDA), D5 = GPIO6 (SCL) ---
   sda_pin: GPIO5
@@ -346,6 +351,23 @@ interval:
           } else {
             id(empty_timer_s) = 0;
           }
+
+binary_sensor:
+  # True while the bank is being charged (net current into the batteries).
+  - platform: template
+    id: batt_charging
+    name: "Charging"
+    device_class: battery_charging
+    lambda: |-
+      float i = id(batt_current).state;
+      if (isnan(i)) return {};
+      // Hysteresis so it does not flicker around zero.
+      if (i >= ${charging_on_current}) return true;
+      if (i <= ${charging_off_current}) return false;
+      return id(batt_charging).state;
+    filters:
+      - delayed_on: 10s
+      - delayed_off: 30s
 
 number:
   - platform: template
