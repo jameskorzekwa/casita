@@ -14,7 +14,7 @@ The repository is public: order references record vendor and date only. Look up 
 | 2 | Magnetic collar, 3D-printed | ASA or PETG, 100 % infill; drawing in README | 2 | `need` | Print at home | — | Filament on hand (owner confirmed 2026-10-19). Print one and test-fit before the second |
 | 3 | Neodymium disc magnets 8 x 3 mm, N42 | 3 per collar | 6 | `delivered` | [Amazon B0GFCBFKKQ](https://www.amazon.com/dp/B0GFCBFKKQ) (100 pack) | Amazon, ordered 2026-10-13 | Delivered 2026-10-16 |
 | 4 | Silicone dielectric grease (couplant) | Permatex 22058 or Mopeka Sonic Grease | 1 | `delivered` | [Amazon B000AL8VD2](https://www.amazon.com/dp/B000AL8VD2) and [B0CVQVGMWB](https://www.amazon.com/dp/B0CVQVGMWB) | Amazon, ordered 2026-10-13 | Delivered 2026-10-14. Both bought; shared with mod 09 |
-| 5 | Seeed Studio XIAO ESP32-S3 | Plain board with U.FL antenna | 1 | `delivered` | [Amazon B0DJ6NQFKX](https://www.amazon.com/dp/B0DJ6NQFKX) (3 pack) | Amazon, ordered 2026-10-14 | Delivered 2026-10-17. One each for mods 07 and 09, one spare |
+| 5 | Seeed Studio XIAO ESP32-S3 | Plain board with U.FL antenna | 1 | `delivered` | [Amazon B0DJ6NQFKX](https://www.amazon.com/dp/B0DJ6NQFKX) (3 pack) | Amazon, ordered 2026-10-14 | Delivered 2026-10-17. One for mod 07 and two for mod 09 (fresh and grey devices, split 2026-10-20) |
 | 6 | Pololu D24V5F5 12 V to 5 V regulator | 500 mA or more, input to 36 V | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 that two are on hand (one each for mods 07 and 09) |
 | 7 | 470 uF 25 V electrolytic capacitor | 25 V or higher | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 (two on hand) |
 | 8 | Inline ATO/ATC fuse holder and 2 A fuse | 2 A | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |

@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="440" viewBox="0 0 1100 440" role="img" aria-labelledby="title desc">
+  <title id="title">Grey tank device wiring: power, XIAO and DYP L02</title>
+  <desc id="desc">Grey device (casita-water-monitor-grey), in the closet. Fused 12 volts from a circuit at the closet, through a 2 amp inline fuse, feeds a 470 microfarad capacitor and the Pololu D24V5F5 buck regulator VIN. The regulator's 5 volt output goes to the XIAO ESP32-S3 5V pin; regulator GND, 12 volt negative and XIAO GND join at one ground point. The DYP L02 is powered from XIAO 3V3 (red) and GND (black); its yellow TX lead goes to XIAO D7 (GPIO44); its white RX lead is left unconnected and insulated. The L02's lead is extended with shielded four-conductor cable up through the floor into the closet, with the shield grounded at the enclosure end only.</desc>
+  <defs>
+    <style>
+      .esp{fill:#e3f8ff;stroke:#186faf;stroke-width:3}
+      .reg{fill:#fde8e8;stroke:#c53030;stroke-width:3}
+      .l02{fill:#e6fffa;stroke:#2f855a;stroke-width:3}
+      .src{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
+      .t{font:600 20px system-ui,sans-serif;fill:#102a43}
+      .s{font:15px system-ui,sans-serif;fill:#334e68}
+      .sb{font:600 15px system-ui,sans-serif;fill:#102a43}
+      .warn{font:600 15px system-ui,sans-serif;fill:#b44d12}
+      .w{fill:none;stroke-width:4}
+      .v12{stroke:#c53030}
+      .v5{stroke:#dd6b20}
+      .v33{stroke:#d69e2e}
+      .gnd{stroke:#334e68}
+      .uart{stroke:#2f855a}
+    </style>
+  </defs>
+  <rect width="1100" height="440" rx="24" fill="#fff"/>
+  <text class="t" x="30" y="40">Grey device: casita-water-monitor-grey</text>
+
+  <!-- 12 V source -->
+  <rect class="src" x="30" y="70" width="200" height="110" rx="14"/>
+  <text class="t" x="130" y="106" text-anchor="middle">12 V supply</text>
+  <text class="s" x="130" y="132" text-anchor="middle">circuit at the closet</text>
+  <text class="s" x="130" y="154" text-anchor="middle">+ 2 A inline fuse</text>
+
+  <!-- cap and regulator -->
+  <rect class="reg" x="300" y="70" width="200" height="110" rx="14"/>
+  <text class="t" x="400" y="106" text-anchor="middle">Pololu D24V5F5</text>
+  <text class="s" x="400" y="132" text-anchor="middle">VIN  GND  VOUT 5 V</text>
+  <text class="s" x="400" y="154" text-anchor="middle">470 uF across VIN-GND</text>
+  <path class="w v12" d="M230 105 H300"/>
+  <text class="s" x="265" y="95" text-anchor="middle">+12 V</text>
+  <path class="w gnd" d="M230 150 H300"/>
+  <text class="s" x="245" y="170" text-anchor="middle">neg</text>
+
+  <!-- XIAO -->
+  <rect class="esp" x="600" y="70" width="200" height="230" rx="14"/>
+  <text class="t" x="700" y="100" text-anchor="middle">XIAO ESP32-S3</text>
+  <text class="sb" x="620" y="120">5V</text>
+  <text class="sb" x="620" y="150">GND</text>
+  <text class="sb" x="780" y="170" text-anchor="end">3V3</text>
+  <text class="sb" x="780" y="200" text-anchor="end">GND</text>
+  <text class="sb" x="780" y="260" text-anchor="end">D7 / GPIO44</text>
+  <text class="s" x="700" y="288" text-anchor="middle">U.FL antenna fitted</text>
+  <path class="w v5" d="M500 105 H560 V115 H600"/>
+  <text class="s" x="545" y="95" text-anchor="middle">5 V</text>
+  <path class="w gnd" d="M500 150 H600"/>
+
+  <!-- L02 -->
+  <rect class="l02" x="860" y="110" width="210" height="190" rx="14"/>
+  <text class="t" x="965" y="144" text-anchor="middle">Grey tank sensor</text>
+  <text class="s" x="965" y="168" text-anchor="middle">DYP-L023MUW-V1.0</text>
+  <text class="sb" x="880" y="204">red  VCC</text>
+  <text class="sb" x="880" y="230">black  GND</text>
+  <text class="sb" x="880" y="256">yellow  TX</text>
+  <text class="sb" x="880" y="282">white  RX: unused</text>
+  <path class="w v33" d="M800 165 H840 V199 H860"/>
+  <path class="w gnd" d="M800 195 H825 V225 H860"/>
+  <path class="w uart" d="M800 255 H860"/>
+  <text class="s" x="830" y="88" text-anchor="middle">3.3 V (not 5 V)</text>
+
+  <text class="s" x="1070" y="330" text-anchor="end">L02 lead (450 mm) via XH pigtail to 22 AWG 4-core shielded cable,</text>
+  <text class="s" x="1070" y="352" text-anchor="end">up through a sealed floor gland into the closet;</text>
+  <text class="s" x="1070" y="374" text-anchor="end">shield to GND at the enclosure end only</text>
+
+  <text class="warn" x="30" y="405">Power the L02 from 3V3 so its TX is 3.3 V logic. A 5 V supply would put 5 V on GPIO44.</text>
+</svg>

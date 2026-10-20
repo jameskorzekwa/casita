@@ -1,13 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="700" viewBox="0 0 1100 700" role="img" aria-labelledby="title desc">
-  <title id="title">Water tank monitor wiring: power, XIAO, interface, sender and L02</title>
-  <desc id="desc">Fused 12 volts from the water pump circuit, through a 2 amp inline fuse, feeds a 470 microfarad capacitor and the Pololu D24V5F5 buck regulator VIN, and also the plus 12 volt input of the SeeLeveL interface board. The regulator's 5 volt output goes to the XIAO ESP32-S3 5V pin. XIAO GND, regulator GND, interface GND, 12 volt negative, the sender's black wire, the L02's black wire and the cable shields all join at one ground point. XIAO D4 (GPIO5) goes to the interface TX input and XIAO D5 (GPIO6) to the interface RX output. The interface's SENSOR_DATA terminal goes to the sender's blue wire. The DYP L02 is powered from XIAO 3V3 (red) and GND (black); its yellow TX lead goes to XIAO D7 (GPIO44); its white RX lead is left unconnected and insulated. The L02 runs on a shielded four-conductor cable to the grey tank with the shield grounded at the enclosure end only.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640" role="img" aria-labelledby="title desc">
+  <title id="title">Fresh tank device wiring: power, XIAO, SeeLeveL interface and sender</title>
+  <desc id="desc">Fresh device (casita-water-monitor-fresh). Fused 12 volts from the water pump circuit, through a 2 amp inline fuse, feeds a 470 microfarad capacitor and the Pololu D24V5F5 buck regulator VIN, and also the plus 12 volt input of the SeeLeveL interface board. The regulator's 5 volt output goes to the XIAO ESP32-S3 5V pin. XIAO GND, regulator GND, interface GND, 12 volt negative and the sender's black wire all join at one ground point. XIAO D4 (GPIO5) goes to the interface TX input and XIAO D5 (GPIO6) to the interface RX output. The interface's SENSOR_DATA terminal goes to the sender's blue wire.</desc>
   <defs>
     <style>
       .esp{fill:#e3f8ff;stroke:#186faf;stroke-width:3}
       .reg{fill:#fde8e8;stroke:#c53030;stroke-width:3}
       .iface{fill:#efe9ff;stroke:#6b46c1;stroke-width:3}
       .sender{fill:#e3f8ff;stroke:#6b46c1;stroke-width:3}
-      .l02{fill:#e6fffa;stroke:#2f855a;stroke-width:3}
       .src{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
       .t{font:600 20px system-ui,sans-serif;fill:#102a43}
       .s{font:15px system-ui,sans-serif;fill:#334e68}
@@ -16,14 +15,13 @@
       .w{fill:none;stroke-width:4}
       .v12{stroke:#c53030}
       .v5{stroke:#dd6b20}
-      .v33{stroke:#d69e2e}
       .gnd{stroke:#334e68}
       .sig{stroke:#6b46c1}
       .blue{stroke:#186faf}
-      .uart{stroke:#2f855a}
     </style>
   </defs>
-  <rect width="1100" height="700" rx="24" fill="#fff"/>
+  <rect width="1100" height="640" rx="24" fill="#fff"/>
+  <text class="t" x="1070" y="40" text-anchor="end">Fresh device: casita-water-monitor-fresh</text>
 
   <!-- 12 V source -->
   <rect class="src" x="30" y="60" width="200" height="110" rx="14"/>
@@ -42,16 +40,13 @@
   <text class="s" x="245" y="160" text-anchor="middle">neg</text>
 
   <!-- XIAO -->
-  <rect class="esp" x="600" y="40" width="200" height="330" rx="14"/>
-  <text class="t" x="700" y="74" text-anchor="middle">XIAO ESP32-S3</text>
+  <rect class="esp" x="600" y="60" width="200" height="230" rx="14"/>
+  <text class="t" x="700" y="90" text-anchor="middle">XIAO ESP32-S3</text>
   <text class="sb" x="620" y="110">5V</text>
   <text class="sb" x="620" y="140">GND</text>
-    <text class="sb" x="620" y="220">D4 / GPIO5</text>
+  <text class="sb" x="620" y="220">D4 / GPIO5</text>
   <text class="sb" x="620" y="250">D5 / GPIO6</text>
-    <text class="sb" x="780" y="170" text-anchor="end">3V3</text>
-  <text class="sb" x="780" y="200" text-anchor="end">GND</text>
-  <text class="sb" x="780" y="300" text-anchor="end">D7 / GPIO44</text>
-  <text class="s" x="700" y="345" text-anchor="middle">U.FL antenna fitted</text>
+  <text class="s" x="700" y="278" text-anchor="middle">U.FL antenna fitted</text>
   <path class="w v5" d="M500 95 H560 V105 H600"/>
   <text class="s" x="545" y="85" text-anchor="middle">5 V</text>
   <path class="w gnd" d="M500 140 H600"/>
@@ -69,6 +64,7 @@
   <path class="w gnd" d="M265 140 V337 H300"/>
   <path class="w sig" d="M500 311 H560 V215 H600"/>
   <path class="w sig" d="M500 337 H580 V245 H600"/>
+  <text class="s" x="610" y="330">TX to D4, RX to D5</text>
 
   <!-- Sender -->
   <rect class="sender" x="30" y="440" width="200" height="130" rx="14"/>
@@ -76,27 +72,10 @@
   <text class="s" x="130" y="498" text-anchor="middle">Garnet 710-ES3</text>
   <text class="s" x="130" y="520" text-anchor="middle">tank 1: no tabs cut</text>
   <text class="s" x="130" y="548" text-anchor="middle">blue = data, black = ground</text>
-  <path class="w blue" d="M230 495 H265 V380 H300"/>
-  <text class="s" x="275" y="460" text-anchor="start">blue</text>
+  <path class="w blue" d="M230 495 H245 V380 H300"/>
+  <text class="s" x="250" y="460" text-anchor="start">blue</text>
   <path class="w gnd" d="M230 540 H265 V560 H560 V140"/>
   <text class="s" x="300" y="582" text-anchor="start">black, to the common ground</text>
 
-  <!-- L02 -->
-  <rect class="l02" x="860" y="440" width="210" height="190" rx="14"/>
-  <text class="t" x="965" y="474" text-anchor="middle">Grey tank sensor</text>
-  <text class="s" x="965" y="498" text-anchor="middle">DYP-L023MUW-V1.0</text>
-  <text class="sb" x="880" y="534">red  VCC</text>
-  <text class="sb" x="880" y="560">black  GND</text>
-  <text class="sb" x="880" y="586">yellow  TX</text>
-  <text class="sb" x="880" y="612">white  RX: unused</text>
-  <path class="w v33" d="M800 165 H840 V529 H860"/>
-  <text class="s" x="830" y="158" text-anchor="start">3.3 V (not 5 V)</text>
-  <path class="w gnd" d="M800 195 H820 V555 H860"/>
-  <path class="w uart" d="M800 295 H810 V581 H860"/>
-  <text class="s" x="770" y="420" text-anchor="end">yellow TX to D7</text>
-  <text class="s" x="1070" y="650" text-anchor="end">22 AWG 4-core shielded cable, about 3 m,</text>
-  <text class="s" x="1070" y="672" text-anchor="end">shield to GND at the enclosure end only</text>
-
-  <text class="warn" x="30" y="650">Power the L02 from 3V3 so its TX is 3.3 V logic. A 5 V supply would put 5 V on GPIO44.</text>
-  <text class="warn" x="30" y="675">The sender's black wire must share the ESP32 ground, not a separate chassis ground.</text>
+  <text class="warn" x="30" y="620">The sender's black wire must share the ESP32 ground, not a separate chassis ground.</text>
 </svg>
