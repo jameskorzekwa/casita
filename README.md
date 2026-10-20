@@ -25,6 +25,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | Installed, running and calibrated; mirrored to the home Home Assistant |
 | 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
 | 06 | [Four smart DC switches (BANDC + Waveshare)](modifications/06-smart-dc-switches/README.md) | Planned / bench-validation required; four BANDC rockers delivered 2026-10-19, Waveshare controller ordered 2026-10-19, not installed |
+| 07 | [Propane tank monitor to Home Assistant (DYP L06 + XIAO ESP32-S3)](modifications/07-propane-tank-monitor/README.md) | Designed; sensors ordered |
 | 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit ordered |
 | 09 | [Water tank monitor to Home Assistant (SeeLeveL + DYP L02 + XIAO ESP32-S3)](modifications/09-water-tank-monitor/README.md) | Designed; sensors ordered |
 | 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; not purchased |

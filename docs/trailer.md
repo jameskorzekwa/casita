@@ -16,7 +16,7 @@ What is installed on the trailer, with the source of each fact. "To confirm" mea
 | Grey water | 32 gal, belly tank under the floor, about 4 in tall, black polyethylene | Casita store (32 gal); height from an owner video, to confirm |
 | Black water | 15 gal, under the toilet | Owner manual |
 | Tank monitor | None from the factory; [mod 09](../modifications/09-water-tank-monitor/README.md) adds fresh and grey sensors | Owner reports |
-| Propane | 2 x 20 lb tanks | |
+| Propane | 2 x 20 lb tanks | Level monitor planned: [mod 07](../modifications/07-propane-tank-monitor/README.md) (designed; sensors ordered) |
 | Microwave | None | Owner |
 
 ## Tow Vehicle
