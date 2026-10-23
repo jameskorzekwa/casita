@@ -77,18 +77,25 @@ class ConfigurationContract(unittest.TestCase):
     def test_offline_and_secrets_contract(self):
         c = self.config
         self.assertEqual(set(c), {
-            "esphome", "esp32", "logger", "api", "ota", "wifi", "i2c",
-            "pca9554", "switch", "binary_sensor",
+            "esphome", "esp32", "logger", "api", "ota", "wifi", "captive_portal",
+            "i2c", "pca9554", "switch", "binary_sensor",
         })
         self.assertEqual(c["wifi"]["reboot_timeout"], "0s")
         self.assertEqual(c["api"]["reboot_timeout"], "0s")
         self.assertEqual(len(c["ota"]), 1)
         self.assertEqual(c["ota"][0]["platform"], "esphome")
+        # Trailer network first, home network as backup; fallback hotspot last.
+        networks = c["wifi"]["networks"]
+        self.assertEqual(len(networks), 2)
+        self.assertEqual(c["wifi"]["ap"]["ssid"], "Casita Smart DC Fallback")
         refs = {
-            "api_encryption_key": c["api"]["encryption"]["key"],
+            "smart_dc_api_encryption_key": c["api"]["encryption"]["key"],
             "ota_password": c["ota"][0]["password"],
-            "wifi_ssid": c["wifi"]["ssid"],
-            "wifi_password": c["wifi"]["password"],
+            "wifi_ssid": networks[0]["ssid"],
+            "wifi_password": networks[0]["password"],
+            "home_wifi_ssid": networks[1]["ssid"],
+            "home_wifi_password": networks[1]["password"],
+            "fallback_ap_password": c["wifi"]["ap"]["password"],
         }
         for name, value in refs.items():
             self.assertIsInstance(value, SecretRef)
