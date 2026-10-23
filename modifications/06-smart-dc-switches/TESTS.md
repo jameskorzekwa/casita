@@ -86,5 +86,6 @@ For every channel, observe both physical test load and the corresponding native 
 | Static tests (Waveshare) | 2026-10-19: five contract tests updated for GPIO4–GPIO11 inputs and TCA9554 0x20 relays | Passed; not ESPHome validation/compile |
 | ESPHome config / compile (Waveshare) | 2026-10-19: `ghcr.io/esphome/esphome:2026.9.1`, ESP-IDF, ESP32-S3, isolated copy with synthetic build-only credentials. RAM 29.8%, flash 9.4% | Passed; no upload. Same OTA-password warning as 2026-10-13 (recommends `ota` encryption instead); not applied. Never deploy the validation artifact. |
 | SVG visual render (Waveshare) | 2026-10-19: rendered with resvg and DejaVu Sans to 1200 x 820 PNG; checked for clipping, readable labels and correct arrows | Passed; conceptual control diagram, not an approved load schematic |
+| Device Builder validate | 2026-10-22: `casita-smart-dc-switches.yaml` in the trailer HA Device Builder, real secrets, ESPHome 2026.10.0 `devices/validate` | Passed; compile started, see README revisions |
 | Continuity / bench / offline / boot | No hardware tests performed | Pending |
 | Load ratings / installed acceptance | Loads not yet identified | Pending |
