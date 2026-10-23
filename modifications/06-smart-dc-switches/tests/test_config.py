@@ -93,8 +93,8 @@ class ConfigurationContract(unittest.TestCase):
             "ota_password": c["ota"][0]["password"],
             "wifi_ssid": networks[0]["ssid"],
             "wifi_password": networks[0]["password"],
-            "home_wifi_ssid": networks[1]["ssid"],
-            "home_wifi_password": networks[1]["password"],
+            "wifi_backup_ssid": networks[1]["ssid"],
+            "wifi_backup_password": networks[1]["password"],
             "fallback_ap_password": c["wifi"]["ap"]["password"],
         }
         for name, value in refs.items():
