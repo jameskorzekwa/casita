@@ -60,7 +60,8 @@ class ConfigurationContract(unittest.TestCase):
         self.assertEqual(len(inputs), 8)
         for index, sensor in enumerate(inputs):
             load = f"load_{index // 2 + 1}"
-            direction = "up" if index % 2 == 0 else "down"
+            # As installed 2026-10-23: odd inputs (even index) are DOWN, even inputs are UP.
+            direction = "down" if index % 2 == 0 else "up"
             action = "switch.turn_on" if direction == "up" else "switch.turn_off"
             self.assertEqual(set(sensor), {
                 "platform", "id", "internal", "pin", "filters", "on_press",

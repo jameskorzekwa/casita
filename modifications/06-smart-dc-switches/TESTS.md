@@ -96,6 +96,8 @@ For every channel, observe both physical test load and the corresponding native 
 | No toggle / idempotent presses | 2026-10-23: Rocker 1 UP ×3 → single `on` (19:38:00); DOWN ×3 → single `off`; Rocker 2 UP ×2 → single `on`; owner heard one click per group, none on repeats | Passed |
 | Relay terminal order | 2026-10-23 meter on CH1, labels upright, left→right: **NO – COM – NC** (L–M closed with Load 1 ON, M–R closed with it OFF). CH2–CH4 assumed identical; spot-check before any load | CH1 verified |
 | DC power-up | 2026-10-23: USB removed (device unavailable 19:44:25), board powered from a bench 12 V supply on the `7~36V` block, current-limited; owner observed no relay movement during boot; HA reconnected 19:44:26 with all four outputs `off` | Passed (clean power-on only) |
-| Offline 30 min (HA down / Wi-Fi down), held-button boot, brownout, safe mode, I2C fault injection | Not run | Pending |
-| Load ratings / installed acceptance | Loads not yet identified | Pending |
-| Load ratings / installed acceptance | Loads not yet identified | Pending |
+| Installed operation | 2026-10-23 23:16 UTC, after the UP/DOWN firmware swap and the light wires on NO: each of the four rockers commanded its load on then off from the panel (recorder: load_1 on 23:16:06 / off 23:16:21, load_2 on 23:16:07 / off, load_3 on :08 / off :09, load_4 on :09 / off :10); HA state matched the lights; all four `off` after the OTA reboot | Passed |
+| Offline 30 min (HA down / Wi-Fi down) | Owner reports done; not recorded with timestamps | Owner-reported |
+| Held-button boot, brownout, safe mode, I2C fault injection | Not run | Pending |
+| Load ratings / installed acceptance | Two LED light circuits on the onboard relays (≤10 A / 30 V DC); WFCO fuse rating and wire gauge still to record; cover pending | Installed, record incomplete |
+| Load ratings / installed acceptance | Two LED light circuits on the onboard relays (≤10 A / 30 V DC); WFCO fuse rating and wire gauge still to record; cover pending | Installed, record incomplete |
