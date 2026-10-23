@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="980" viewBox="0 0 1240 980" font-family="Helvetica, Arial, sans-serif">
+<title>Bench wiring: four BANDC momentary rockers to the Waveshare ESP32-S3-POE-ETH-8DI-8RO</title>
+<desc>Each rocker common goes to the board DGND terminal; the throw that closes on UP goes to the odd digital input and the DOWN throw to the even input. The COM terminal stays empty. The board is powered from a current-limited bench 12 V supply on the 7-36 V block; relay terminals carry no load during bench tests.</desc>
+<rect width="1240" height="980" fill="#ffffff"/>
+<text x="24" y="40" font-size="24" font-weight="bold" fill="#111">Bench wiring: BANDC momentary rockers to Waveshare ESP32-S3-POE-ETH-8DI-8RO</text>
+<text x="24" y="66" font-size="14" fill="#444">Dry-contact inputs only. No trailer load, no 12 V on any DI/DGND/COM terminal. Terminal legends from Waveshare images; confirm on the received board.</text>
+<rect x="660" y="100" width="550" height="820" rx="10" fill="#eef3f8" stroke="#2b4c7e" stroke-width="2"/>
+<text x="935.0" y="128" font-size="17" font-weight="bold" text-anchor="middle" fill="#2b4c7e">Waveshare ESP32-S3-POE-ETH-8DI-8RO (in rail-mount case)</text>
+<text x="935.0" y="908" font-size="12" text-anchor="middle" fill="#2b4c7e">ANT: SMA antenna fitted.  USB-C: first flash only, unplugged while on DC.  ETH/PoE, RS485: unused.</text>
+<rect x="662" y="170" width="150" height="600" rx="6" fill="#ffffff" stroke="#888" stroke-dasharray="4 3"/>
+<text x="670" y="162" font-size="12.5" font-weight="bold" fill="#555">Digital input block</text>
+<rect x="673" y="191" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="200" r="3.2" fill="#333"/>
+<text x="698" y="205" font-size="14" font-weight="bold" fill="#111">COM</text>
+<text x="752" y="205" font-size="11.5" fill="#555">leave EMPTY (active inputs only)</text>
+<rect x="673" y="251" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="260" r="3.2" fill="#333"/>
+<text x="698" y="265" font-size="14" font-weight="bold" fill="#111">DGND</text>
+<text x="752" y="265" font-size="11.5" fill="#555">all four rocker commons</text>
+<rect x="673" y="311" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="320" r="3.2" fill="#333"/>
+<text x="698" y="325" font-size="14" font-weight="bold" fill="#111">DI1</text>
+<text x="752" y="325" font-size="11.5" fill="#555">GPIO4  Load 1 UP = ON</text>
+<rect x="673" y="371" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="380" r="3.2" fill="#333"/>
+<text x="698" y="385" font-size="14" font-weight="bold" fill="#111">DI2</text>
+<text x="752" y="385" font-size="11.5" fill="#555">GPIO5  Load 1 DOWN = OFF</text>
+<rect x="673" y="431" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="440" r="3.2" fill="#333"/>
+<text x="698" y="445" font-size="14" font-weight="bold" fill="#111">DI3</text>
+<text x="752" y="445" font-size="11.5" fill="#555">GPIO6  Load 2 UP = ON</text>
+<rect x="673" y="491" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="500" r="3.2" fill="#333"/>
+<text x="698" y="505" font-size="14" font-weight="bold" fill="#111">DI4</text>
+<text x="752" y="505" font-size="11.5" fill="#555">GPIO7  Load 2 DOWN = OFF</text>
+<rect x="673" y="551" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="560" r="3.2" fill="#333"/>
+<text x="698" y="565" font-size="14" font-weight="bold" fill="#111">DI5</text>
+<text x="752" y="565" font-size="11.5" fill="#555">GPIO8  Load 3 UP = ON</text>
+<rect x="673" y="611" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="620" r="3.2" fill="#333"/>
+<text x="698" y="625" font-size="14" font-weight="bold" fill="#111">DI6</text>
+<text x="752" y="625" font-size="11.5" fill="#555">GPIO9  Load 3 DOWN = OFF</text>
+<rect x="673" y="671" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="680" r="3.2" fill="#333"/>
+<text x="698" y="685" font-size="14" font-weight="bold" fill="#111">DI7</text>
+<text x="752" y="685" font-size="11.5" fill="#555">GPIO10  Load 4 UP = ON</text>
+<rect x="673" y="731" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="740" r="3.2" fill="#333"/>
+<text x="698" y="745" font-size="14" font-weight="bold" fill="#111">DI8</text>
+<text x="752" y="745" font-size="11.5" fill="#555">GPIO11  Load 4 DOWN = OFF</text>
+<rect x="662" y="790" width="150" height="100" rx="6" fill="#ffffff" stroke="#888" stroke-dasharray="4 3"/>
+<text x="670" y="782" font-size="12.5" font-weight="bold" fill="#555">7~36V supply block</text>
+<rect x="673" y="811" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="820" r="3.2" fill="#333"/>
+<text x="698" y="825" font-size="14" font-weight="bold" fill="#111">−</text>
+<text x="752" y="825" font-size="11.5" fill="#555">supply negative</text>
+<rect x="673" y="851" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="682" cy="860" r="3.2" fill="#333"/>
+<text x="698" y="865" font-size="14" font-weight="bold" fill="#111">+</text>
+<text x="752" y="865" font-size="11.5" fill="#555">supply positive (fused)</text>
+<text x="1117" y="162" font-size="12.5" font-weight="bold" text-anchor="middle" fill="#555">Relay outputs</text>
+<rect x="1042" y="170" width="150" height="66" rx="5" fill="#fff8e6" stroke="#b07a00" stroke-width="1.4"/>
+<text x="1050" y="186" font-size="12.5" font-weight="bold" fill="#7a5500">CH1  = Load 1</text>
+<rect x="1073" y="200" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1109" y="200" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1145" y="200" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<text x="1117" y="230" font-size="10.5" text-anchor="middle" fill="#666">NO / COM / NC: find with meter</text>
+<rect x="1042" y="248" width="150" height="66" rx="5" fill="#fff8e6" stroke="#b07a00" stroke-width="1.4"/>
+<text x="1050" y="264" font-size="12.5" font-weight="bold" fill="#7a5500">CH2  = Load 2</text>
+<rect x="1073" y="278" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1109" y="278" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1145" y="278" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<text x="1117" y="308" font-size="10.5" text-anchor="middle" fill="#666">NO / COM / NC: find with meter</text>
+<rect x="1042" y="326" width="150" height="66" rx="5" fill="#fff8e6" stroke="#b07a00" stroke-width="1.4"/>
+<text x="1050" y="342" font-size="12.5" font-weight="bold" fill="#7a5500">CH3  = Load 3</text>
+<rect x="1073" y="356" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1109" y="356" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1145" y="356" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<text x="1117" y="386" font-size="10.5" text-anchor="middle" fill="#666">NO / COM / NC: find with meter</text>
+<rect x="1042" y="404" width="150" height="66" rx="5" fill="#fff8e6" stroke="#b07a00" stroke-width="1.4"/>
+<text x="1050" y="420" font-size="12.5" font-weight="bold" fill="#7a5500">CH4  = Load 4</text>
+<rect x="1073" y="434" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1109" y="434" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1145" y="434" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<text x="1117" y="464" font-size="10.5" text-anchor="middle" fill="#666">NO / COM / NC: find with meter</text>
+<rect x="1042" y="482" width="150" height="66" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.4"/>
+<text x="1050" y="498" font-size="12.5" font-weight="bold" fill="#777">CH5  unused</text>
+<rect x="1073" y="512" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1109" y="512" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1145" y="512" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<text x="1117" y="542" font-size="10.5" text-anchor="middle" fill="#666">leave empty</text>
+<rect x="1042" y="560" width="150" height="66" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.4"/>
+<text x="1050" y="576" font-size="12.5" font-weight="bold" fill="#777">CH6  unused</text>
+<rect x="1073" y="590" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1109" y="590" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1145" y="590" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<text x="1117" y="620" font-size="10.5" text-anchor="middle" fill="#666">leave empty</text>
+<rect x="1042" y="638" width="150" height="66" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.4"/>
+<text x="1050" y="654" font-size="12.5" font-weight="bold" fill="#777">CH7  unused</text>
+<rect x="1073" y="668" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1109" y="668" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1145" y="668" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<text x="1117" y="698" font-size="10.5" text-anchor="middle" fill="#666">leave empty</text>
+<rect x="1042" y="716" width="150" height="66" rx="5" fill="#f4f4f4" stroke="#aaa" stroke-width="1.4"/>
+<text x="1050" y="732" font-size="12.5" font-weight="bold" fill="#777">CH8  unused</text>
+<rect x="1073" y="746" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1109" y="746" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<rect x="1145" y="746" width="16" height="16" fill="#fff" stroke="#555" stroke-width="1.3"/>
+<text x="1117" y="776" font-size="10.5" text-anchor="middle" fill="#666">leave empty</text>
+<text x="1117" y="808" font-size="11" text-anchor="middle" fill="#7a5500">Bench: no load on any relay terminal.</text>
+<text x="1117" y="824" font-size="11" text-anchor="middle" fill="#7a5500">Switch ON in HA = NO closed.</text>
+<rect x="150" y="302" width="180" height="96" rx="8" fill="#f7f7f7" stroke="#333" stroke-width="1.8"/>
+<text x="138" y="344" font-size="15" font-weight="bold" text-anchor="end" fill="#111">Rocker 1</text>
+<text x="138" y="362" font-size="12" text-anchor="end" fill="#555">Load 1</text>
+<text x="138" y="378" font-size="10" text-anchor="end" fill="#777">(ON)-OFF-(ON)</text>
+<rect x="168" y="314" width="46" height="72" rx="6" fill="#dcdcdc" stroke="#777"/>
+<path d="M178 320 L204 320 L204 347 L178 347 Z" fill="#cfd8dc" stroke="#555"/>
+<path d="M178 353 L204 353 L204 380 L178 380 Z" fill="#cfd8dc" stroke="#555"/>
+<text x="191" y="337" font-size="9" text-anchor="middle" fill="#333">UP</text>
+<text x="191" y="371" font-size="9" text-anchor="middle" fill="#333">DOWN</text>
+<rect x="321" y="311" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="320" r="3.2" fill="#333"/>
+<text x="314" y="324.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#1b8f3a">UP throw</text>
+<rect x="321" y="341" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="350" r="3.2" fill="#333"/>
+<text x="314" y="354.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#111111">COMMON</text>
+<rect x="321" y="371" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="380" r="3.2" fill="#333"/>
+<text x="314" y="384.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#d9a400">DOWN throw</text>
+<rect x="150" y="422" width="180" height="96" rx="8" fill="#f7f7f7" stroke="#333" stroke-width="1.8"/>
+<text x="138" y="464" font-size="15" font-weight="bold" text-anchor="end" fill="#111">Rocker 2</text>
+<text x="138" y="482" font-size="12" text-anchor="end" fill="#555">Load 2</text>
+<text x="138" y="498" font-size="10" text-anchor="end" fill="#777">(ON)-OFF-(ON)</text>
+<rect x="168" y="434" width="46" height="72" rx="6" fill="#dcdcdc" stroke="#777"/>
+<path d="M178 440 L204 440 L204 467 L178 467 Z" fill="#cfd8dc" stroke="#555"/>
+<path d="M178 473 L204 473 L204 500 L178 500 Z" fill="#cfd8dc" stroke="#555"/>
+<text x="191" y="457" font-size="9" text-anchor="middle" fill="#333">UP</text>
+<text x="191" y="491" font-size="9" text-anchor="middle" fill="#333">DOWN</text>
+<rect x="321" y="431" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="440" r="3.2" fill="#333"/>
+<text x="314" y="444.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#1b8f3a">UP throw</text>
+<rect x="321" y="461" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="470" r="3.2" fill="#333"/>
+<text x="314" y="474.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#111111">COMMON</text>
+<rect x="321" y="491" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="500" r="3.2" fill="#333"/>
+<text x="314" y="504.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#d9a400">DOWN throw</text>
+<rect x="150" y="542" width="180" height="96" rx="8" fill="#f7f7f7" stroke="#333" stroke-width="1.8"/>
+<text x="138" y="584" font-size="15" font-weight="bold" text-anchor="end" fill="#111">Rocker 3</text>
+<text x="138" y="602" font-size="12" text-anchor="end" fill="#555">Load 3</text>
+<text x="138" y="618" font-size="10" text-anchor="end" fill="#777">(ON)-OFF-(ON)</text>
+<rect x="168" y="554" width="46" height="72" rx="6" fill="#dcdcdc" stroke="#777"/>
+<path d="M178 560 L204 560 L204 587 L178 587 Z" fill="#cfd8dc" stroke="#555"/>
+<path d="M178 593 L204 593 L204 620 L178 620 Z" fill="#cfd8dc" stroke="#555"/>
+<text x="191" y="577" font-size="9" text-anchor="middle" fill="#333">UP</text>
+<text x="191" y="611" font-size="9" text-anchor="middle" fill="#333">DOWN</text>
+<rect x="321" y="551" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="560" r="3.2" fill="#333"/>
+<text x="314" y="564.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#1b8f3a">UP throw</text>
+<rect x="321" y="581" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="590" r="3.2" fill="#333"/>
+<text x="314" y="594.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#111111">COMMON</text>
+<rect x="321" y="611" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="620" r="3.2" fill="#333"/>
+<text x="314" y="624.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#d9a400">DOWN throw</text>
+<rect x="150" y="662" width="180" height="96" rx="8" fill="#f7f7f7" stroke="#333" stroke-width="1.8"/>
+<text x="138" y="704" font-size="15" font-weight="bold" text-anchor="end" fill="#111">Rocker 4</text>
+<text x="138" y="722" font-size="12" text-anchor="end" fill="#555">Load 4</text>
+<text x="138" y="738" font-size="10" text-anchor="end" fill="#777">(ON)-OFF-(ON)</text>
+<rect x="168" y="674" width="46" height="72" rx="6" fill="#dcdcdc" stroke="#777"/>
+<path d="M178 680 L204 680 L204 707 L178 707 Z" fill="#cfd8dc" stroke="#555"/>
+<path d="M178 713 L204 713 L204 740 L178 740 Z" fill="#cfd8dc" stroke="#555"/>
+<text x="191" y="697" font-size="9" text-anchor="middle" fill="#333">UP</text>
+<text x="191" y="731" font-size="9" text-anchor="middle" fill="#333">DOWN</text>
+<rect x="321" y="671" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="680" r="3.2" fill="#333"/>
+<text x="314" y="684.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#1b8f3a">UP throw</text>
+<rect x="321" y="701" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="710" r="3.2" fill="#333"/>
+<text x="314" y="714.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#111111">COMMON</text>
+<rect x="321" y="731" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="740" r="3.2" fill="#333"/>
+<text x="314" y="744.5" font-size="11.5" font-weight="bold" text-anchor="end" fill="#d9a400">DOWN throw</text>
+<path d="M339 320 H673" fill="none" stroke="#1b8f3a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 380 H673" fill="none" stroke="#d9a400" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="506.0" y="314" font-size="11" text-anchor="middle" fill="#1b8f3a">UP → DI1</text>
+<text x="506.0" y="396" font-size="11" text-anchor="middle" fill="#8a6a00">DOWN → DI2</text>
+<path d="M339 440 H673" fill="none" stroke="#1b8f3a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 500 H673" fill="none" stroke="#d9a400" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="506.0" y="434" font-size="11" text-anchor="middle" fill="#1b8f3a">UP → DI3</text>
+<text x="506.0" y="516" font-size="11" text-anchor="middle" fill="#8a6a00">DOWN → DI4</text>
+<path d="M339 560 H673" fill="none" stroke="#1b8f3a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 620 H673" fill="none" stroke="#d9a400" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="506.0" y="554" font-size="11" text-anchor="middle" fill="#1b8f3a">UP → DI5</text>
+<text x="506.0" y="636" font-size="11" text-anchor="middle" fill="#8a6a00">DOWN → DI6</text>
+<path d="M339 680 H673" fill="none" stroke="#1b8f3a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 740 H673" fill="none" stroke="#d9a400" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="506.0" y="674" font-size="11" text-anchor="middle" fill="#1b8f3a">UP → DI7</text>
+<text x="506.0" y="756" font-size="11" text-anchor="middle" fill="#8a6a00">DOWN → DI8</text>
+<path d="M339 350 H420" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 470 H420" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 590 H420" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 710 H420" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M420 710 V260 H673" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 350 H420" fill="none" stroke="#111111" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 470 H420" fill="none" stroke="#111111" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 590 H420" fill="none" stroke="#111111" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 710 H420" fill="none" stroke="#111111" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M420 710 V260 H673" fill="none" stroke="#111111" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="420" cy="350" r="5" fill="#111111"/>
+<circle cx="420" cy="470" r="5" fill="#111111"/>
+<circle cx="420" cy="590" r="5" fill="#111111"/>
+<circle cx="420" cy="710" r="5" fill="#111111"/>
+<text x="428" y="250" font-size="11.5" fill="#111">all commons → DGND</text>
+<text x="428" y="282" font-size="10.5" fill="#444">chain commons with piggyback spades or a</text>
+<text x="428" y="295" font-size="10.5" fill="#444">small splice; land ONE wire on DGND</text>
+<rect x="150" y="800" width="180" height="90" rx="8" fill="#fbeaea" stroke="#9b2c2c" stroke-width="1.8"/>
+<text x="232" y="822" font-size="13" font-weight="bold" text-anchor="middle" fill="#9b2c2c">Bench 12 V DC supply</text>
+<text x="240" y="839" font-size="11" text-anchor="middle" fill="#9b2c2c">current-limited, polarity checked</text>
+<rect x="321" y="811" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="820" r="3.2" fill="#333"/>
+<text x="314" y="825" font-size="14" font-weight="bold" text-anchor="end" fill="#111">−</text>
+<rect x="321" y="851" width="18" height="18" fill="#fff" stroke="#333" stroke-width="1.6"/>
+<circle cx="330" cy="860" r="3.2" fill="#333"/>
+<text x="314" y="865" font-size="14" font-weight="bold" text-anchor="end" fill="#111">+</text>
+<path d="M339 820 H673" fill="none" stroke="#222" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339 860 H673" fill="none" stroke="#c62828" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="484.0" y="851" width="44" height="18" rx="4" fill="#fff" stroke="#c62828" stroke-width="1.6"/>
+<text x="506.0" y="864.5" font-size="10.5" text-anchor="middle" fill="#c62828">fuse</text>
+<text x="510.5" y="812" font-size="11" text-anchor="middle" fill="#222">− to −</text>
+<text x="510.5" y="884" font-size="11" text-anchor="middle" fill="#c62828">+ to +  (small inline fuse, e.g. 2 A)</text>
+<rect x="24" y="100" width="300" height="118" rx="6" fill="#fafafa" stroke="#bbb"/>
+<text x="34" y="120" font-size="12.5" font-weight="bold" fill="#111">Suggested 22/4 cable colours (one run per rocker)</text>
+<line x1="36" y1="138" x2="64" y2="138" stroke="#1b8f3a" stroke-width="4" stroke-linecap="round"/>
+<text x="72" y="142" font-size="11.5" fill="#333">green = UP throw → odd DI</text>
+<line x1="36" y1="158" x2="64" y2="158" stroke="#d9a400" stroke-width="4" stroke-linecap="round"/>
+<text x="72" y="162" font-size="11.5" fill="#333">yellow/white = DOWN throw → even DI</text>
+<line x1="36" y1="178" x2="64" y2="178" stroke="#111111" stroke-width="4" stroke-linecap="round"/>
+<text x="72" y="182" font-size="11.5" fill="#333">black = common → DGND</text>
+<line x1="36" y1="198" x2="64" y2="198" stroke="#c62828" stroke-width="4" stroke-linecap="round"/>
+<text x="72" y="202" font-size="11.5" fill="#333">red = spare, cap it (NOT 12 V)</text>
+<text x="24" y="240" font-size="11.5" fill="#444">Colours are a convention only; the meter result decides which pin is which.</text>
+<text x="24" y="256" font-size="11.5" fill="#444">The common is the pin that connects to one neighbour on UP</text>
+<text x="24" y="272" font-size="11.5" fill="#444">and to the other on DOWN; centre = open to both.</text>
+<text x="24" y="964" font-size="11" fill="#666">casita / modifications/06-smart-dc-switches / images/rocker-wiring.svg — 2026-10-22. Bench diagram; not an installation or load schematic.</text>
+</svg>
