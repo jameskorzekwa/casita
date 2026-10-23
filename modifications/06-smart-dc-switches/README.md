@@ -1,6 +1,6 @@
 # Four Smart DC Switches — BANDC Rockers + Waveshare ESP32-S3-ETH-8DI-8RO
 
-> **Status: Bench-tested, not installed (updated 2026-10-23).** The four **BANDC three-pin momentary SPDT** rockers ([Amazon B0CNS17ZMK](https://www.amazon.com/dp/B0CNS17ZMK)) are wired to the **Waveshare ESP32-S3-POE-ETH-8DI-8RO** ([Amazon B0FBKGGKK3](https://www.amazon.com/dp/B0FBKGGKK3)) on the bench; firmware flashed 2026-10-23 and the device is live in the trailer Home Assistant as **Casita Smart DC Switches** (area Casita RV, `switch.casita_smart_dc_switches_load_1`–`_4`). All four rockers drive their relays, repeated presses do not toggle, HA control works, and a clean 12 V power-up left every relay open. Extended offline, fault and load tests are still pending; see [TESTS.md](TESTS.md). The controller replaced the KinCony KC868-A4S on 2026-10-19; the rockers replaced the originally selected Carling V8D1-S00B bodies. Purchase status is tracked in [components.md](components.md). Nothing is installed. This project contains a control design and firmware candidate, not approval to connect the trailer's unidentified loads. Build results are in [TESTS.md](TESTS.md); the [bench quick-start](#bench-quick-start) below is the next step.
+> **Status: Installed and working (2026-10-23); cabinet cover pending.** Four **BANDC three-pin momentary SPDT** rockers ([Amazon B0CNS17ZMK](https://www.amazon.com/dp/B0CNS17ZMK)) are in the Nilight panel and a **Waveshare ESP32-S3-POE-ETH-8DI-8RO** ([Amazon B0FBKGGKK3](https://www.amazon.com/dp/B0FBKGGKK3)) in the cabinet beside it switches the two LED light circuits on relays **CH1 and CH2**; channels 3–4 are wired spares. The device is live in the trailer Home Assistant as **Casita Smart DC Switches** (`switch.casita_smart_dc_switches_load_1`–`_4`). Verified 2026-10-23: rockers and HA agree on all four channels, a power-up leaves every relay open. Remaining: a 3D-printed cover for the board (the original cabinet cover no longer fits), the antenna check, and the pending TESTS.md items. The original `ALWAYS_OFF` restore means the lights are off after any power loss or firmware update.
 
 Replace four existing illuminated DC rockers with unlit, two-direction momentary rockers. One controller handles four independent channels locally and exposes those same output switches to Home Assistant. Background and alternatives remain in [the research record](../../docs/smart-dc-switch-research.md).
 
@@ -44,7 +44,7 @@ The BANDC listing advertises an approximately **0.83 x 1.46 in** mounting openin
 The previous Carling terminal numbering **does not apply** to the BANDC selection. The Amazon listing describes three-pin momentary SPDT behavior, but does not establish a trustworthy pin map or physical UP orientation for the received parts. Off-trailer with each loose rocker disconnected from all power, use continuity to identify its common and both throws; confirm center opens both, each press closes only one, and spring return works in both directions. Record which throw closes for the installed actuator's physical UP side. If the received switch fails any check, stop and revise the wiring plan rather than guessing from terminal position or wire color.
 
 - The **continuity-verified common** of each rocker goes to the board's **`DGND`** terminal. The input terminal block is printed `COM  DGND  DI1 … DI8`. Waveshare's [dry-contact wiring diagram](https://www.waveshare.com/img/devkit/accBoard/ESP32-S3-ETH-8DI-8RO/ESP32-S3-ETH-8DI-8RO-details-9.jpg) (product page, read 2026-10-22) puts a plain switch between **DIx and DGND** and leaves **`COM` unconnected**; `COM` is only for "active" inputs driven from an external 5–36 V source, which this project does not use. The inputs are optocoupler-isolated and fed from the board's own isolated supply, so no external voltage is needed and the rocker commons must **not** be tied to trailer ground or 12 V. All four rocker commons share the single `DGND` terminal (daisy-chain or a small splice).
-- The throw verified to close on **UP** goes to the odd DI input in the table below; the other throw goes to the even DI input.
+- One throw goes to the odd DI input of the pair and the other to the even input; which one is UP depends on how the body sits in the panel, and the firmware assigns the direction (see the as-installed note under the table).
 - Center must leave both circuits open. Pressing one direction must close only its intended circuit. Use fresh labeled signal conductors, or reuse conductors only after complete isolation and identification.
 - **Never connect the old 12 V switch-positive jumpers, illumination feed, or battery positive to any DI/GPIO or rocker common in this dry-contact circuit.** The old lamp harness is not an input harness. Keep load supply and dry signals separated.
 
@@ -54,12 +54,14 @@ Taken from the [ESPHome device page](https://devices.esphome.io/devices/waveshar
 
 **Inputs:** DI1–DI8 are ESP32-S3 **GPIO4–GPIO11**, `INPUT_PULLUP`, `inverted: true` (contact closed = pressed). **Relays:** TCA9554 I/O expander at **0x20** on I2C **SDA GPIO42 / SCL GPIO41** (Waveshare FAQ gives the 0x20 address); relay pins `inverted: false`. All polarities are from the published example and must be bench-confirmed.
 
-| Channel / firmware ID | UP → ON | DOWN → OFF | Board output |
-| --- | --- | --- | --- |
-| Load 1 / `load_1` | DI1, GPIO4 | DI2, GPIO5 | Relay 1, TCA9554 P0 |
-| Load 2 / `load_2` | DI3, GPIO6 | DI4, GPIO7 | Relay 2, TCA9554 P1 |
-| Load 3 / `load_3` | DI5, GPIO8 | DI6, GPIO9 | Relay 3, TCA9554 P2 |
-| Load 4 / `load_4` | DI7, GPIO10 | DI8, GPIO11 | Relay 4, TCA9554 P3 |
+| Channel / firmware ID | UP → ON | DOWN → OFF | Board output | As installed |
+| --- | --- | --- | --- | --- |
+| Load 1 / `load_1` | DI2, GPIO5 | DI1, GPIO4 | Relay 1, TCA9554 P0 | Rocker 1, LED lights A on CH1 |
+| Load 2 / `load_2` | DI4, GPIO7 | DI3, GPIO6 | Relay 2, TCA9554 P1 | Rocker 2, LED lights B on CH2 |
+| Load 3 / `load_3` | DI6, GPIO9 | DI5, GPIO8 | Relay 3, TCA9554 P2 | Rocker 3, spare |
+| Load 4 / `load_4` | DI8, GPIO11 | DI7, GPIO10 | Relay 4, TCA9554 P3 | Rocker 4, spare |
+
+**As installed, the even inputs are UP and the odd inputs are DOWN.** On the bench the bodies were held so the throw on the odd input was UP; in the panel they sit rotated 180°, and the first installed test gave DOWN = ON. The owner chose a firmware fix over re-seating four rockers: the `on_press` actions were swapped and installed over the air on 2026-10-23. Wiring is unchanged (common → `DGND`, one throw → odd DI, the other → even DI). If a rocker is ever re-seated the other way, swap its two DI wires.
 
 All eight digital inputs are used; **there are no spare inputs** for a fifth rocker. Relays 5–8 (TCA9554 P4–P7) are unused and left unconfigured, so they stay at the expander's power-up state; confirm on the bench that they remain open. Ethernet/PoE (W5500), RS485, RTC, buzzer (GPIO46) and RGB LED (GPIO38) are not configured. Each physical input is internal to ESPHome and has **25 ms debounce on both transitions**. Only `on_press` invokes `switch.turn_on` / `switch.turn_off`; release has no action.
 
@@ -71,7 +73,7 @@ All eight digital inputs are used; **there are no spare inputs** for a fifth roc
 | --- | --- |
 | Supply | Two-terminal block `7~36V`, marked `−` and `+`. USB-C (5 V/1 A) is the alternative supply and the programming port; Waveshare does not state whether USB alone runs the relays, nor whether USB and DC may be connected together. Bench: flash on USB alone, then test on DC alone. |
 | Digital inputs | `COM  DGND  DI1 DI2 DI3 DI4 DI5 DI6 DI7 DI8`. Dry contact = DIx to `DGND`; `COM` unused. |
-| Relays | `CH1` … `CH8`, three screw terminals each, SPDT pictogram only (no NO/NC/COM text). Measured on CH1 2026-10-23, labels upright, left→right: **NO – COM – NC**. CH2–CH8 assumed identical; spot-check with a meter before any load. |
+| Relays | `CH1` … `CH8`, three screw terminals each, SPDT pictogram only (no NO/NC/COM text). COM is the middle terminal. **NO is the outer terminal that is open to COM while the relay is off**; identify it with a meter rather than by left/right, because the order flips with the board's mounting orientation (measured NO–COM–NC with labels upright on the bench; the board is mounted labels-down in the cabinet, so it reads NC–COM–NO there). The installed light wires were first landed on NC, which inverted the HA state; moved to NO 2026-10-23. |
 | RS485 | `A+  B−  PE`, unused. |
 | Antenna | `ANT`, SMA female; a 2.4 GHz 4 dBi SMA antenna is listed in the box. The WROOM-1U module has **no PCB antenna**; Wi-Fi will not work without the external antenna fitted. |
 | Buttons | `BOOT` (GPIO0) and `RESET`. Download mode: hold `BOOT`, press and release `RESET`, release `BOOT`. |
@@ -106,30 +108,32 @@ Complete this worksheet before selecting power components or installing:
 
 | Channel | Actual load/model; power or control signal | Existing fuse / conductor | Measured running / startup; stall requirement | DC-rated interface + suppression | Deliberate restore decision |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Nothing (spare; old switch load tab empty) | Panel feed fuse, rating to record | n/a | None; CH1 left empty | `ALWAYS_OFF` (no load) |
-| 2 | Nothing (spare; old switch load tab empty) | Panel feed fuse, rating to record | n/a | None; CH2 left empty | `ALWAYS_OFF` (no load) |
-| 3 | LED lights A, switched positive (grey wire from the old switch 3 load tab) | Same panel feed fuse; grey wire gauge to record | Not measured; LED lighting, expected well under 2 A | Onboard relay CH3 direct (≤10 A / 30 V DC), no suppression | `ALWAYS_OFF` — lights off after a power loss is acceptable |
-| 4 | LED lights B, switched positive (grey wire from the old switch 4 load tab) | Same panel feed fuse; grey wire gauge to record | Not measured; LED lighting, expected well under 2 A | Onboard relay CH4 direct, no suppression | `ALWAYS_OFF` — acceptable |
+| 1 | LED lights A, switched positive (grey wire from an old switch load tab) | Panel feed fuse (WFCO); rating and grey wire gauge to record | Not measured; LED lighting, expected well under 2 A | Onboard relay CH1 direct (≤10 A / 30 V DC), COM ← feed, NO → light; no suppression | `ALWAYS_OFF` — lights off after a power loss is acceptable |
+| 2 | LED lights B, switched positive (grey wire from the other old switch load tab) | Same | Same | Onboard relay CH2 direct, COM ← feed, NO → light | `ALWAYS_OFF` — acceptable |
+| 3 | Nothing (spare) | — | n/a | CH3 empty | `ALWAYS_OFF` (no load) |
+| 4 | Nothing (spare) | — | n/a | CH4 empty | `ALWAYS_OFF` (no load) |
 
 Load identities were given by the owner and confirmed by the 2026-10-23 panel photos (two empty load tabs, two grey load wires). The panel rear has one red +12 V daisy chain and one black lamp-ground daisy chain, both spliced to two grey harness wires and shared with the panel voltmeter. **The WFCO fuse rating and the grey wire gauge still need recording.** Why the old panel had no local fuses: nothing after the WFCO fuse was thinner than the wire it protects. The same holds for the new wiring if every extension matches that gauge; the only reason to add a fuse at the panel is a thinner extension wire, and the 2 A controller fuse is device protection, not wire protection.
 
 No fuse amperage or wire gauge is selected here. Fuses protect conductors; choose wire, protection and connectors for run length, voltage drop, environment, load and fault current. Final load wiring requires a qualified RV installer and the completed worksheet.
 
-## Installation wiring (planned from the 2026-10-23 photos)
+## Installation wiring (as built 2026-10-23)
 
 ![Installation wiring: harness splices, voltmeter chains, feed and fuses, light wires to CH3/CH4, rocker signals](images/install-wiring.svg)
 
 | # | From | To | Notes |
 | --- | --- | --- | --- |
-| 1 | Red feed chain (keep the harness splice and the voltmeter's red) | cabinet → **CH4 COM** | Extend in the existing feed gauge or heavier and the WFCO fuse already protects it. Only if a thinner wire is used (e.g. 18 AWG) add a 10 A inline fuse at the panel end: a fuse protects the wire after it, and a step down in gauge needs its own protection |
-| 2 | CH4 COM | **CH3 COM** | Short red jumper |
+| 1 | Red feed chain (keep the harness splice and the voltmeter's red) | cabinet → **CH1 COM** | Extend in the existing feed gauge or heavier and the WFCO fuse already protects it. Only if a thinner wire is used (e.g. 18 AWG) add a 10 A inline fuse at the panel end: a fuse protects the wire after it, and a step down in gauge needs its own protection |
+| 2 | CH1 COM | **CH2 COM** | Short red jumper |
 | 3 | Same red feed, second tap | 2 A inline fuse → **`7~36V +`** | Recommended, not required: Waveshare documents no internal input fuse, and a 2 A fuse limits a board fault to 2 A instead of the branch's 15 A. Goes away when the controller moves to its own fuse-block circuit |
 | 4 | Black chain (keep the harness splice and the voltmeter's black) | **`7~36V −`** | Returns through the WFCO negative to the shunt P- side |
-| 5 | Grey light wire from the old switch 3 load tab | **CH3 NO** | Extend, same gauge, butt splice and heat-shrink |
-| 6 | Grey light wire from the old switch 4 load tab | **CH4 NO** | Same |
+| 5 | Grey light wire, lights A | **CH1 NO** | NO = the outer terminal that is open while the relay is off (meter it) |
+| 6 | Grey light wire, lights B | **CH2 NO** | Same |
 | 7 | Red/black chain stubs at the four switch positions | removed and capped | BANDC rockers have no lamp |
 | 8 | Rockers 1–4 | `DGND` / `DI1`–`DI8` | Exactly the bench wiring |
-| — | CH1, CH2, CH3 NC, CH4 NC, input `COM` | empty | Spares |
+| — | CH3, CH4, CH1 NC, CH2 NC, input `COM` | empty | Spares |
+
+As built (owner photos, 2026-10-23): board screwed to the cabinet wall with its labels facing down (so the relay row is at the top and `CH8 … CH1` read right-to-left); feed, negative and rocker commons joined with WAGO 221 lever connectors; rocker runs in 22/4 alarm cable; no inline fuses fitted (owner's decision; the WFCO branch fuse remains the only protection, see the fuse note above); panel voltmeter alive on its original chains (13.8 V shown). The original cabinet cover no longer fits over the board; a 3D-printed cover is planned. The diagram above was drawn before installation with the lights on CH3/CH4; the installed channels are CH1/CH2 as in the table.
 
 Sequence: pull the WFCO fuse that feeds the panel (the voltmeter goes dark), verify the red chain reads 0 V, do the wiring, check CH3/CH4 COM–NO open and no continuity between any DI/DGND terminal and the red feed, refit the fuse, confirm no relay clicks at power-up, the voltmeter is lit and the device is back in Home Assistant, then test both lights from the rockers and from HA. Mounting: the case is for 35 mm DIN rail (not yet owned); screws through the wooden cabinet wall with the case strapped is acceptable meanwhile. Record the as-built result, fuse rating, wire gauge and dated photos before changing the status to installed.
 
@@ -179,6 +183,7 @@ Keep the original panel, switches and labeled harness, plus before photos and a 
 | 2026-10-19 | Owner changed planned rocker purchase to four BANDC three-pin momentary SPDT switches (Amazon B0CNS17ZMK), replacing the previously selected Carling bodies. Pin map, fit and received-part behavior remain unverified; no purchase or physical test confirmed. Controller/firmware choice unchanged. |
 | 2026-10-19 | Added [components.md](components.md). Amazon order history shows the four BANDC rockers ordered 2026-10-18 and delivered 2026-10-19 (not yet inspected). KC868-A4S not ordered; not sold on Amazon, available from the KinCony store. Owner confirmed wire, terminals, fuse holder, labels, multimeter and bench supply on hand. |
 | 2026-10-19 | Controller changed from the KinCony KC868-A4S (never ordered) to a Waveshare ESP32-S3-POE-ETH-8DI-8RO, Amazon B0FBKGGKK3, ordered by the owner 2026-10-19, arriving 2026-10-23 per Amazon. Reasons: sold on Amazon, published 10 A / 30 V DC relay rating, optocoupler-isolated inputs, rail-mount case included, 7–36 V DC supply. Trade-off: all eight inputs used, no spare. Firmware, mapping, diagram, tests and checklist rewritten for the new board from the ESPHome device page and Waveshare wiki; five static tests passed; ESPHome 2026.9.1 compile passed with synthetic credentials; SVG render checked. Board not yet received; no physical tests. |
+| 2026-10-23 | Installed by the owner: rockers in the Nilight panel, board in the adjacent cabinet, lights on CH1/CH2 via the onboard relays, voltmeter retained. First test showed DOWN = ON (rocker bodies rotated 180° from the bench orientation); the light wires were briefly moved to NC, which inverted the HA state, then returned to NO. Firmware `on_press` actions swapped (even DI = UP = ON) and installed over the air; recorder shows all four channels on/off from the rockers with HA in agreement. Cover to be 3D printed; antenna fitting to confirm. |
 | 2026-10-23 | Installation wiring planned from the owner's panel photos (two spare switches, two LED light circuits, voltmeter on the shared red/black chains); load worksheet filled; `images/install-wiring.svg` added. Not installed. |
 | 2026-10-23 | Bench session: factory image flashed over native USB with esptool from the laptop; I2C scan found 0x20 and 0x51; trailer Wi-Fi joined; HA adopted the device (area Casita RV). All four rockers verified (UP = ON, DOWN = OFF, repeats do not toggle), HA control verified, CH1 terminal order NO–COM–NC measured, clean DC power-up left all relays open. Results in TESTS.md. Note: the home HA's Remote Home-Assistant link imports every Casita entity, so `switch.rv_casita_smart_dc_switches_load_1`–`_4` appear at home automatically. |
 | 2026-10-22 | Controller delivered (Amazon order status). Configuration pushed to the trailer HA's ESPHome Device Builder as `casita-smart-dc-switches.yaml` with `secrets.yaml` completed (backup Wi-Fi reuses the existing `wifi_backup_*` secrets; a fresh device-specific API key was generated and stored only there); `devices/validate` passed on ESPHome 2026.10.0 and the first compile was started. Not yet flashed. Dry-contact wiring made specific from Waveshare's product-page diagram: switch between DIx and `DGND`, `COM` unused. Added the board terminal/control table and a bench quick-start. Firmware: Wi-Fi changed to trailer-first with home backup plus a `Casita Smart DC Fallback` hotspot and captive portal (same pattern as the battery monitor); API key secret renamed `smart_dc_api_encryption_key` so the device does not share the battery monitor's key. Static tests updated and passing (five). Not yet compiled or flashed on real hardware. |

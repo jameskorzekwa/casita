@@ -94,9 +94,11 @@ switch:
       inverted: false
 
 # Contact closure = pressed. Release has no action; never toggle or call HA.
+# As installed 2026-10-23 the rocker bodies sit rotated 180 deg from the bench
+# orientation: ODD inputs (DI1/3/5/7) are the DOWN throw -> OFF, EVEN inputs are UP -> ON.
 binary_sensor:
   - platform: gpio
-    id: load_1_up
+    id: load_1_down
     internal: true
     pin:
       number: GPIO4
@@ -105,9 +107,9 @@ binary_sensor:
     filters:
       - delayed_on_off: 25ms
     on_press:
-      - switch.turn_on: load_1
+      - switch.turn_off: load_1
   - platform: gpio
-    id: load_1_down
+    id: load_1_up
     internal: true
     pin:
       number: GPIO5
@@ -116,9 +118,9 @@ binary_sensor:
     filters:
       - delayed_on_off: 25ms
     on_press:
-      - switch.turn_off: load_1
+      - switch.turn_on: load_1
   - platform: gpio
-    id: load_2_up
+    id: load_2_down
     internal: true
     pin:
       number: GPIO6
@@ -127,9 +129,9 @@ binary_sensor:
     filters:
       - delayed_on_off: 25ms
     on_press:
-      - switch.turn_on: load_2
+      - switch.turn_off: load_2
   - platform: gpio
-    id: load_2_down
+    id: load_2_up
     internal: true
     pin:
       number: GPIO7
@@ -138,9 +140,9 @@ binary_sensor:
     filters:
       - delayed_on_off: 25ms
     on_press:
-      - switch.turn_off: load_2
+      - switch.turn_on: load_2
   - platform: gpio
-    id: load_3_up
+    id: load_3_down
     internal: true
     pin:
       number: GPIO8
@@ -149,9 +151,9 @@ binary_sensor:
     filters:
       - delayed_on_off: 25ms
     on_press:
-      - switch.turn_on: load_3
+      - switch.turn_off: load_3
   - platform: gpio
-    id: load_3_down
+    id: load_3_up
     internal: true
     pin:
       number: GPIO9
@@ -160,9 +162,9 @@ binary_sensor:
     filters:
       - delayed_on_off: 25ms
     on_press:
-      - switch.turn_off: load_3
+      - switch.turn_on: load_3
   - platform: gpio
-    id: load_4_up
+    id: load_4_down
     internal: true
     pin:
       number: GPIO10
@@ -171,9 +173,9 @@ binary_sensor:
     filters:
       - delayed_on_off: 25ms
     on_press:
-      - switch.turn_on: load_4
+      - switch.turn_off: load_4
   - platform: gpio
-    id: load_4_down
+    id: load_4_up
     internal: true
     pin:
       number: GPIO11
@@ -182,4 +184,4 @@ binary_sensor:
     filters:
       - delayed_on_off: 25ms
     on_press:
-      - switch.turn_off: load_4
+      - switch.turn_on: load_4
