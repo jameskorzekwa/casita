@@ -1,6 +1,6 @@
 # Commissioning and acceptance — four smart DC switches
 
-**All physical checks below are pending.** This checklist is a plan, not evidence of tests performed. Record date, board version (Waveshare ESP32-S3-POE-ETH-8DI-8RO as purchased), firmware version/hash, instruments, observations and pass/fail for each channel. Resolve failures before progressing to trailer loads. See [design and wiring boundaries](README.md).
+**Bench session 2026-10-23: first physical tests passed** (see the result table at the end; unchecked items remain pending). This checklist is the plan; only items with recorded evidence count as done. Record date, board version (Waveshare ESP32-S3-POE-ETH-8DI-8RO as purchased), firmware version/hash, instruments, observations and pass/fail for each channel. Resolve failures before progressing to trailer loads. See [design and wiring boundaries](README.md).
 
 ## 1. Unpowered inspection and continuity (no battery)
 
@@ -14,10 +14,12 @@
 
 | Channel | Verified common pin | UP closes common–? | DOWN closes common–? | Center both open | Label / fit | Date / result |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | TBD | TBD | TBD | Pending | TBD | Pending |
-| 2 | TBD | TBD | TBD | Pending | TBD | Pending |
-| 3 | TBD | TBD | TBD | Pending | TBD | Pending |
-| 4 | TBD | TBD | TBD | Pending | TBD | Pending |
+| 1 | Owner-identified by meter | DI1 | DI2 | Confirmed by behaviour | Loose, not panel-mounted | 2026-10-23 pass (functional) |
+| 2 | Owner-identified by meter | DI3 | DI4 | Confirmed by behaviour | Loose, not panel-mounted | 2026-10-23 pass (functional) |
+| 3 | Owner-identified by meter | DI5 | DI6 | Confirmed by behaviour | Loose, not panel-mounted | 2026-10-23 pass (functional) |
+| 4 | Owner-identified by meter | DI7 | DI8 | Confirmed by behaviour | Loose, not panel-mounted | 2026-10-23 pass (functional) |
+
+Physical pin positions on the BANDC bodies were not written down; the functional result (UP → odd DI → ON on every channel) is the evidence. Record the pin positions when the rockers are labelled for installation.
 
 ## 2. Static source and separate build gates
 
@@ -86,6 +88,14 @@ For every channel, observe both physical test load and the corresponding native 
 | Static tests (Waveshare) | 2026-10-19: five contract tests updated for GPIO4–GPIO11 inputs and TCA9554 0x20 relays | Passed; not ESPHome validation/compile |
 | ESPHome config / compile (Waveshare) | 2026-10-19: `ghcr.io/esphome/esphome:2026.9.1`, ESP-IDF, ESP32-S3, isolated copy with synthetic build-only credentials. RAM 29.8%, flash 9.4% | Passed; no upload. Same OTA-password warning as 2026-10-13 (recommends `ota` encryption instead); not applied. Never deploy the validation artifact. |
 | SVG visual render (Waveshare) | 2026-10-19: rendered with resvg and DejaVu Sans to 1200 x 820 PNG; checked for clipping, readable labels and correct arrows | Passed; conceptual control diagram, not an approved load schematic |
-| Device Builder validate | 2026-10-22: `casita-smart-dc-switches.yaml` in the trailer HA Device Builder, real secrets, ESPHome 2026.10.0 `devices/validate` | Passed; compile started, see README revisions |
-| Continuity / bench / offline / boot | No hardware tests performed | Pending |
+| Device Builder validate / compile | 2026-10-22: `casita-smart-dc-switches.yaml` in the trailer HA Device Builder, real secrets, ESPHome 2026.10.0 `devices/validate` and `firmware/compile` | Passed (compile ~14 min on the Pi 4) |
+| First flash | 2026-10-23: factory image downloaded from the Device Builder, written with esptool 4.12 over the board's native USB from the laptop; chip ESP32-S3 rev v0.2, 8 MB embedded PSRAM, 16 MB flash, hash verified | Passed |
+| Boot / I2C | 2026-10-23 serial log: I2C scan found `0x20` (TCA9554) and `0x51` (onboard RTC); PCA9554 init warning 0 / error 0; joined the trailer Wi-Fi first attempt at −68 dB; HA discovered the device by mDNS and adopted it (key fetched from the Device Builder); device in area Casita RV; entities `switch.casita_smart_dc_switches_load_1`–`_4`, all `off` at first contact | Passed |
+| HA → relay | 2026-10-23: `switch.turn_on` / `turn_off` on Load 1 from HA; state followed within 1.5 s; relay click audible | Passed |
+| Rocker → relay, all channels | 2026-10-23 recorder: Rocker 1 UP/DOWN → Load 1 on 19:29:25 / off 19:29:26 UTC; Rocker 2 → Load 2 on :31 / off :32; Rocker 3 → Load 3 on :35 / off :35; Rocker 4 → Load 4 on :38 / off :39. UP = odd DI = ON on every channel; no mapping change needed | Passed |
+| No toggle / idempotent presses | 2026-10-23: Rocker 1 UP ×3 → single `on` (19:38:00); DOWN ×3 → single `off`; Rocker 2 UP ×2 → single `on`; owner heard one click per group, none on repeats | Passed |
+| Relay terminal order | 2026-10-23 meter on CH1, labels upright, left→right: **NO – COM – NC** (L–M closed with Load 1 ON, M–R closed with it OFF). CH2–CH4 assumed identical; spot-check before any load | CH1 verified |
+| DC power-up | 2026-10-23: USB removed (device unavailable 19:44:25), board powered from a bench 12 V supply on the `7~36V` block, current-limited; owner observed no relay movement during boot; HA reconnected 19:44:26 with all four outputs `off` | Passed (clean power-on only) |
+| Offline 30 min (HA down / Wi-Fi down), held-button boot, brownout, safe mode, I2C fault injection | Not run | Pending |
+| Load ratings / installed acceptance | Loads not yet identified | Pending |
 | Load ratings / installed acceptance | Loads not yet identified | Pending |
