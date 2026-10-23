@@ -111,7 +111,7 @@ Complete this worksheet before selecting power components or installing:
 | 3 | LED lights A, switched positive (grey wire from the old switch 3 load tab) | Same panel feed fuse; grey wire gauge to record | Not measured; LED lighting, expected well under 2 A | Onboard relay CH3 direct (≤10 A / 30 V DC), no suppression | `ALWAYS_OFF` — lights off after a power loss is acceptable |
 | 4 | LED lights B, switched positive (grey wire from the old switch 4 load tab) | Same panel feed fuse; grey wire gauge to record | Not measured; LED lighting, expected well under 2 A | Onboard relay CH4 direct, no suppression | `ALWAYS_OFF` — acceptable |
 
-Load identities were given by the owner and confirmed by the 2026-10-23 panel photos (two empty load tabs, two grey load wires). The panel rear has one red +12 V daisy chain and one black lamp-ground daisy chain, both spliced to two grey harness wires and shared with the panel voltmeter. **The WFCO fuse rating and the grey wire gauge still need recording**; the 10 A inline fuse on the feed extension protects the 18 AWG run independently of that rating.
+Load identities were given by the owner and confirmed by the 2026-10-23 panel photos (two empty load tabs, two grey load wires). The panel rear has one red +12 V daisy chain and one black lamp-ground daisy chain, both spliced to two grey harness wires and shared with the panel voltmeter. **The WFCO fuse rating and the grey wire gauge still need recording.** Why the old panel had no local fuses: nothing after the WFCO fuse was thinner than the wire it protects. The same holds for the new wiring if every extension matches that gauge; the only reason to add a fuse at the panel is a thinner extension wire, and the 2 A controller fuse is device protection, not wire protection.
 
 No fuse amperage or wire gauge is selected here. Fuses protect conductors; choose wire, protection and connectors for run length, voltage drop, environment, load and fault current. Final load wiring requires a qualified RV installer and the completed worksheet.
 
@@ -121,9 +121,9 @@ No fuse amperage or wire gauge is selected here. Fuses protect conductors; choos
 
 | # | From | To | Notes |
 | --- | --- | --- | --- |
-| 1 | Red feed chain (keep the harness splice and the voltmeter's red) | 10 A inline fuse → cabinet → **CH4 COM** | Fuse at the panel end, sized for the 18 AWG extension |
+| 1 | Red feed chain (keep the harness splice and the voltmeter's red) | cabinet → **CH4 COM** | Extend in the existing feed gauge or heavier and the WFCO fuse already protects it. Only if a thinner wire is used (e.g. 18 AWG) add a 10 A inline fuse at the panel end: a fuse protects the wire after it, and a step down in gauge needs its own protection |
 | 2 | CH4 COM | **CH3 COM** | Short red jumper |
-| 3 | Same red feed, second tap | 2 A inline fuse → **`7~36V +`** | Controller supply: unswitched and separately fused. Move it to its own circuit when the new fuse block is installed |
+| 3 | Same red feed, second tap | 2 A inline fuse → **`7~36V +`** | Recommended, not required: Waveshare documents no internal input fuse, and a 2 A fuse limits a board fault to 2 A instead of the branch's 15 A. Goes away when the controller moves to its own fuse-block circuit |
 | 4 | Black chain (keep the harness splice and the voltmeter's black) | **`7~36V −`** | Returns through the WFCO negative to the shunt P- side |
 | 5 | Grey light wire from the old switch 3 load tab | **CH3 NO** | Extend, same gauge, butt splice and heat-shrink |
 | 6 | Grey light wire from the old switch 4 load tab | **CH4 NO** | Same |
