@@ -12,7 +12,7 @@ The repository is public: order references record vendor and date only. Look up 
 
 | # | Component | Spec / acceptable substitute | Qty | Status | Source / option | Order ref | Notes |
 |---|---|---|---:|---|---|---|---|
-| 1 | Seeed Studio XIAO ESP32-S3 | Plain board with U.FL antenna | 1 | `delivered` | [Amazon B0DJ6NQFKX](https://www.amazon.com/dp/B0DJ6NQFKX) (3 pack) | Amazon, ordered 2026-10-14 | Delivered 2026-10-17. 3 pack: main, fresh, one spare |
+| 1 | Seeed Studio XIAO ESP32-S3 | Plain board with U.FL antenna | 1 | `have` | [Amazon B0DJ6NQFKX](https://www.amazon.com/dp/B0DJ6NQFKX) (3 pack) | Amazon, ordered 2026-10-14 | Delivered 2026-10-17. 3 pack: main, fresh, one spare. Main board flashed 2026-10-27 |
 | 2 | Pololu D24V5F5 12 V to 5 V regulator | 500 mA or more, input to 36 V | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 and 2026-10-20 (three on hand) |
 | 3 | 470 uF 25 V electrolytic capacitor | 25 V or higher | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
 | 4 | Inline ATO/ATC fuse holder and 2 A fuse | 2 A | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
