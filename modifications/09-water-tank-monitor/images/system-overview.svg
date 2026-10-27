@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="670" viewBox="0 0 1100 670" role="img" aria-labelledby="title desc">
   <title id="title">Casita water tank monitor: system overview (two devices)</title>
-  <desc id="desc">Two separate ESPHome devices, one per tank. Fresh device: a Garnet SeeLeveL 710-ES3 capacitive sender is stuck to the side of the 23 gallon fresh water tank and wired to an enclosure in the fresh tank bay holding a three-transistor SeeLeveL interface circuit, a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from the fused 12 volt water pump circuit. Grey device: a DYP L02 ultrasonic sensor is glued to the underside of the 32 gallon grey belly tank; its cable comes up through the floor to a second enclosure in the closet holding its own buck regulator and XIAO ESP32-S3, powered from a fused 12 volt circuit at the closet. Each device publishes its tank's percent, gallons and diagnostics over Wi-Fi to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a third device of the same kind as the fresh one.</desc>
+  <desc id="desc">Two separate ESPHome devices, one per tank. Fresh device: a Garnet SeeLeveL 710-ES3 capacitive sender is stuck to the side of the 25 gallon fresh water tank and wired to an enclosure in the fresh tank bay holding a three-transistor SeeLeveL interface circuit, a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from the fused 12 volt water pump circuit. Grey device: a DYP L02 ultrasonic sensor is glued to the underside of the 32 gallon grey belly tank; its cable comes up through the floor to a second enclosure in the closet holding its own buck regulator and XIAO ESP32-S3, powered from a fused 12 volt circuit at the closet. Each device publishes its tank's percent, gallons and diagnostics over Wi-Fi to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a third device of the same kind as the fresh one.</desc>
   <defs>
     <style>
       .tank{fill:#e3f8ff;stroke:#186faf;stroke-width:3}
@@ -27,7 +27,7 @@
   <!-- ============ Fresh device ============ -->
   <rect class="tank" x="30" y="30" width="200" height="150" rx="16"/>
   <text class="t" x="120" y="64" text-anchor="middle">Fresh tank</text>
-  <text class="s" x="120" y="90" text-anchor="middle">23 gal, 12 in tall</text>
+  <text class="s" x="120" y="90" text-anchor="middle">25 gal, 12 in tall</text>
   <text class="s" x="120" y="112" text-anchor="middle">rear passenger bay</text>
   <text class="s" x="120" y="150" text-anchor="middle">710-ES3 on the side</text>
   <rect x="206" y="50" width="14" height="110" rx="4" fill="#6b46c1"/>

@@ -29,6 +29,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit delivered, enclosure to print |
 | 09 | [Water tank monitor to Home Assistant (two devices: SeeLeveL fresh + DYP L02 grey, each on its own XIAO ESP32-S3)](modifications/09-water-tank-monitor/README.md) | Designed; fresh sender on hand, grey sensor ordered |
 | 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; parts ordered (second clamp due mid-November) |
+| 12 | [Cold-weather package (grey tank heat, drain protection, battery warming, freeze monitoring)](modifications/12-cold-weather/README.md) | Proposed; nothing ordered or measured |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
 

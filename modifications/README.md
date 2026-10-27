@@ -1,6 +1,6 @@
 # Modifications
 
-Each modification has its own folder with instructions, diagrams, parts, and a status line. Number new folders in order; 11 is on an open branch, so the next free number is 12.
+Each modification has its own folder with instructions, diagrams, parts, and a status line. Number new folders in order; 11 is on an open branch and 12 is taken, so the next free number is 13.
 
 | # | Modification | Status | Summary |
 | --- | --- | --- | --- |
@@ -14,6 +14,7 @@ Each modification has its own folder with instructions, diagrams, parts, and a s
 | 08 | [E-ink dashboard](08-eink-dashboard/README.md) | Designed; kit delivered | TRMNL 7.5" e-paper kit running ESPHome, mounted in the trailer, showing battery, propane and water levels from the trailer's Home Assistant |
 | 09 | [Water tank monitor](09-water-tank-monitor/README.md) | Designed; fresh sender on hand, grey sensor ordered | Two separate devices, each with its own XIAO ESP32-S3 and buck regulator: a Garnet SeeLeveL 710-ES3 sender on the fresh tank (enclosure in the fresh bay, on the pump circuit) and a DYP L02 ultrasonic sensor under the grey tank (enclosure in the closet); fresh and grey percent and gallons in the trailer's Home Assistant |
 | 10 | [AC voltage and power meter](10-ac-power-meter/README.md) | Designed; parts ordered | Shelly EM Gen3 on the TS-30 output, so AC voltage and power are measured from shore or inverter alike; second clamp on the shore cord gives total shore draw and the live source |
+| 12 | [Cold-weather package](12-cold-weather/README.md) | Proposed; nothing ordered or measured | 12 V heating pads and an insulated belly pan on the exposed grey tank, heat cable on the dump valves and drain stubs, warming pads and insulation in the battery compartment so the LiFePO4 bank can charge below freezing, five DS18B20 probes on the mod 09 XIAO, heaters switched by spare mod 06 relays, and Home Assistant freeze alarms and shore-budget automations |
 
 ## Template for a new modification
 
