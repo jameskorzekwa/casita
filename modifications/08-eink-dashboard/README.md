@@ -7,7 +7,7 @@ A 7.5-inch e-paper panel mounted inside the Casita that shows the trailer's stat
 > [!IMPORTANT]
 > **Status: designed, kit delivered, not built (updated 2026-10-19).** The TRMNL kit (Seeed order placed 2026-10-13) arrived 2026-10-19; the power adapter, cable and mounting hardware are on hand, so only the enclosure print remains before the build ([components.md](components.md)). The ESPHome configuration validates and compiles with ESPHome 2026.9.1 (RAM 31%, flash 55%) but has not run on hardware. The layout above is a drawing to the panel's 800 x 480 grid, not a photo.
 >
-> **What shows today:** the battery section, from [mod 04](../04-battery-monitor-esp32/README.md). **Propane** fills in when [mod 07](../07-propane-tank-monitor/README.md) is built, **water** when [mod 09](../09-water-tank-monitor/README.md) is built (fresh and grey first; black later), and the **AC** line when [mod 10](../10-ac-power-meter/README.md) is; until then those gauges draw empty with `--`. Nothing in the firmware needs changing for them to appear, as long as the new projects use the entity names in [Entities shown](#entities-shown).
+> **What shows today:** the battery section, from [mod 04](../04-battery-monitor-esp32/README.md). **Propane** and **water** fill in when the [mod 07 tank monitor](../07-tank-monitor/README.md) is built (fresh and grey first; black later), and the **AC** line when [mod 10](../10-ac-power-meter/README.md) is; until then those gauges draw empty with `--`. Nothing in the firmware needs changing for them to appear, as long as the new projects use the entity names in [Entities shown](#entities-shown).
 
 **Contents:** [What arrives in the box](#what-arrives-in-the-box) · [Design choices](#design-choices) · [How it works](#how-it-works) · [Parts](#parts) · [Steps](#steps) · [Entities shown](#entities-shown) · [Changing the layout](#changing-the-layout) · [Running on the battery](#running-on-the-battery-instead) · [Testing](#testing-checklist) · [Troubleshooting](#troubleshooting) · [Safety](#safety-notes)
 
@@ -119,8 +119,8 @@ The configuration's `substitutions` block names every entity. Change a name ther
 | Section | Entity (trailer Home Assistant) | Source |
 | --- | --- | --- |
 | Battery | `sensor.casita_battery_monitor_state_of_charge`, `_voltage`, `_current`, `_power`, `_time_to_empty`, `_time_to_full`, `_daily_charged_energy`, `_daily_discharged_energy`, `binary_sensor.casita_battery_monitor_charging` | [mod 04](../04-battery-monitor-esp32/README.md), live |
-| Propane | `sensor.casita_propane_monitor_tank_1_propane`, `_tank_1_propane_remaining`, `_tank_2_propane`, `_tank_2_propane_remaining` | [mod 07](../07-propane-tank-monitor/README.md), not built |
-| Water | `sensor.casita_water_monitor_fresh_tank`, `_grey_tank`, `_black_tank` (percent full) | [mod 09](../09-water-tank-monitor/README.md), not built; it uses these names, so the dashboard needs no change. Black is a later addition |
+| Propane | `sensor.casita_tank_monitor_propane_1`, `_propane_1_remaining`, `_propane_2`, `_propane_2_remaining` | [mod 07](../07-tank-monitor/README.md) main device, not built |
+| Water | `sensor.casita_water_monitor_fresh_tank` (fresh device), `sensor.casita_tank_monitor_grey_tank` (main device), `sensor.casita_water_monitor_black_tank` (future black device); percent full | [mod 07](../07-tank-monitor/README.md), not built. Black is a later addition |
 | AC | `sensor.casita_ac_meter_panel_voltage`, `sensor.casita_ac_meter_panel_power`, `sensor.casita_ac_source` (`shore` / `inverter` / `none`) | [mod 10](../10-ac-power-meter/README.md), not built |
 
 ## Changing the layout
@@ -201,3 +201,4 @@ Add photos to `photos/` as the build progresses:
 | 2026-10-13 | Project written: ESPHome design, layout, configuration validated and compiled (not run on hardware). Kit ordered |
 | 2026-10-14 | AC line added to both pages (voltage, panel watts, source) for mod 10; `--` until it is built |
 | 2026-10-19 | Added [components.md](components.md). Kit delivered; owner confirmed the 12 V to USB-C adapter, USB-C cable and mounting hardware on hand. Nothing left to buy. |
+| 2026-10-27 | Propane and grey entity IDs changed to the combined [mod 07 tank monitor](../07-tank-monitor/README.md) device: `sensor.casita_tank_monitor_propane_1` / `_2` (and `_remaining`), `sensor.casita_tank_monitor_grey_tank`. Fresh and black unchanged. Configuration not yet flashed, so nothing on the trailer to update |

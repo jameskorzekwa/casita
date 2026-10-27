@@ -12,11 +12,11 @@ What is installed on the trailer, with the source of each fact. "To confirm" mea
 | Dry weight | About 2,480 lb (17' Deluxe) | Dealer listings; weigh the actual trailer |
 | Dry tongue weight | Not published; owners report 350-450 lb loaded | To measure |
 | Length / width | 204 in (17 ft) / 80 in | Dealer listings |
-| Fresh water | 25 gal, tank 12 in tall (natural polyethylene, inside, rear passenger side bay) | Owner, 2026-10-21, and the owner's manual ("the Casitas come with a 16 gallon fresh water tank; only the 17' has the option of a 25 gallon tank"); this trailer has the 25 gal option. Supersedes the 23 gal recorded 2026-10-20. Height measured by owner 2026-10. Confirm capacity with a measured fill during the [mod 09](../modifications/09-water-tank-monitor/README.md#calibrate) calibration |
+| Fresh water | 25 gal, tank 12 in tall (natural polyethylene, inside, rear passenger side bay) | Owner, 2026-10-21, and the owner's manual ("the Casitas come with a 16 gallon fresh water tank; only the 17' has the option of a 25 gallon tank"); this trailer has the 25 gal option. Supersedes the 23 gal recorded 2026-10-20. Height measured by owner 2026-10. Confirm capacity with a measured fill during the [mod 07](../modifications/07-tank-monitor/water-tanks.md#calibrate) calibration |
 | Grey water | 32 gal, belly tank under the floor, about 4 in tall, black polyethylene, not enclosed or insulated | Owner, 2026-10-21, and Casita store (32 gal). Height from an owner video, to confirm. The only tank exposed to outside air; see [mod 12](../modifications/12-cold-weather/README.md) |
 | Black water | 15 gal, inside, under the toilet; 3 in ABS drain to the termination valve under the trailer | Owner manual; location confirmed by owner 2026-10-21 |
-| Tank monitor | None from the factory; [mod 09](../modifications/09-water-tank-monitor/README.md) adds fresh and grey sensors, one ESPHome device per tank | Owner reports |
-| Propane | 2 x 20 lb tanks | Level monitor planned: [mod 07](../modifications/07-propane-tank-monitor/README.md) (designed; sensors ordered) |
+| Tank monitor | None from the factory; [mod 07](../modifications/07-tank-monitor/README.md) adds propane, grey and fresh sensors on two ESPHome devices (propane and grey on one, fresh on its own) | Owner reports |
+| Propane | 2 x 20 lb tanks | Level monitor planned: [mod 07](../modifications/07-tank-monitor/README.md) (designed; sensors on hand) |
 | Microwave | None | Owner |
 
 ## Tow Vehicle

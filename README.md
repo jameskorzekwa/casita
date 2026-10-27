@@ -25,9 +25,8 @@ This repository is the maintained record. The Google Docs that some of this star
 | 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | Installed, running and calibrated; mirrored to the home Home Assistant |
 | 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
 | 06 | [Four smart DC switches (BANDC + Waveshare)](modifications/06-smart-dc-switches/README.md) | Installed 2026-10-23: two LED light circuits on the Waveshare relays, two spare channels, rockers and Home Assistant; cabinet cover pending |
-| 07 | [Propane tank monitor to Home Assistant (DYP L06 + XIAO ESP32-S3)](modifications/07-propane-tank-monitor/README.md) | Designed; sensors ordered |
+| 07 | [Tank monitor to Home Assistant (propane + grey on one XIAO ESP32-S3, fresh on its own)](modifications/07-tank-monitor/README.md) | Designed; all sensors on hand, not built |
 | 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit delivered, enclosure to print |
-| 09 | [Water tank monitor to Home Assistant (two devices: SeeLeveL fresh + DYP L02 grey, each on its own XIAO ESP32-S3)](modifications/09-water-tank-monitor/README.md) | Designed; fresh sender on hand, grey sensor ordered |
 | 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; parts ordered (second clamp due mid-November) |
 | 12 | [Cold-weather package (grey tank heat, drain protection, battery warming, freeze monitoring)](modifications/12-cold-weather/README.md) | Proposed; nothing ordered or measured |
 
