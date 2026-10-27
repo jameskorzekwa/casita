@@ -1,23 +1,23 @@
-# Water Tank Sensors (SeeLeveL fresh device + DYP L02 grey)
+# Water Tank Sensors (SeeLeveL fresh device + Mopeka grey)
 
-Part of [mod 07, the tank monitor](README.md). Fresh and grey water tank levels in the trailer's Home Assistant, with nothing inside either tank and no batteries to replace.
+Part of [mod 07, the tank monitor](README.md). Fresh and grey water tank levels in the trailer's Home Assistant, with nothing inside either tank.
 
-- **Fresh tank: its own device** (`casita-water-monitor-fresh`). A Garnet SeeLeveL II **710-ES3** capacitive sender stuck to the side of the 23 gal fresh tank, read through a three-transistor interface by a XIAO ESP32-S3 in an enclosure in the fresh tank bay, powered from the 12 V water pump circuit. This guide covers the whole fresh device.
-- **Grey tank: on the main device** (`casita-tank-monitor`). A DYP **L02** ultrasonic sensor glued to the underside of the 32 gal grey belly tank, wired to the same XIAO that reads the two propane sensors. This guide covers the sensor: testing it, gluing it on and running its cable. The main device itself (wiring, firmware, installation, Home Assistant) is in the [README](README.md).
+- **Fresh tank: its own ESPHome device** (`casita-water-monitor-fresh`). A Garnet SeeLeveL II **710-ES3** capacitive sender stuck to the side of the 23 gal fresh tank, read through a three-transistor interface by a XIAO ESP32-S3 in an enclosure in the fresh tank bay, powered from the 12 V water pump circuit. This guide covers the whole fresh device.
+- **Grey tank: a Mopeka Pro Check Universal** under the 32 gal grey belly tank, read by the trailer's Home Assistant over Bluetooth. No ESP32, no cable, one coin cell. This guide covers mounting it, adding it to Home Assistant and turning its reading into a percentage.
 
 The black tank is left for later, as a third device of the same kind as the fresh one.
 
 ![System overview](images/system-overview.svg)
 
 > [!IMPORTANT]
-> **Status: designed, not built (updated 2026-10-27).** The SeeLeveL sender and the DYP L02 are both on hand (owner, 2026-10-20 and 2026-10-27). Everything else is delivered or on hand ([components.md](components.md)). Both ESPHome configurations compile with ESPHome 2026.9.1 but have not run on hardware. Neither sensor has been tried on a Casita tank by this project. Two things decide whether it works and are checked early, before anything is glued down:
+> **Status (updated 2026-10-27): fresh device designed, not built; grey Mopeka ordered, arriving 2026-10-28.** The SeeLeveL sender and everything for the fresh device are on hand ([components.md](components.md)); its configuration compiles but has not run on hardware, and the sender has not been tried on this tank. The grey tank's first sensor, a wired DYP L02, never sent a byte (see [Why this design](#why-this-design)) and was replaced by the Mopeka the same day. Two things decide whether it works:
 >
 > 1. **Fresh tank:** the 710-ES3 needs a flat strip of tank wall 2.2 in wide by about 11 in tall, at least 2 in from any metal in front of it and 1 in from metal beside it ([Step F1](#step-f1-measure-the-fresh-tank)).
-> 2. **Grey tank:** the L02 must get an echo through the tank's bottom wall. DYP rates it for walls up to 5 mm; rotomolded tanks are usually 4.5-6 mm. The tape-and-grease test in [Step G4](#step-g4-test-the-l02-on-the-grey-tank-before-gluing-it) answers this with nothing permanent done.
+> 2. **Grey tank:** the Mopeka must get an echo through the tank's bottom wall and reach the Home Assistant Pi over Bluetooth from under the trailer ([Step G2](#step-g2-test-the-mopeka-under-the-grey-tank)). One Casita owner runs one on this tank, which is encouraging.
 >
-> The grey tank is only about 4 in tall, so the L02 measures over roughly 2-3.5 in of its height: good for "is it getting full", coarse near empty. See [Known limitations](#known-limitations).
+> The grey tank is only about 4 in tall, so any bottom-mounted ultrasonic sensor measures over roughly the top two thirds of it: good for "is it getting full", coarse near empty. See [Known limitations](#known-limitations).
 
-**Contents:** [What to order](#what-to-order) · [Build order](#build-order) · [Why this design](#why-this-design) · [How it works](#how-it-works) · [Known limitations](#known-limitations) · [Parts](#parts) · [Tools](#tools-and-supplies) · [Wiring](#wiring) · [SeeLeveL interface](#seelevel-interface-circuit) · [Fresh device steps](#fresh-device-steps) · [Grey sensor steps](#grey-sensor-steps) · [ESPHome configuration](#esphome-configuration) · [Home Assistant](#home-assistant) · [Calibrate](#calibrate) · [Testing](#testing-checklist) · [Troubleshooting](#troubleshooting) · [Safety](#safety-notes) · [Black tank later](#adding-the-black-tank-later)
+**Contents:** [What to order](#what-to-order) · [Build order](#build-order) · [Why this design](#why-this-design) · [How it works](#how-it-works) · [Known limitations](#known-limitations) · [Parts](#parts) · [Tools](#tools-and-supplies) · [Wiring](#wiring) · [SeeLeveL interface](#seelevel-interface-circuit) · [Fresh device steps](#fresh-device-steps) · [Grey tank (Mopeka)](#grey-tank-mopeka) · [Grey tank steps](#grey-tank-steps) · [ESPHome configuration](#esphome-configuration) · [Home Assistant](#home-assistant) · [Calibrate](#calibrate) · [Testing](#testing-checklist) · [Troubleshooting](#troubleshooting) · [Safety](#safety-notes) · [Black tank later](#adding-the-black-tank-later)
 
 ## What to order
 
@@ -26,13 +26,13 @@ Two sensors, and only these models:
 | Tank | Sensor | Check on arrival |
 | --- | --- | --- |
 | Fresh | **Garnet SeeLeveL II 710-ES3** 12 in sender, sold by RecPro as "SeeLevel 710 RV Tank Level Sensor (12")": [Amazon B0GWJR52N8](https://www.amazon.com/dp/B0GWJR52N8), about $70. Also from [Garnet direct](https://shopusa.garnetinstruments.com/solutions/holding-tanks/710-es3-710-es3-12-sender) | The board is 12.15 x 2.20 in with **9 segmented pads** and four programming tabs across the top (`2/GRY`, `3/BLK`, `4`, `TOP`). Two wires: blue and black. **Do not cut anything yet.** |
-| Grey | **DYP-L023MUW-V1.0** ("DYP-L02, UART Automatic"): [Amazon B0C1GFJKMV](https://www.amazon.com/dp/B0C1GFJKMV), about $22. The listing's **Size** option must say **UART Automatic**, not UART Controlled | A 27.7 mm round puck 17 mm tall with a 450 mm lead ending in a white 4-pin 2.54 mm (XH) plug. Wire colors red, black, yellow, white. The Amazon listing does not say whether the plug's mating cable is included; the pigtails in [Parts](#parts) cover it |
+| Grey | **Mopeka Pro Check Universal, the version for aluminium, plastic and poly tanks** (with the mounting collar; not the magnetic steel-tank version): [Amazon B0C7HM61BP](https://www.amazon.com/dp/B0C7HM61BP), about $81 (seen 2026-10-27) | A round sensor with a plastic collar, a CR2032 cell and a sachet of couplant. Pull the battery tab; the Mopeka Tank Check app (or Home Assistant) should see it within a minute |
 
-Everything else is in [Parts](#parts) and on hand. The fresh device has its own XIAO ESP32-S3, Pololu regulator, 470 uF capacitor, fuse holder and enclosure; the three transistors for its interface (one 2N3906, two 2N3904) come from one assortment kit. The grey sensor uses the main device's.
+Everything else is in [Parts](#parts) and on hand. The fresh device has its own XIAO ESP32-S3, Pololu regulator, 470 uF capacitor, fuse holder and enclosure; the three transistors for its interface (one 2N3906, two 2N3904) come from one assortment kit. The Mopeka needs nothing else.
 
 ## Build order
 
-The fresh device is independent: build, test and install it any time. The grey sensor steps fit into the main device's build order in the [README](README.md#build-order).
+The fresh device and the grey Mopeka are independent of each other and of the main device: do either first.
 
 | Step | Fresh device (`casita-water-monitor-fresh`) | Result |
 | --- | --- | --- |
@@ -44,14 +44,12 @@ The fresh device is independent: build, test and install it any time. The grey s
 | F6 | Mount the enclosure in the fresh tank bay and power it from the pump circuit | Permanent install |
 | F7 | Add to Home Assistant, calibrate, set the low-water alert | Done |
 
-| Step | Grey sensor (on the main device, `casita-tank-monitor`) | Result |
+| Step | Grey tank (Mopeka Pro Check Universal) | Result |
 | --- | --- | --- |
-| G1 | Measure the grey tank, pick the sensor spot, plan the cable route to the main device | Sensor spot, cable route and length |
-| G2 | Connect the L02 to the main XIAO on the bench (after [Step M2](README.md#step-m2-flash-the-main-device)) | Frames arriving on D3 |
-| G3 | Bench-test the L02 on a plastic tub of water | A height in mm that tracks the water. **Go / no-go for the L02 itself** |
-| G4 | Tape the L02 under the grey tank with grease and read it | **Go / no-go for the grey tank wall.** Only now is anything permanent |
-| G5 | Glue the L02 under the grey tank, run its cable to the main device, protect it | Sensor installed |
-| G6 | Calibrate and set the grey-full alert, once the main device is installed ([Step M3](README.md#step-m3-install-the-main-device)) | Done |
+| G1 | Unbox, fit the battery, pair it with the trailer's Home Assistant on the bench, set the medium to Waste Water | A **Tank level** reading in Home Assistant |
+| G2 | Hold it under the grey tank with couplant and read it from inside the trailer | **Go / no-go for the tank wall and the Bluetooth reach** |
+| G3 | Mount it in its collar under the tank | Sensor installed |
+| G4 | Add the percent template sensor, the dashboard gauge and the alert; calibrate with a measured fill | Done |
 
 ## Why this design
 
@@ -59,40 +57,36 @@ The requirement was fresh and grey levels in Home Assistant, powered by the trai
 
 | Option | Fresh | Grey (about 4 in tall, under the floor) | Home Assistant | Verdict |
 | --- | --- | --- | --- | --- |
-| Mopeka Pro Check Universal (bottom-mount ultrasonic) | Yes | Yes; one Casita owner reports 6+ months without trouble | Native Bluetooth integration | Simplest, but coin cells, and HA receives propane-scaled millimeters that need rescaling for water |
+| **Mopeka Pro Check Universal (bottom-mount ultrasonic)** | Yes | **Yes; one Casita owner reports 6+ months without trouble** | **Native Bluetooth integration; the medium can be set to Waste Water** | **Chosen for the grey tank on 2026-10-27.** A coin cell to change, and a template sensor turns its millimetres into a percentage |
 | Garnet SeeLeveL senders + 709-BTP3 Bluetooth display | Yes | Only if a flat side wall exists; a 4 in tank leaves little | Community integration (danTapps/garnet) | A proven RV product, but $150+ for the display and no side-wall certainty on the grey tank |
-| Capacitive point switches (XKC-Y25) on the grey tank side | | 2-3 steps only | GPIO | Fallback if the L02 fails: cheap and robust, no percentage |
+| Capacitive point switches (XKC-Y25) on the grey tank side | | 2-3 steps only | GPIO | Fallback: cheap and robust, no percentage |
 | **SeeLeveL 710-ES3 on the fresh tank, driven by the ESP32 directly** | **Yes** | | **ESPHome component (j9brown/esphome-seelevel) + a 3-transistor interface** | **Chosen.** The sender is the RV industry's standard external strip, 12 V, 0.33 in resolution; the interface is a few cents of parts |
-| **DYP L02 under the grey tank** | | **Yes if the wall passes the echo test.** Specified for 0.6-5 mm non-foamed plastic, 2 cm dead zone, water-based liquids | **ESPHome's built-in `ds1603l` platform reads its frame directly** | **Chosen.** Wired, continuous, 1 mm resolution, no custom code |
+| DYP L02 under the grey tank | | Specified for 0.6-5 mm non-foamed plastic, 2 cm dead zone | ESPHome's built-in `ds1603l` platform reads its frame | **Tried and dropped.** The first choice (wired, no battery), but the unit that arrived never sent a byte |
 
-**Which ESP32 reads which tank.** The first design (2026-10-14) had one XIAO in the fresh tank bay reading both water sensors. On 2026-10-20 it was split into one device per tank, with the grey device in the closet. On 2026-10-27 the grey sensor moved onto the propane monitor's XIAO, and the propane and water projects became one tank monitor (mod 07):
+**How the grey tank got here.** The first design (2026-10-14) had one XIAO in the fresh tank bay reading the sender and a wired DYP L02 under the grey tank. On 2026-10-20 that became one device per tank, and on 2026-10-27 the L02 moved onto the propane monitor's XIAO when the projects were combined. The L02 was then wired up (3.3 V confirmed at the sensor, yellow TX on the ESP32's D3 per DYP's datasheet pinout, no LED ever lit) and a UART byte dump on the device showed **nothing at all** on that pin. Rather than chase a possibly dead sensor that was also out of stock, the owner ordered the Mopeka the same evening. It trades the L02's advantages (no battery, wired into the ESP32) for a sensor already proven on this tank, with a native Home Assistant integration and nothing to run under the trailer. The L02, its UART and its entities were removed from the main device's firmware.
 
-- The main device has the spare pins and the spare hardware UART: the two propane sensors use two UARTs and four pins, the L02 needs the third UART and one receive pin (D3). See the [README](README.md#why-two-devices).
-- One fewer XIAO, regulator, fuse, enclosure and 12 V tap, and 40-80 mA less standby current.
-- The cost is a longer L02 cable, from the grey tank to the main enclosure. At 9600 baud that is not a concern.
-- The fresh device stays separate: its sender and the 12 V interface board belong in the rear passenger bay next to the tank, and it can be built now without waiting for anything else.
-
-The 710-ES3 and the L02 come from different worlds: one is a Garnet RV part with a proprietary protocol that the community has reverse-engineered, the other is an OEM module from DYP (Shenzhen Dianyingpu) meant for product designers. The [e-ink dashboard (mod 08)](../08-eink-dashboard/README.md) reads `sensor.casita_water_monitor_fresh_tank` from the fresh device and `sensor.casita_tank_monitor_grey_tank` from the main device.
+The 710-ES3 and the Mopeka come from different worlds: one is a Garnet RV part with a proprietary protocol that the community has reverse-engineered and an ESP32 drives directly, the other is a finished consumer product with its own radio. The [e-ink dashboard (mod 08)](../08-eink-dashboard/README.md) reads `sensor.casita_water_monitor_fresh_tank` from the fresh device and the template sensor `sensor.casita_grey_tank` built on the Mopeka's reading.
 
 ## How It Works
 
 **Fresh device (SeeLeveL).** The sender is a flexible circuit board with a column of copper pads, stuck to the outside of the tank. Each pad and the water behind the wall form a capacitor; the sender measures each pad's capacitance and reports ten values, 0 (air) to 255 (water), to whatever polls it. The ESP32 polls it through the [interface circuit](#seelevel-interface-circuit): it puts 12 V on the sender's blue wire for 1.5 ms (which powers the sender), sends one short low pulse to address tank 1, then counts the sender's reply pulses. The `seelevel` component turns the ten values into a level in segments (0 to the number of pads kept), and the firmware turns that into percent and gallons. A poll takes about 15 ms; the sender is unpowered in between.
 
-**Grey sensor (L02, on the main device).** The L02 sits against the underside of the tank with a film of couplant between its face and the plastic. Once a second it fires a 2 MHz ultrasonic pulse up through the wall and the water and times the echo from the water surface, then sends the height in millimeters as a 4-byte serial frame (`FF`, high byte, low byte, checksum) at 9600 baud. ESPHome's `ds1603l` sensor platform, written for DYP's DS1603L which uses the identical frame, parses it. Percent = height / **Grey Tank Full Level**, a calibration number stored on the ESP32 and set from the [calibration fill](#calibrate) or with the **Grey Tank Mark Full** button. Below the sensor's dead zone (about 2-4 cm of water, depending on the wall) the sensor reports 0, which the firmware shows as 0%.
+**Grey tank (Mopeka).** The Pro Check Universal is a self-contained ultrasonic sensor: it sits in a collar stuck to the underside of the tank with a film of couplant, fires a pulse up through the wall and the water every few seconds, times the echo from the surface, and broadcasts the result over Bluetooth Low Energy. The trailer's Home Assistant Pi (which already has Bluetooth, see [Grey tank (Mopeka)](#grey-tank-mopeka)) picks the broadcasts up with the built-in **Mopeka** integration and publishes **Tank level** in millimetres, plus temperature, battery, signal strength and a reading-quality score. The integration's medium setting (Waste Water for this tank) sets the speed of sound it uses. A template sensor in Home Assistant divides the millimetres by the tank's full height to give the percent the dashboard and alerts use.
 
-**Power.** On the fresh device, fused 12 V feeds a 2 A inline fuse, the 470 uF capacitor and the Pololu 5 V regulator, which powers the XIAO; the interface also takes 12 V directly, since that is what the sender needs. The L02 is powered from the main device's 3.3 V pin, so its serial output is 3.3 V, safe for the ESP32 ([README: power](README.md#power)).
+**Power.** On the fresh device, fused 12 V feeds a 2 A inline fuse, the 470 uF capacitor and the Pololu 5 V regulator, which powers the XIAO; the interface also takes 12 V directly, since that is what the sender needs. The Mopeka runs on a CR2032 coin cell, which Mopeka rates for a year or more; Home Assistant shows its battery percentage.
 
 ## Known Limitations
 
-- **The grey tank is shallow, and the L02 cannot see the bottom 2-4 cm.** On a tank about 4 in (100 mm) tall outside, perhaps 90 mm inside, the measurable range is roughly 30-90 mm: the top two thirds. Below that the sensor reports 0 and Home Assistant shows 0%. That is fine for the question that matters (is it nearly full?) and useless for "is it completely empty?". The volume sensor is a straight line from 0 to 32 gal over the full height, so it reads low in the dead zone.
-- **The grey tank wall may be too thick.** DYP's limit is 5 mm; the tank is probably 4.5-6 mm. Step G4 tests it. If the sensor reads 0 with water above it and the LED stays solid, the wall is too thick or too textured for this sensor and the fallback is capacitive point switches on the tank side (see [Why this design](#why-this-design)).
-- **Sloshing and slope.** Both sensors read the water where they are. The L02 is unreliable while the trailer moves; the firmware's median filter smooths it, but trust readings when parked. If the trailer is not level, a wide, shallow grey tank reads quite differently at opposite ends. Park level before judging.
+- **The grey tank is shallow, and a bottom-mounted ultrasonic sensor cannot see the first few cm.** On a tank about 4 in (100 mm) tall outside, perhaps 90 mm inside, the usable range is roughly the top two thirds. Below that the Mopeka reports 0 and the percent shows 0%. That is fine for the question that matters (is it nearly full?) and useless for "is it completely empty?".
+- **The tank wall and the Bluetooth reach are untested on this trailer.** Mopeka does not publish a wall-thickness limit for the Universal on plastic; one Casita owner's working install is the evidence. The sensor broadcasts from under the belly tank and the Pi is inside; Step G2 checks both before anything is stuck on. If the reach is marginal, a cheap ESPHome Bluetooth proxy near the floor fixes it.
+- **Sloshing and slope.** Both sensors read the water where they are. The Mopeka's reading-quality score drops while the trailer moves; trust readings when parked. If the trailer is not level, a wide, shallow grey tank reads quite differently at opposite ends. Park level before judging.
 - **The fresh sender's percentage is an estimate.** The `seelevel` component interpolates between pads using its own algorithm, not Garnet's; another user saw a 33% reading on a full shallow tank until the segment count was set correctly. The [calibration fill](#calibrate) checks it. Resolution is one pad, 1.33 in, about 3 gal on this tank, with interpolation between.
 - **Metal near the sender reads as water.** Keep steel, aluminum and copper 2 in from the sender's face and 1 in from its edges; check again with doors and covers closed.
 - **One shot at sticking the sender.** Its 3M 300LSE adhesive does not survive removal, so the taped trial in Step F5 is the time to find problems.
-- **Polyethylene is hard to glue.** Epoxy, CA and most tapes peel off it. The L02 mount uses 3M 300LSE tape (the same adhesive Garnet uses on the sender, made for low-energy plastics) with a polyolefin primer; see Step G5.
+- **Polyethylene is hard to glue.** Epoxy, CA and most tapes peel off it. The Mopeka collar comes with its own adhesive; if it lets go of this tank, 3M 9495LE (300LSE) tape with Primer 94, the same combination Garnet uses on the sender, is on hand (Step G3).
+- **A battery to change.** The Mopeka's CR2032 is the only battery in the whole project. Home Assistant shows its level; expect a year or two.
 - **Always on.** The fresh device's XIAO on Wi-Fi draws about 40-80 mA, 1-2 Ah per day; the main device's draw is in the [README](README.md#power). The 12 V tap should be on a circuit that the trailer's 12 V master (when there is one) or a WFCO fuse cuts for storage. If the pump switch itself cuts the fresh device's circuit, see Step F6.
-- **Temperature.** The sender is rated 0 to 60 degC and will not bond below 15 degC; the L02 is rated -15 to 60 degC. Winter readings from the belly tank may stop below about -15 degC.
+- **Temperature.** The sender is rated 0 to 60 degC and will not bond below 15 degC. The Mopeka's cold-weather rating is to check in its manual; coin cells fade in deep cold; see [mod 12](../12-cold-weather/README.md) for the belly pan that keeps the tank, and the sensor, warmer.
 - **Away from home** the Home Assistant connection needs a network path, the same as the battery monitor: see [mod 04](../04-battery-monitor-esp32/README.md#reading-the-battery-away-from-home).
 
 ## Parts
@@ -115,30 +109,24 @@ Ownership and purchase status, kept current as parts arrive: [components.md](com
 | Small ABS enclosure, about 83 x 58 x 33 mm | 1 | XIAO, regulator and interface | [Amazon: IP65, 2 pack](https://www.amazon.com/dp/B0FDQCHNQP) |
 | 22 AWG pair (or two conductors of the shielded cable) | about 1 m | Sender wires to the enclosure, if they do not reach | |
 
-### Grey sensor
-
-The XIAO, regulator, capacitor, fuse and enclosure are the main device's ([README: parts](README.md#parts)).
+### Grey tank (Mopeka)
 
 | Component | Qty | Notes | Purchase link |
 | --- | ---: | --- | --- |
-| DYP-L023MUW-V1.0 (L02, UART Automatic) | 1 | See [What to order](#what-to-order) | [Amazon B0C1GFJKMV](https://www.amazon.com/dp/B0C1GFJKMV) |
-| 4-conductor shielded cable, 22 AWG | measure in Step G1 | From the L02's pigtail under the tank to the main device | |
-| JST-XH 2.54 mm 4-pin pigtails | 1 pack | Mates with the L02's plug; the joint to the shielded cable is the disconnect point at the tank. **Confirm the plug on the sensor**: if it is the smaller 1.25 mm type, use the propane sensors' 1.25 mm pigtails instead | [Amazon search: JST XH 2.54 mm 4-pin pigtail](https://www.amazon.com/s?k=JST+XH+2.54mm+4+pin+connector+pigtail+cable) |
-| Silicone dielectric grease | 1 | Couplant for the L02 (test and final). Not DYP's water-based gel, which dries | [Amazon: Permatex 22058](https://www.amazon.com/dp/B000AL8VD2) |
-| 3M 9495LE double-sided tape (300LSE adhesive) | 1 roll | Holds the L02 to the polyethylene tank; the same adhesive family as the sender's backing | [Amazon search: 3M 9495LE](https://www.amazon.com/s?k=3M+9495LE+300LSE+tape) |
-| 3M Primer 94 or Loctite polyolefin primer | 1 | Pre-treats the polyethylene so the tape bonds | [Amazon search: 3M Primer 94](https://www.amazon.com/s?k=3M+Primer+94+adhesion+promoter) |
-| Cable gland (PG7) or grommet | 1 | Where the L02 cable enters the trailer, if it cannot share the propane cables' pass-through | [Amazon: PG7 glands](https://www.amazon.com/dp/B0CTCG4HMM) |
-| Split loom, about 10 mm | measure | Protects the L02 cable where it runs along the frame under the trailer | |
+| Mopeka Pro Check Universal, aluminium/plastic/poly version with collar | 1 | See [What to order](#what-to-order). Ordered 2026-10-27 | [Amazon B0C7HM61BP](https://www.amazon.com/dp/B0C7HM61BP) |
+| CR2032 coin cell | 1 spare | One comes with the sensor | |
+| Silicone dielectric grease or Mopeka Sonic Grease | 1 | Couplant between the sensor and the tank; both on hand | [Amazon: Permatex 22058](https://www.amazon.com/dp/B000AL8VD2), [Mopeka Sonic Grease](https://www.amazon.com/dp/B0CVQVGMWB) |
+| 3M 9495LE double-sided tape and 3M Primer 94 | | Only if the collar's own adhesive will not hold on the polyethylene; both on hand | |
 
 ### Shared supplies
 
 | Component | Notes | Purchase link |
 | --- | --- | --- |
-| Rubberized undercoating | Over the L02, its cable joint and the sender if road spray can reach them. Garnet names 3M 03584 | [Amazon search: 3M 03584](https://www.amazon.com/s?k=3M+03584+rubberized+undercoating) |
+| Rubberized undercoating | Over the sender if road spray can reach it. Garnet names 3M 03584. Do not coat the Mopeka: it needs its battery door and its radio | [Amazon search: 3M 03584](https://www.amazon.com/s?k=3M+03584+rubberized+undercoating) |
 | Adhesive-lined heat-shrink, zip ties, painter's tape, Gorilla tape | | [Amazon: heat-shrink kit](https://www.amazon.com/dp/B0DC5YN5CD) |
 | 18-20 AWG red and black wire, crimp butt splices | The fresh device's 12 V tap | |
 
-Prices seen 2026-10-14: sender about $70, L02 $22, the rest $5-15 each. Links marked "search" were not checked against a specific listing; pick the genuine 3M part.
+Prices seen 2026-10-14: sender about $70, the rest $5-15 each; Mopeka about $81 on 2026-10-27. Links marked "search" were not checked against a specific listing; pick the genuine 3M part.
 
 ## Tools and Supplies
 
@@ -147,7 +135,6 @@ Prices seen 2026-10-14: sender about $70, L02 $22, the rest $5-15 each. Links ma
 - Isopropyl alcohol (99%) and lint-free cloths; 220-grit sandpaper
 - Heat gun or hair dryer (the sender's adhesive needs the tank above 15 degC / 60 degF)
 - Tape measure, straightedge, marker; scissors or a hole punch for the sender's tabs
-- Drill and step bit for a gland, if the L02 cable cannot share an existing penetration
 - A plastic bucket and a flat-bottomed plastic tub (storage box) for the bench tests; a 1 gal jug for calibration
 - USB-C cable for the first flash
 
@@ -167,25 +154,15 @@ Prices seen 2026-10-14: sender about $70, L02 $22, the rest $5-15 each. Links ma
 | Interface `SENSOR_DATA` | Sender **blue** wire | |
 | Interface `GND` | Sender **black** wire | The sender must share the ESP32's ground |
 
-### Grey sensor wiring
+### Grey tank
 
-The L02 connects to the main device; the full schematic is in the [README](README.md#main-device-wiring).
-
-| L02 lead | Main device | Notes |
-| --- | --- | --- |
-| **red** (`VCC`) | XIAO `3V3` | **3.3 V, not 5 V**, so the L02's serial output is 3.3 V |
-| **black** (`GND`) | XIAO `GND`, and the cable shield (enclosure end only) | |
-| **yellow** (`TX`) | XIAO `D3` (GPIO4) | ESP32 receives the frames, 9600 baud |
-| **white** (`RX`) | (nothing) | Not used by the UART-auto model; fold back and insulate |
-
-L02 lead colors are from DYP's datasheet photo (red, black, yellow, white, top to bottom on the housing). Confirm against the label or by measuring: red reads 0 ohm to nothing else, black is common with the housing's ESD shell.
+No wiring: the Mopeka is wireless and battery-powered.
 
 ### Where things go
 
 - **Fresh enclosure:** inside the trailer, in or beside the fresh tank bay (rear passenger side), where the pump's 12 V is at hand. Keep it above any possible water on the floor of the bay. The sender's two wires run to it.
-- **Main device:** see the [README](README.md#where-things-go). The L02's cable runs to it.
 - **Sender:** on the fresh tank's side, [Step F5](#step-f5-cut-program-and-stick-the-sender-on-the-fresh-tank).
-- **L02:** under the grey tank, [Step G5](#step-g5-glue-the-l02-under-the-grey-tank). Its cable runs along the tank support and frame to the main device, entering the trailer through an existing penetration (ideally the propane cables' pass-through) or a new sealed PG7 gland ([Step G1](#step-g1-measure-the-grey-tank-and-plan-the-cable-route)).
+- **Mopeka:** under the grey tank in its collar, on a flat, smooth spot away from the drain end and the support angles, [Step G3](#step-g3-mount-the-mopeka-under-the-grey-tank). Nothing runs from it.
 
 ## SeeLeveL interface circuit
 
@@ -272,76 +249,64 @@ Garnet's rules, condensed. The adhesive is single-use: do the taped trial first.
 
 See [Home Assistant](#home-assistant) and [Calibrate: fresh tank](#fresh-tank).
 
-## Grey sensor steps
+## Grey tank (Mopeka)
 
-### Step G1: Measure the grey tank and plan the cable route
+The trailer's Home Assistant already has Bluetooth: the Pi 4's built-in radio and a Realtek USB adapter are both loaded (checked 2026-10-27). The built-in **Mopeka** integration discovers Pro Check sensors automatically and publishes, per sensor: **Tank level** (mm), **Temperature** (degC), **Battery** (%) and battery voltage, **Reading quality** (%), **Signal strength** (dBm) and two accelerometer axes. Its options let you pick the medium; **Waste Water** is the one for this tank.
 
-Nobody has published the grey tank's dimensions; a Casita owner measured one at about 4 in tall. Record:
+The percentage the dashboard and alerts use is a template sensor in the trailer's Home Assistant (**Settings > Devices & services > Helpers > Template > Sensor**, or YAML), planned as:
 
-| Measurement | Value | Why |
-| --- | ---: | --- |
-| Tank height, outside | | Sets the expected full level (about height minus 2 x wall thickness) |
-| Wall thickness, if any edge, fitting or the drain let you gauge it (calipers at the drain fitting lip, or compare the outside height with a probe through the drain) | | DYP's limit is 5 mm. Over that, expect the echo test to fail |
-| A flat, smooth, horizontal spot on the bottom, at least 40 mm across, **away from the drain end** (it collects sludge) and from any supporting angle iron or strap, where the tank is supported (not a sagging unsupported span) | | The sensor must sit flat with no air gap and the surface must not flex |
-| Is the tank bottom sloped toward the drain? By how much? | | A sloped tank reads differently at each end; a middle spot is the best compromise |
-| The cable route from the sensor spot to the main device: along the tank's support angles and the frame (zip-tied, in split loom, clear of the drain valves, anything hot and anything that moves), and where it enters the trailer: the propane cables' front pass-through, another existing penetration, or a new PG7 gland clear of frame members, wiring and plumbing (check from both sides before drilling) | | Sets the cable length |
-| Cable length, plus a drip loop and service slack | | Recorded in [Step M1](README.md#step-m1-pick-the-main-enclosure-spot-and-measure-the-runs); 9600 baud is fine over several metres of the shielded cable |
+```yaml
+template:
+  - sensor:
+      - name: "Casita Grey Tank"
+        unique_id: casita_grey_tank
+        unit_of_measurement: "%"
+        state_class: measurement
+        icon: mdi:water-opacity
+        # Replace the entity ID with the Mopeka's actual Tank level entity, and
+        # 90 with the full-tank reading from the calibration fill.
+        state: >-
+          {% set mm = states('sensor.pro_check_universal_tank_level') | float(none) %}
+          {% if mm is none %}unknown{% else %}{{ ([0, (mm / 90 * 100) | round(0), 100] | sort)[1] }}{% endif %}
+        availability: "{{ has_value('sensor.pro_check_universal_tank_level') }}"
+```
 
-Photograph the tank underside and the cable route and put the photos in `photos/`.
+That gives `sensor.casita_grey_tank`, the ID in the README's [dashboard card and alerts](README.md#home-assistant-setup) and in mod 08. Entity IDs are confirmed in Step G1.
 
-### Step G2: Connect the L02 to the main XIAO on the bench
+## Grey tank steps
 
-The main device is flashed with `casita-tank-monitor.yaml` ([Step M2](README.md#step-m2-flash-the-main-device)).
+### Step G1: Pair the Mopeka on the bench
 
-1. Unpowered, connect the L02 through a pigtail: red to XIAO `3V3`, black to `GND`, yellow to `D3`. Insulate the white lead.
-2. Power up and open **Logs**. With the sensor in the air, the L02's LED stays solid and **Grey Tank Level** reads 0; **Grey Tank Sensor Online** turns on as soon as frames arrive. If the log still says `No frame from the L02 for 30 s`, check 3.3 V at the red lead and that yellow is on `D3`.
+1. Pull the battery tab (or fit the CR2032). The sensor starts broadcasting at once.
+2. In the trailer's Home Assistant, **Settings > Devices & services** should show a discovered **Mopeka** device within a minute. **Add**, then open its options and set the medium to **Waste Water**. Rename the device **Casita Grey Tank** so its entities get sensible IDs; note the **Tank level** entity ID for the template above.
+3. With the sensor face up on the bench, **Tank level** should read 0 and **Reading quality** low. Press it, with a dab of grease, against the underside of a plastic tub of water about 60 mm deep: the level should read close to that within a few readings.
 
-### Step G3: Bench-test the L02 on a plastic tub
+### Step G2: Test the Mopeka under the grey tank
 
-1. Use the bench setup from Step G2.
-2. Smear a thin layer of silicone grease on the sensor's flat face and press it against the **underside** of an empty flat-bottomed plastic storage tub (1-3 mm wall; a thin tub is the easy case). Tape it in place.
-3. Power up. The L02's LED stays solid with no liquid. The logs show **Grey Tank Level** readings of 0 (the firmware treats 0 as no echo).
-4. Add water to about 60 mm deep. The LED should blink at 1 Hz and the level should read close to the real depth (expect within about 5 mm). Add and remove water; the reading should follow within a couple of seconds (the median filter adds a few).
-5. Press **Grey Tank Mark Full** on the web page with a known depth and check that **Grey Tank** reads 100% and tracks lower as you remove water.
+Nothing here is permanent.
 
-A sensor that fails this test on a thin tub is defective or miswired; return it rather than try it on the trailer.
+1. Dump the grey tank, then put a known amount of water in through the sink: about 10 gal (roughly 25-30 mm in a tank this size). Park level.
+2. Under the trailer, clean the chosen spot (flat, smooth, supported, away from the drain end) with alcohol. Grease the sensor face and hold it up against the tank, flat, no air gap; a strip of Gorilla tape across the collar holds it for the test.
+3. Inside the trailer, read **Tank level** and **Reading quality**. **Pass:** a steady, non-zero level that rises when you add 5 more gallons, with quality well above zero, and **Signal strength** comfortably readable from where the Pi is. **Fail:** 0 with water above it (wall or coupling), or no updates at all (Bluetooth reach).
+4. If the reach is the problem, try the USB Bluetooth adapter on a short extension nearer the floor, or plan an ESPHome Bluetooth proxy; if the wall is the problem, try another spot before giving up.
+5. Note the reading and the gallons in; that is the first calibration point.
 
-### Step G4: Test the L02 on the grey tank before gluing it
+### Step G3: Mount the Mopeka under the grey tank
 
-This is the decisive test. Nothing here is permanent.
+1. Dump the tank and park level. Clean the spot from Step G2 with alcohol; sand lightly with 220 grit if textured; wipe again; dry. Warm the plastic with a heat gun in cold weather.
+2. Follow Mopeka's collar instructions: couplant on the sensor face, the sensor in the collar, the collar's adhesive onto the primed tank, firm pressure for a minute. If the collar adhesive does not grab the polyethylene, use a ring of 3M 9495LE on Primer 94 instead, as the sender uses.
+3. Leave the tank empty for 24 h so the adhesive cures. Do not undercoat the sensor.
+4. Check the reading again after mounting; it should match the taped test.
 
-1. Dump the grey tank, then put a known amount of water in through the sink: about 10 gal (that should be 25-30 mm deep in a tank this size, above the dead zone). Park level.
-2. Under the trailer, clean the chosen spot (Step G1) with alcohol. Grease the sensor face and press it up against the tank; hold it with a strip of Gorilla tape across the sensor and onto the tank, or a stick wedged against the ground. It must be flat against the plastic with no air gap.
-3. Bring the bench setup under the trailer on a 12 V supply, or run the sensor's lead to it on a temporary extension.
-4. Read **Grey Tank Level**. **Pass:** a steady, non-zero value that changes when you add 5 more gallons. **Fail:** 0 with the LED solid, or wildly varying values.
-5. If it fails, try one more spot (thinner-looking, smoother, better supported), and try more grease pressed harder. If it still fails, the wall is beyond this sensor: stop, and use the capacitive-switch fallback for the grey tank instead of gluing anything.
-6. If it passes, note the reading and the gallons in; that is the first calibration point.
+### Step G4: Calibrate and finish
 
-### Step G5: Glue the L02 under the grey tank
-
-Polyethylene rejects most adhesives, so this uses 3M 300LSE tape with a primer, the way Garnet's sender is stuck to the same plastic, with grease as the couplant in a pocket in the tape. Epoxy around the ring is a backup, not the main bond.
-
-1. Dump the tank and park level. Clean the spot from Step G4 with alcohol; sand lightly with 220 grit if textured; wipe again; dry.
-2. Cut a ring of 9495LE tape: a piece about 40 x 40 mm with a 24 mm hole punched or cut in the middle (the sensor face is 27.7 mm; the hole must be smaller than the sensor so the tape grips the sensor's rim, and large enough to leave a grease pocket under most of the face). Two layers of tape if the sensor's face is recessed below its rim.
-3. Apply primer to the tank spot and to the sensor's rim per the primer's instructions (Primer 94: wipe on, let flash 5 minutes).
-4. Stick the tape ring to the tank, press firmly for 30 s. Fill the hole with silicone grease, slightly proud.
-5. Peel the tape's other liner, press the sensor up into the grease so the face seats on the plastic and the rim lands on the tape. Hold with firm pressure for a minute. Grease should squeeze out all around; wipe the excess.
-6. Optional extra hold: a bead of polyurethane sealant (Sikaflex 221 or 3M 5200) around the sensor's edge, onto the primed tank. Do not get sealant under the face.
-7. Plug the sensor into its pigtail, splice the pigtail to the shielded cable (solder and adhesive-lined heat-shrink each conductor, then heat-shrink over the whole joint), and zip-tie the cable to the tank's support frame with a drip loop, so no pull reaches the sensor.
-8. Route the cable along the route from Step G1, in split loom and zip-tied every 30 cm or so, into the trailer (the existing penetration, or the PG7 gland, sealed) and on to the main enclosure. Ground the shield at the enclosure end only.
-9. After 24 h, two coats of rubberized undercoating over the sensor, the tape, the joint and the first inches of cable.
-10. Leave the tank empty for 24 h before the first fill so the tape cures.
-
-### Step G6: Calibrate the grey tank
-
-Once the main device is installed and in Home Assistant ([Steps M3 and M4](README.md#step-m3-install-the-main-device)), see [Calibrate: grey tank](#grey-tank).
+See [Calibrate: grey tank](#grey-tank). Then add the gauge and the grey-full alert from the [README](README.md#home-assistant-setup), and the `rv_` mirror at home.
 
 ## ESPHome Configuration
 
 | Device | Configuration | Components |
 | --- | --- | --- |
 | Fresh | [`esphome/casita-water-monitor-fresh.yaml`](esphome/casita-water-monitor-fresh.yaml) | The external [`seelevel`](https://github.com/j9brown/esphome-seelevel) component (MIT), fetched from GitHub at compile time |
-| Main (grey tank part) | [`esphome/casita-tank-monitor.yaml`](esphome/casita-tank-monitor.yaml) | ESPHome's built-in `uart` and `ds1603l`; see the [README](README.md#esphome-configuration) |
 
 **Fresh substitutions:**
 
@@ -355,7 +320,7 @@ The fresh volume map (`level 8.0 = 23 gal`) is written out in the sensor because
 
 What the fresh firmware does beyond the component: **Tank** (%) = level / `fresh_segments` x 100, clamped 0-100. **Tank Segment Data** (diagnostic) shows the ten raw values, top to bottom, for calibration and troubleshooting.
 
-The grey tank's processing (median filter, **Grey Tank Full Level**, **Grey Tank Mark Full**, **Grey Tank Sensor Online**) is described in the [README](README.md#esphome-configuration).
+The grey tank has no ESPHome configuration; its percent is the Home Assistant template above.
 
 Validation on bee2 with ESPHome 2026.9.1 on 2026-10-27: `esphome compile` succeeded for the fresh configuration (RAM 31.3%, flash 58.3%). This proves only that it builds.
 
@@ -378,7 +343,7 @@ Same names as the trailer's other ESPHome devices; see the [README](README.md#se
 | Tank Segment Data | `text_sensor.casita_water_monitor_fresh_tank_segment_data` | | Diagnostic |
 | Wi-Fi Signal, Uptime, IP Address, Restart | diagnostic entities | | |
 
-The grey tank's entities are on the main device. The dashboard card, the fresh-low and grey-full alerts, and mirroring to the home Home Assistant are in the README's [Home Assistant setup](README.md#home-assistant-setup).
+The grey tank's entities come from the Mopeka integration plus the `sensor.casita_grey_tank` template ([Grey tank (Mopeka)](#grey-tank-mopeka)). The dashboard card, the fresh-low and grey-full alerts, and mirroring to the home Home Assistant are in the README's [Home Assistant setup](README.md#home-assistant-setup).
 
 ## Calibrate
 
@@ -393,11 +358,11 @@ Drain the tank, then fill it with the hose in measured steps (a 1 gal jug, or ti
 
 ### Grey tank
 
-After dumping, with the tank empty, **Grey Tank Level** should read 0 (below the dead zone). Then add water through the sink in 5 gal steps and record **Grey Tank Level** each time. From two points above the dead zone, compute millimeters per gallon; then:
+After dumping, with the tank empty, the Mopeka's **Tank level** should read 0 (below its dead zone). Then add water through the sink in 5 gal steps and record **Tank level** each time. From two points above the dead zone, compute millimeters per gallon; then:
 
-`Grey Tank Full Level (mm) = 32 gal x (mm per gal)`, adjusted by the intercept if the line does not pass through zero (the first few gallons fill the tank's low spots).
+`full level (mm) = 32 gal x (mm per gal)`, adjusted by the intercept if the line does not pass through zero (the first few gallons fill the tank's low spots).
 
-Enter that into **Grey Tank Full Level**. Alternatively, keep filling while watching the shower drain and press **Grey Tank Mark Full** the moment water appears in the shower pan; that defines 100% as "about to back up", which is the practical meaning. Dump afterwards.
+Put that number in place of the `90` in the template sensor. Alternatively, keep filling while watching the shower drain, note **Tank level** the moment water appears in the shower pan, and use that; it defines 100% as "about to back up", which is the practical meaning. Dump afterwards.
 
 Repeat the grey calibration once after the first trip, since a belly tank's shape under load can differ from the empty tank's.
 
@@ -412,17 +377,17 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 5. Enclosure powered from the pump circuit with the pump switch off and on: readings continue; the XIAO does not reset when the pump runs; current draw 40-80 mA.
 6. Calibration: empty reads 0, full reads about 8.0 (100%, 23 gal).
 
-**Grey sensor**
+**Grey tank (Mopeka)**
 
-7. L02 on a thin tub: level within 5 mm of a ruler; LED blinks with liquid, solid without.
-8. L02 taped under the grey tank with 10 gal in: steady non-zero reading that rises with 5 more gallons.
-9. Installed on the main device: **Grey Tank Sensor Online** on, readings steady when parked, propane readings unaffected.
-10. Calibration: **Grey Tank Full Level** set from a measured fill; 32 gal reads about 100%.
+7. On the bench against a tub of water: **Tank level** within about 5 mm of a ruler; 0 in air.
+8. Taped under the grey tank with 10 gal in: steady non-zero level that rises with 5 more gallons; **Reading quality** well above zero; updates arrive inside the trailer.
+9. Mounted: reading matches the taped test; `sensor.casita_grey_tank` follows it.
+10. Calibration: the template's full level set from a measured fill; 32 gal reads about 100%.
 
 **Both**
 
-11. Home Assistant shows the fresh device and the main device's grey entities; the e-ink dashboard's water gauges fill in on its next refresh; the home Home Assistant shows the `rv_` mirrors in the Casita RV area.
-12. After the first tow: both tanks still read; **Grey Tank Sensor Online** on; undercoating and cable loom intact.
+11. Home Assistant shows the fresh device, the Mopeka and `sensor.casita_grey_tank`; the e-ink dashboard's water gauges fill in on its next refresh; the home Home Assistant shows the `rv_` mirrors in the Casita RV area.
+12. After the first tow: both tanks still read; the Mopeka has not moved; undercoating on the sender intact.
 
 ## Troubleshooting
 
@@ -436,18 +401,18 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 | Fresh | Level reads low with the tank full | `fresh_segments` too high, or a pad sits above the water line | Count the pads kept; check the top gap |
 | Fresh | Level jumps while filling or reads non-zero when empty | Metal within 2 in of the face or 1 in of the edges; AC wiring bundled with the sender wires | Move the metal or the sender; reroute wires |
 | Fresh | XIAO resets when the pump runs | Voltage sag on the shared circuit | Confirm the 470 uF is across `VIN`; if it persists, feed from a WFCO fuse instead |
-| Grey | **Grey Tank Sensor Online** off, no frames | L02 unpowered (3V3), yellow not on `D3`, wrong baud, or cable broken | Check 3.3 V at the sensor's red/black; check the joint; the LED must light |
-| Grey | Level always 0, LED solid | No echo: no couplant, air gap, wall too thick or textured, water below the dead zone | Re-grease and press; try another spot; add water |
-| Grey | Level noisy or jumping | Sloshing, the tank flexing where the sensor sits, or a poor bond | Read when parked; move to a supported spot |
-| Grey | Level far off the ruler | Wrong **Grey Tank Full Level**, or the tank is tilted | Recalibrate on level ground |
-| Either | Device offline after a trip | Lost Wi-Fi: the fallback hotspot **Casita Fresh Fallback** (fresh) or **Casita Tank Fallback** (main) appears after a minute | Join it and re-enter the trailer Wi-Fi, or check the travel router |
+| Grey | No Mopeka device discovered | Battery tab still in, flat cell, or the sensor out of Bluetooth reach of the Pi | Check the cell; bring the sensor inside to pair, then test reach at the tank (Step G2) |
+| Grey | Updates stop when the sensor is under the tank | Bluetooth reach through the floor | USB adapter nearer the floor, or an ESPHome Bluetooth proxy |
+| Grey | Level always 0 with water above it, low reading quality | No couplant, air gap, wrong medium setting, or the wall is beyond the sensor | Re-grease and press; set the medium to Waste Water; try another spot |
+| Grey | `sensor.casita_grey_tank` unknown | Wrong Tank level entity ID in the template | Fix the ID (Step G1) |
+| Grey | Level far off the ruler | Wrong full level in the template, or the tank is tilted | Recalibrate on level ground |
+| Fresh | Device offline after a trip | Lost Wi-Fi: the fallback hotspot **Casita Fresh Fallback** appears after a minute | Join it and re-enter the trailer Wi-Fi, or check the travel router |
 
 ## Safety Notes
 
 - The fresh device's 12 V tap is fused at 2 A as close to the tap as possible; the wire from there is sized for that fuse. Never run an enclosure off a 10-15 A circuit fuse alone.
-- Disconnect 12 V (pull the inline fuse) before working inside an enclosure or on the sender wires. The fresh interface puts 12 V on the blue wire during polls.
-- The L02 is powered at 3.3 V. Powering it from 5 V puts 5 V on an ESP32 pin and can destroy the XIAO.
-- Before drilling for a gland, check both sides for frame members, wiring, plumbing and the tank itself; seal the hole afterward against water and road spray. Keep the L02 cable clear of the drain valves and anything hot or moving.
+- Disconnect 12 V (pull the inline fuse) before working inside the enclosure or on the sender wires. The fresh interface puts 12 V on the blue wire during polls.
+- The Mopeka's coin cell is a swallowing hazard for children and pets; keep the spare put away.
 - Working under the trailer: chock the wheels, park on firm level ground, keep clear of the drain valves.
 - Undercoating and primer: ventilate, no flames, keep off the fiberglass body.
 - The fresh tank is potable. Nothing in this project touches the water; keep adhesives, grease and undercoating away from the fill, vent and drain fittings.
@@ -464,19 +429,18 @@ Add photos to `photos/` as the build progresses:
 - `interface-board.jpg`: the finished perfboard
 - `sender-taped.jpg` and `sender-installed.jpg`
 - `fresh-enclosure.jpg`: inside the fresh enclosure, wired
-- `grey-tank-underside.jpg`: the tank bottom and the sensor spot before gluing
-- `l02-taped.jpg` and `l02-installed.jpg`
-- `l02-cable-route.jpg`: the L02 cable along the frame and where it enters the trailer
+- `grey-tank-underside.jpg`: the tank bottom and the sensor spot before mounting
+- `mopeka-taped.jpg` and `mopeka-installed.jpg`
 
 ## References
 
 - [Garnet SeeLeveL 709 Series manual v2.0 (Nov 2025)](https://www.garnetinstruments.com/wp-content/uploads/2025/11/SeeLeveL-709-Series-Manual-v2.0.pdf): sender cutting, tab programming, placement gaps, metal clearance, adhesion, undercoating
 - [Garnet 710-ES3 product page](https://shopusa.garnetinstruments.com/solutions/holding-tanks/710-es3-710-es3-12-sender): 12.15 x 2.20 in, 9 pads, 300LSE adhesive, 0-60 degC
 - [j9brown/esphome-seelevel](https://github.com/j9brown/esphome-seelevel): the ESPHome component, the interface schematic (`seelevel-interface/`), the protocol notes and the level-estimation algorithm. [Issue #3](https://github.com/j9brown/esphome-seelevel/issues/3): segment count and estimator discussion from a three-tank Airstream install
-- [DYP L02 product page](https://www.dypcn.com/integrated-waterproof-ultrasonic-liquid-level-sensor-dyp-l02-product/), [datasheet](https://www.dypcn.com/uploads/L02-Datasheet1.pdf) and [output interfaces](https://www.dypcn.com/uploads/L02-Output-Interfaces.pdf): 2.8-5 V, 2-200 cm, 1 mm, 0.6-5 mm walls, 9600 baud 4-byte frame
-- [ESPHome `ds1603l` sensor](https://esphome.io/components/sensor/ds1603l/): the same 4-byte frame; "needs some kind of couplant, no air gap"
-- [DS1603L on a plastic water container (Home Assistant community)](https://community.home-assistant.io/t/continuous-ultra-sonic-level-measurement-ds1603l/214959): "tested with both metallic and plastic container filled with water and works; you need a coupling compound like silicone grease"
-- [Mopeka grey tank install on a Casita (video)](https://www.youtube.com/watch?v=rsI1zkrDrD4): the tank measured at about 4 in tall; a bottom-mounted ultrasonic sensor working on this tank for 6+ months
+- [Home Assistant Mopeka integration](https://www.home-assistant.io/integrations/mopeka/): auto-discovery over Bluetooth, the medium list (Waste Water among them), supported sensors including the Pro Check Universal
+- [Mopeka Pro Check Universal](https://www.mopekaiot.com/procheckuniversal): the sensor and its collar
+- [DYP L02 datasheet](https://www.dypcn.com/uploads/L02-Datasheet1.pdf): the sensor tried first (pinout red VCC, black GND, yellow TX, white RX; 2.8-5 V; 9600 baud 4-byte frame), kept for the record
+- [Mopeka grey tank install on a Casita (video)](https://www.youtube.com/watch?v=rsI1zkrDrD4): the tank measured at about 4 in tall; a Mopeka working on this tank for 6+ months
 - [Seeed Studio XIAO ESP32-S3 wiki](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)
 - [Mod 08 e-ink dashboard](../08-eink-dashboard/README.md#entities-shown): the entity names this project must produce
 

@@ -1,12 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="840" viewBox="0 0 1100 840" role="img" aria-labelledby="title desc">
-  <title id="title">Tank monitor main device wiring: two DYP L06 propane sensors and a DYP L02 grey tank sensor on one XIAO ESP32-S3</title>
-  <desc id="desc">Main device, casita-tank-monitor. A 12 volt feed through a 2 amp fuse enters a Pololu D24V5F5 buck regulator with a 470 microfarad capacitor across its input. The regulator's 5 volt output goes to the XIAO ESP32-S3 5V pin and its ground to the XIAO ground. The XIAO 3V3 pin powers all three sensors' red VCC leads; the XIAO ground goes to all three black GND leads and to the cable shields. Propane sensor 1: yellow RX lead to XIAO D6, GPIO43; green TX lead to XIAO D7, GPIO44. Propane sensor 2: yellow RX lead to XIAO D4, GPIO5; green TX lead to XIAO D5, GPIO6. Grey tank DYP L02 sensor: yellow TX lead to XIAO D3, GPIO4; white RX lead unused and insulated. D1, GPIO2, is reserved for the mod 12 temperature probes, and D2, GPIO3, is avoided because it is a strapping pin.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="660" viewBox="0 0 1100 660" role="img" aria-labelledby="title desc">
+  <title id="title">Tank monitor main device wiring: two DYP L06 propane sensors on one XIAO ESP32-S3</title>
+  <desc id="desc">Main device, casita-tank-monitor. A 12 volt feed through a 2 amp fuse enters a Pololu D24V5F5 buck regulator with a 470 microfarad capacitor across its input. The regulator's 5 volt output goes to the XIAO ESP32-S3 5V pin and its ground to the XIAO ground. The XIAO 3V3 pin powers both sensors' red VCC leads; the XIAO ground goes to both black GND leads and to the cable shields. Propane sensor 1: yellow RX lead to XIAO D6, GPIO43; green TX lead to XIAO D7, GPIO44. Propane sensor 2: yellow RX lead to XIAO D4, GPIO5; green TX lead to XIAO D5, GPIO6. D1, GPIO2, is reserved for the mod 12 temperature probes; D2, GPIO3, is avoided because it is a strapping pin; D3 and the third hardware UART are free. The grey tank is read by a Mopeka Bluetooth sensor, not by this device.</desc>
   <defs>
     <style>
       .box{fill:#f5f7fa;stroke:#243b53;stroke-width:3}
       .dev{fill:#e3f8ff;stroke:#186faf;stroke-width:3}
       .sens{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
-      .grey{fill:#e6fffa;stroke:#2f855a;stroke-width:3}
       .t{font:600 18px system-ui,sans-serif;fill:#102a43}
       .s{font:14px system-ui,sans-serif;fill:#334e68}
       .warn{font:600 14px system-ui,sans-serif;fill:#b44d12}
@@ -21,8 +20,8 @@
       .dotg{fill:#243b53}
     </style>
   </defs>
-  <rect width="1100" height="840" rx="24" fill="#fff"/>
-  <text class="t" x="40" y="40">Main device (casita-tank-monitor): 12 V feed, regulator, XIAO ESP32-S3, two DYP L06 and one DYP L02</text>
+  <rect width="1100" height="660" rx="24" fill="#fff"/>
+  <text class="t" x="40" y="40">Main device (casita-tank-monitor): 12 V feed, regulator, XIAO ESP32-S3, two DYP L06</text>
 
   <!-- 12 V source and fuse -->
   <rect class="box" x="40" y="90" width="170" height="70" rx="12"/>
@@ -43,7 +42,7 @@
   <text class="s" x="500" y="102">5 V</text>
 
   <!-- XIAO -->
-  <rect class="dev" x="600" y="200" width="200" height="380" rx="14"/>
+  <rect class="dev" x="600" y="200" width="200" height="330" rx="14"/>
   <text class="t" x="700" y="232" text-anchor="middle">XIAO ESP32-S3</text>
   <text class="pin" x="610" y="255">5V</text>
   <text class="pin" x="610" y="285">GND</text>
@@ -52,25 +51,22 @@
   <text class="pin" x="610" y="395">D7 GPIO44 RX</text>
   <text class="pin" x="610" y="445">D4 GPIO5 TX</text>
   <text class="pin" x="610" y="475">D5 GPIO6 RX</text>
-  <text class="pin" x="610" y="525">D3 GPIO4 RX</text>
-  <text class="s" x="610" y="560">D1: mod 12 1-Wire (later)</text>
-  <text class="s" x="700" y="602" text-anchor="middle">D2 (GPIO3) not used: strapping pin</text>
+  <text class="s" x="610" y="510">D1: mod 12 1-Wire (later)</text>
+  <text class="s" x="700" y="552" text-anchor="middle">D2 (GPIO3) not used: strapping pin; D3 free</text>
 
   <!-- 3V3 bus -->
   <path class="w v33" d="M800 320 H830"/>
-  <path class="w v33" d="M830 150 V590"/>
+  <path class="w v33" d="M830 150 V370"/>
   <path class="w v33" d="M830 150 H900"/>
   <path class="w v33" d="M830 370 H900"/>
-  <path class="w v33" d="M830 590 H900"/>
   <circle class="dot33" cx="830" cy="320" r="6"/>
   <circle class="dot33" cx="830" cy="370" r="6"/>
 
   <!-- GND bus -->
   <path class="w neg" d="M800 280 H850"/>
-  <path class="w neg" d="M850 180 V620"/>
+  <path class="w neg" d="M850 180 V400"/>
   <path class="w neg" d="M850 180 H900"/>
   <path class="w neg" d="M850 400 H900"/>
-  <path class="w neg" d="M850 620 H900"/>
   <circle class="dotg" cx="850" cy="280" r="6"/>
   <circle class="dotg" cx="850" cy="400" r="6"/>
 
@@ -80,9 +76,6 @@
   <!-- Propane 2 UART -->
   <path class="w rx" d="M800 440 H870 V430 H900"/>
   <path class="w tx" d="M800 470 H885 V460 H900"/>
-  <!-- Grey L02 -->
-  <path class="w tx" d="M800 520 H870 V650 H900"/>
-
   <!-- Sensor 1 -->
   <rect class="sens" x="900" y="90" width="185" height="190" rx="12"/>
   <text class="t" x="992" y="118" text-anchor="middle">Propane 1</text>
@@ -101,15 +94,6 @@
   <text class="pin" x="910" y="465">green TX</text>
   <text class="s" x="992" y="490" text-anchor="middle">DYP-L062MTW-V1.0</text>
 
-  <!-- Grey L02 -->
-  <rect class="grey" x="900" y="530" width="185" height="210" rx="12"/>
-  <text class="t" x="992" y="558" text-anchor="middle">Grey tank</text>
-  <text class="pin" x="910" y="595">red VCC</text>
-  <text class="pin" x="910" y="625">black GND</text>
-  <text class="pin" x="910" y="655">yellow TX</text>
-  <text class="pin" x="910" y="685">white RX: unused</text>
-  <text class="s" x="992" y="725" text-anchor="middle">DYP-L023MUW-V1.0</text>
-
   <!-- Legend -->
   <rect class="box" x="40" y="220" width="250" height="165" rx="12"/>
   <text class="t" x="165" y="248" text-anchor="middle">Wire colours</text>
@@ -119,13 +103,12 @@
   <path class="w rx" d="M55 343 H95"/><text class="s" x="105" y="348">ESP32 TX to sensor RX</text>
   <path class="w tx" d="M55 363 H95"/><text class="s" x="105" y="368">sensor TX to ESP32 RX</text>
 
-  <rect class="box" x="40" y="420" width="500" height="150" rx="12"/>
-  <text class="t" x="60" y="450">Three hardware UARTs</text>
+  <rect class="box" x="40" y="420" width="500" height="110" rx="12"/>
+  <text class="t" x="60" y="450">Two hardware UARTs</text>
   <text class="s" x="60" y="476">Propane 1 and 2: 115200 baud, woken by one byte from the ESP32,</text>
   <text class="s" x="60" y="498">reply with a 10-byte frame. Keep runs under about 3 m.</text>
-  <text class="s" x="60" y="526">Grey L02: 9600 baud, streams a 4-byte frame every second;</text>
-  <text class="s" x="60" y="548">receive only. Takes the longer run to the grey tank.</text>
+  <text class="s" x="60" y="520">Third UART and D3 free: the grey tank uses a Mopeka (Bluetooth).</text>
 
-  <text class="warn" x="40" y="780">Yellow is an input on the L06 (sensor RX) but an output on the L02 (sensor TX). All three sensors on 3V3, never 5 V.</text>
-  <text class="s" x="40" y="808">Cable shields: connect to XIAO GND at the ESP32 end only. Junction dots mark the shared 3V3 and GND connections.</text>
+  <text class="warn" x="40" y="600">Both sensors on 3V3, never 5 V. ESP32 TX (yellow lead) wakes the sensor; sensor TX (green lead) carries the reading.</text>
+  <text class="s" x="40" y="628">Cable shields: connect to XIAO GND at the ESP32 end only. Junction dots mark the shared 3V3 and GND connections.</text>
 </svg>

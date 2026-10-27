@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520" role="img" aria-labelledby="title desc">
   <title id="title">Casita e-ink dashboard: how the data gets to the panel</title>
-  <desc id="desc">The battery monitor and the two tank monitor devices (propane and grey on one, fresh on the other) are ESPHome devices on the trailer Wi-Fi that report to the trailer's Home Assistant. The dashboard is another ESPHome device on the same Wi-Fi: a XIAO ESP32-S3 Plus on the TRMNL driver board. Home Assistant pushes the chosen entity states to it over the ESPHome API, and the ESP32 draws them on the 7.5 inch 800 by 480 e-paper panel every minute. The dashboard is powered from the trailer's 12 volt system through a USB-C adapter, with the kit's 2000 mAh battery as an optional backup. Everything works at the campsite without internet; the trailer's Home Assistant also mirrors the entities to the home Home Assistant over Tailscale.</desc>
+  <desc id="desc">The battery monitor and the two tank monitor devices (propane on one, fresh on the other) are ESPHome devices; the grey tank is a Mopeka Bluetooth sensor read by Home Assistant directly. The ESPHome devices are on the trailer Wi-Fi and report to the trailer's Home Assistant. The dashboard is another ESPHome device on the same Wi-Fi: a XIAO ESP32-S3 Plus on the TRMNL driver board. Home Assistant pushes the chosen entity states to it over the ESPHome API, and the ESP32 draws them on the 7.5 inch 800 by 480 e-paper panel every minute. The dashboard is powered from the trailer's 12 volt system through a USB-C adapter, with the kit's 2000 mAh battery as an optional backup. Everything works at the campsite without internet; the trailer's Home Assistant also mirrors the entities to the home Home Assistant over Tailscale.</desc>
   <defs>
     <style>
       .box{fill:#f8fafc;stroke:#334e68;stroke-width:3}
@@ -24,7 +24,7 @@
 
   <rect class="dev" x="40" y="190" width="230" height="90" rx="12"/>
   <text class="t" x="155" y="226" text-anchor="middle" style="font-size:17px">Tank monitor: main</text>
-  <text class="s" x="155" y="252" text-anchor="middle">mod 07, propane + grey</text>
+  <text class="s" x="155" y="252" text-anchor="middle">mod 07, propane</text>
 
   <rect class="dev" x="40" y="320" width="230" height="90" rx="12" stroke-dasharray="8 6"/>
   <text class="t" x="155" y="356" text-anchor="middle" style="font-size:17px">Tank monitor: fresh</text>

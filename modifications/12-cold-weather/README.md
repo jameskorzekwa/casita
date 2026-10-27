@@ -34,13 +34,13 @@ In order of importance. Items A, B and G are the minimum for a trip with water o
 
 ### A. Grey tank: 12 V heating pad under the tank, foam insulation, belly enclosure
 
-**Pad.** A 12 V thermostatic RV holding-tank pad (the Ultra-Heat / UltraHeat type: a thin silicone or vinyl heater with a built-in thermostat that closes at about 45 °F and opens at about 68 °F, applied to the tank bottom with its own adhesive). Pads come in sizes up to about 12 x 24 in; this tank's footprint is unknown but is large. Working from 32 gal at about 3.5 in inside height gives a footprint on the order of 2,100 in², roughly 36 x 60 in, so **two pads** spaced along the bottom are more likely than one. Measure the tank in Step 1 before choosing; the pads must also stay clear of the DYP L02 sensor spot from [mod 07](../07-tank-monitor/water-tanks.md#step-g1-measure-the-grey-tank-and-plan-the-cable-route), the drain fitting, and any support straps.
+**Pad.** A 12 V thermostatic RV holding-tank pad (the Ultra-Heat / UltraHeat type: a thin silicone or vinyl heater with a built-in thermostat that closes at about 45 °F and opens at about 68 °F, applied to the tank bottom with its own adhesive). Pads come in sizes up to about 12 x 24 in; this tank's footprint is unknown but is large. Working from 32 gal at about 3.5 in inside height gives a footprint on the order of 2,100 in², roughly 36 x 60 in, so **two pads** spaced along the bottom are more likely than one. Measure the tank in Step 1 before choosing; the pads must also stay clear of the DYP L02 sensor spot from [mod 07](../07-tank-monitor/water-tanks.md#step-g2-test-the-mopeka-under-the-grey-tank), the drain fitting, and any support straps.
 
 Pads of this type draw about 3-4 A each at 12 V when on. Two pads are 6-8 A, well inside the 10 A contact rating of the Waveshare board's spare relays from [mod 06](../06-smart-dc-switches/README.md), but mod 06's rule is that no trailer load goes directly on those relays until its rating is proven, so the pads are switched through an external automotive relay (Section [Wiring](#wiring)).
 
 Why 12 V, not 120 V pads: the pads must work on the inverter and off-grid, and a 12 V pad can be switched from Home Assistant without touching the AC side. On shore the converter carries the load anyway.
 
-**Insulation.** 1 in foil-faced polyisocyanurate board (about R-6) cut to the tank bottom with openings for the pads' lead exits, the L02 and the drain, plus strips around the tank sides. The foil faces the tank. Polyiso, not polystyrene: it tolerates the pad's surface temperature and does not crumble on the road.
+**Insulation.** 1 in foil-faced polyisocyanurate board (about R-6) cut to the tank bottom with openings for the pads' lead exits, the Mopeka grey sensor and the drain, plus strips around the tank sides. The foil faces the tank. Polyiso, not polystyrene: it tolerates the pad's surface temperature and does not crumble on the road.
 
 **Enclosure.** A sheet of 4 mm coroplast (or 0.025 in aluminum if the coroplast proves too flimsy) under the foam, screwed to the tank's steel support angles or the frame, never to the fiberglass shell, with the edges sealed to the floor with foam tape and a drip gap at the lowest point so any leak or condensation drains instead of pooling. The enclosure also protects the L02 and its cable from road spray, which mod 07 currently does with undercoating alone. Make the pan removable: the L02 and the pads will need attention at some point.
 
@@ -199,7 +199,7 @@ All on the trailer's Home Assistant. Thresholds are starting points.
 | Charge blocked | Battery temperature at or below 33 °F and shore connected (mod 10) or solar present | Notification: "batteries below the charge cutoff; warming" |
 | Shore budget | Mod 10 shore current above 26 A for 30 s | Turn off the space heater's smart plug; notify. Turn back on when below 20 A for 5 min |
 | Cabinet reminder | Fresh bay temperature below 40 °F at 21:00 | Notification: open the lower cabinet doors |
-| Heater interlock | Grey tank sensor online (mod 07) is off, or the grey tank is empty after a dump | Keep the tank heaters off unless the valve probe is below 36 °F; most pads are not rated to run on an empty tank for long (check the product) |
+| Heater interlock | The grey tank's Mopeka (mod 07) is unavailable or reads empty after a dump | Keep the tank heaters off unless the valve probe is below 36 °F; most pads are not rated to run on an empty tank for long (check the product) |
 
 The same entities are mirrored to the home Home Assistant over the existing link, so the freeze warnings reach a phone wherever it is.
 
@@ -207,7 +207,7 @@ The same entities are mirrored to the home Home Assistant over the existing link
 
 ### Phase 0: measure and decide (no purchases)
 
-1. **Grey tank:** outside length, width, height; where the support angles, straps, drain fitting and vent are; the flat area for the mod 07 L02; the wall thickness estimate from mod 07 Step G1. Photograph from below. Decide pad count and size, and the L02 spot, together.
+1. **Grey tank:** outside length, width, height; where the support angles, straps, drain fitting and vent are; the flat area for the mod 07 grey tank sensor (a Mopeka since 2026-10-27). Photograph from below. Decide pad count and size, and the L02 spot, together.
 2. **Termination assembly:** valve body make and size (Valterra T1003 class 3 in and T1001 class 1-1/2 in are typical; confirm), stub lengths from the floor to the valves, clearance for insulation around the handles.
 3. **Fresh tank bay:** whether it shares air with the cabin; where the fill, vent and drain penetrations are; whether the pump is at floor level.
 4. **Battery compartment:** inside dimensions, clearances around the busbars and fuses, whether the lid seals, cable route to the nearest XIAO for a probe.
@@ -222,10 +222,10 @@ The same entities are mirrored to the home Home Assistant over the existing link
 
 ### Phase 2: grey tank and drain protection
 
-10. With the mod 07 L02 glued and tested, clean the tank bottom and apply the pads per their instructions (surface above 50 °F, alcohol-cleaned, pressed firmly; a heat gun in cold weather).
+10. With the mod 07 Mopeka mounted and tested, clean the tank bottom and apply the pads per their instructions (surface above 50 °F, alcohol-cleaned, pressed firmly; a heat gun in cold weather).
 11. Wire the pads and the valve heater to relay 1 through the 10 A fuse; wire relay 1's coil to the Waveshare; flash the mod 06 firmware change. Test with the automation before any insulation goes on.
 12. Spiral the heat cable on the stubs and valves with foil tape; foam insulation over it; sleeve.
-13. Fit the polyiso to the tank bottom and sides, cut around the pads' leads, the L02, the drain and the probe; tape the joints.
+13. Fit the polyiso to the tank bottom and sides, cut around the pads' leads, the Mopeka (leave it reachable for its battery), the drain and the probe; tape the joints.
 14. Fit the belly pan to the supports and frame; seal the edges to the floor with foam tape, leaving the drip gap at the low point. Mark the pan "grey tank heater and sensors inside; remove before service".
 
 ### Phase 3: battery compartment
@@ -273,7 +273,7 @@ To be refined after the first cold trip:
 
 ## Open questions
 
-1. Grey tank footprint, support layout and L02 spot: one pad or two, and where. (Phase 0, item 1.)
+1. Grey tank footprint, support layout and Mopeka spot: one pad or two, and where. (Phase 0, item 1.)
 2. Where does the battery compartment probe connect: a cable from the mod 07 fresh device's XIAO in the rear passenger bay to the rear center compartment, a second small XIAO, or a spare input on the mod 06 Waveshare board (it has no spare DI, but 1-Wire needs a GPIO, not a DI)? Decide after Phase 0, item 4.
 3. Is mod 06 going to be installed before the first winter trip? If not, the fallback switches in [Wiring](#wiring) are used and the automations only alarm.
 4. Does the fresh tank bay need a vent for furnace air, or does it already share air with the cabin?
@@ -287,3 +287,4 @@ To be refined after the first cold trip:
 | --- | --- |
 | 2026-10-21 | Proposed. Plan written from `docs/trailer.md`, the owner's manual (winter precautions page 46, winterization page 36, LP regulator page 23), the Suburban furnace and water heater manuals, and mods 01, 03, 04, 06, 09 and 10. Nothing measured, ordered or built |
 | 2026-10-27 | References updated for the combined [mod 07 tank monitor](../07-tank-monitor/README.md) (mod 09 merged into it): the grey tank, valve and outside probes go on the main device's D1, the fresh bay probe on the fresh device's D1 |
+| 2026-10-27 | Mod 07's grey sensor is now a Mopeka (battery, Bluetooth): the belly pan must leave it reachable for battery changes, and the heater interlock watches the Mopeka's availability instead of an ESPHome online flag |

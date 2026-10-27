@@ -1,43 +1,35 @@
-# Casita tank monitor, MAIN device: two propane cylinders + the grey tank
+# Casita tank monitor, MAIN device: two propane cylinders
 #
 # One of the two ESPHome devices in mod 07 (tank monitor). A Seeed Studio
-# XIAO ESP32-S3 inside the trailer reads three ultrasonic sensors, each on its
-# own hardware UART:
+# XIAO ESP32-S3 inside the trailer reads two DYP-L062MTW-V1.0 ("UART
+# controlled") ultrasonic sensors held under the 20 lb propane cylinders,
+# each on its own hardware UART. They sleep until the ESP32 sends any byte,
+# then measure once and reply with a 10-byte frame (level in mm, temperature,
+# echo strength, tilt). Each cylinder is an instance of
+# packages/dyp-l06-propane.yaml.
 #
-#   Propane 1 and 2: DYP-L062MTW-V1.0 ("UART controlled") sensors held under
-#   the 20 lb cylinders. They sleep until the ESP32 sends any byte, then
-#   measure once and reply with a 10-byte frame (level in mm, temperature,
-#   echo strength, tilt). Each cylinder is an instance of
-#   packages/dyp-l06-propane.yaml.
-#
-#   Grey tank: a DYP-L023MUW-V1.0 ("UART automatic") sensor glued under the
-#   32 gal grey belly tank. It streams a 4-byte frame at 9600 baud once a
-#   second, the same frame as the DYP DS1603L, so ESPHome's built-in ds1603l
-#   platform reads it. Receive only: the sensor needs no TX line.
-#
-# The ESP32-S3 has three hardware UARTs; this device uses all three, which is
-# why the logger stays on the USB port (USB_SERIAL_JTAG).
-#
-# The fresh tank is the other device: casita-water-monitor-fresh.yaml.
+# The grey tank is NOT on this device: from 2026-10-27 it is read by a
+# battery-powered Mopeka Pro Check Universal over Bluetooth, straight into
+# Home Assistant (see ../water-tanks.md). A DYP L02 on the third UART was
+# tried and removed the same day. The fresh tank is the other ESPHome device:
+# casita-water-monitor-fresh.yaml.
 #
 # Powered from the trailer's 12 V through a 2 A inline fuse and a 5 V buck
-# regulator; the XIAO's 3.3 V pin powers all three sensors. No batteries.
+# regulator; the XIAO's 3.3 V pin powers both sensors. No batteries.
 # See ../README.md before flashing.
 #
 # Entity names omit the device name; Home Assistant prefixes them with the
-# friendly name, e.g. sensor.casita_tank_monitor_propane_1 and
-# sensor.casita_tank_monitor_grey_tank, the names the e-ink dashboard
-# (mod 08) uses.
+# friendly name, e.g. sensor.casita_tank_monitor_propane_1, the names the
+# e-ink dashboard (mod 08) uses.
 #
 # Pin map (XIAO ESP32-S3):
-#   D3 = GPIO4   grey L02 TX (yellow) -> ESP32 RX
 #   D4 = GPIO5   ESP32 TX -> propane 2 RX (yellow)
 #   D5 = GPIO6   propane 2 TX (green) -> ESP32 RX
 #   D6 = GPIO43  ESP32 TX -> propane 1 RX (yellow)
 #   D7 = GPIO44  propane 1 TX (green) -> ESP32 RX
 #   D1 = GPIO2   reserved for the mod 12 1-Wire temperature bus
 #   D2 = GPIO3   not used: ESP32-S3 strapping pin
-#   D0, D8, D9, D10 free
+#   D0, D3, D8, D9, D10 free (D3 and the third hardware UART are free)
 
 substitutions:
   name: casita-tank-monitor
@@ -55,17 +47,18 @@ substitutions:
   # ASSUMED, TO CONFIRM: press "Propane N Mark Full" on a full cylinder; the
   # value is stored in flash and this default is then ignored.
   full_level_mm: "280"
-
-  # --- Grey tank (DYP L02) ---
-  # Liquid height in mm that the sensor reports when the tank is full. The
-  # 32 gal tank measured about 4 in tall outside, so about 90 mm inside.
-  # ASSUMED, TO CONFIRM: set it from the first calibration fill or press
-  # "Grey Tank Mark Full"; the value is then stored in flash.
-  grey_full_level_mm: "90"
-  # Grey tank capacity in US gallons (32 gal on the 2026 17 ft).
-  grey_capacity_gal: "32"
-  # XIAO D3 = GPIO4 receives the L02's TX (yellow lead).
-  l02_rx_pin: GPIO4
+  # Jitter control near empty (see packages/dyp-l06-propane.yaml header).
+  # Measurements per read cycle, about a second apart.
+  samples_per_read: "5"
+  # Cycles a level about 2x the last one must persist before it is believed
+  # (a real refill rather than a double-bounce echo). Minutes, at read_interval.
+  double_hold_cycles: "5"
+  # Cycles of "no liquid" in a row before the level is shown as 0.
+  none_hold_cycles: "3"
+  # Minimum change, mm, before a new level is published.
+  publish_deadband_mm: "2"
+  # Echo strength, mV, at or above which "Coupling OK" is on.
+  coupling_ok_mv: "800"
 
 packages:
   propane1: !include
@@ -105,7 +98,8 @@ preferences:
   flash_write_interval: 1min
 
 logger:
-  # All three hardware UARTs are used for sensors; keep logging on USB.
+  # Both hardware UARTs on GPIO pins are used for the sensors; keep logging
+  # on the USB port.
   hardware_uart: USB_SERIAL_JTAG
   level: INFO
 
@@ -138,53 +132,6 @@ time:
   - platform: sntp
     id: sntp_time
 
-# ---------------------------------------------------------------------------
-# Grey tank: DYP-L02 on the third UART, 9600 8N1, streaming once a second
-# ---------------------------------------------------------------------------
-
-uart:
-  - id: uart_grey
-    rx_pin:
-      number: ${l02_rx_pin}
-      mode:
-        input: true
-        pullup: true
-    baud_rate: 9600
-    data_bits: 8
-    parity: NONE
-    stop_bits: 1
-
-globals:
-  # Seconds since the L02 last produced a frame, to detect a dead sensor.
-  - id: grey_silent_s
-    type: int
-    restore_value: false
-    initial_value: "0"
-
-number:
-  - platform: template
-    name: "Grey Tank Full Level"
-    id: grey_full_level
-    icon: mdi:ruler
-    unit_of_measurement: mm
-    min_value: 30
-    max_value: 400
-    step: 1
-    initial_value: ${grey_full_level_mm}
-    restore_value: true
-    optimistic: true
-    entity_category: config
-    mode: box
-    on_value:
-      # Recompute the percentage right away with the new calibration.
-      - lambda: |-
-          if (id(grey_level).has_state() && !std::isnan(id(grey_level).state) && x > 0) {
-            float pct = id(grey_level).state / x * 100.0f;
-            pct = std::max(0.0f, std::min(100.0f, pct));
-            id(grey_percent).publish_state(pct);
-            id(grey_volume).publish_state(pct / 100.0f * ${grey_capacity_gal});
-          }
-
 button:
   - platform: template
     name: "Read Propane Now"
@@ -193,87 +140,11 @@ button:
     on_press:
       - script.execute: read_propane1
       - script.execute: read_propane2
-  - platform: template
-    name: "Grey Tank Mark Full"
-    icon: mdi:water-alert
-    entity_category: config
-    on_press:
-      - lambda: |-
-          float level = id(grey_level).state;
-          if (!id(grey_level).has_state() || std::isnan(level) || level < 30.0f) {
-            ESP_LOGW("grey", "Mark Full ignored: no valid level reading (%.0f mm)", level);
-            return;
-          }
-          ESP_LOGI("grey", "Full level set to %.0f mm", level);
-          auto call = id(grey_full_level).make_call();
-          call.set_value(level);
-          call.perform();
   - platform: restart
     name: "Restart"
     entity_category: diagnostic
 
-binary_sensor:
-  - platform: template
-    name: "Grey Tank Sensor Online"
-    id: grey_online
-    device_class: connectivity
-    entity_category: diagnostic
-
 sensor:
-  - platform: ds1603l
-    # Reads the DYP-L02's 4-byte frame: FF, mm high, mm low, checksum.
-    uart_id: uart_grey
-    name: "Grey Tank Level"
-    id: grey_level
-    icon: mdi:waves-arrow-up
-    unit_of_measurement: mm
-    accuracy_decimals: 0
-    entity_category: diagnostic
-    filters:
-      # 0 mm means no echo: below the dead zone (empty), no couplant, or the
-      # sensor has come off the tank. Report it as 0 so the tank reads empty.
-      - median:
-          window_size: 7
-          send_every: 5
-          send_first_at: 1
-      - delta: 1.0
-    on_raw_value:
-      - lambda: |-
-          id(grey_silent_s) = 0;
-          if (!id(grey_online).has_state() || !id(grey_online).state) {
-            id(grey_online).publish_state(true);
-          }
-    on_value:
-      - lambda: |-
-          float full = id(grey_full_level).state;
-          if (std::isnan(x) || std::isnan(full) || full <= 0) {
-            id(grey_percent).publish_state(NAN);
-            id(grey_volume).publish_state(NAN);
-            return;
-          }
-          float pct = x / full * 100.0f;
-          pct = std::max(0.0f, std::min(100.0f, pct));
-          id(grey_percent).publish_state(pct);
-          id(grey_volume).publish_state(pct / 100.0f * ${grey_capacity_gal});
-
-  - platform: template
-    # The value the e-ink dashboard and Home Assistant alerts use.
-    name: "Grey Tank"
-    id: grey_percent
-    icon: mdi:water-opacity
-    unit_of_measurement: "%"
-    accuracy_decimals: 0
-    state_class: measurement
-
-  - platform: template
-    name: "Grey Tank Volume"
-    id: grey_volume
-    icon: mdi:water-opacity
-    unit_of_measurement: gal
-    accuracy_decimals: 1
-    state_class: measurement
-
-  # ----- Device -----
   - platform: wifi_signal
     name: "Wi-Fi Signal"
     update_interval: 60s
@@ -293,16 +164,3 @@ interval:
     then:
       - script.execute: read_propane1
       - script.execute: read_propane2
-  # The L02 streams every second. If nothing valid arrives for 30 s the
-  # sensor, its cable or its power is gone: mark it offline and clear the
-  # readings so Home Assistant shows "unknown" instead of a stale level.
-  - interval: 1s
-    then:
-      - lambda: |-
-          id(grey_silent_s) += 1;
-          if (id(grey_silent_s) == 30) {
-            ESP_LOGW("grey", "No frame from the L02 for 30 s");
-            id(grey_online).publish_state(false);
-            id(grey_percent).publish_state(NAN);
-            id(grey_volume).publish_state(NAN);
-          }

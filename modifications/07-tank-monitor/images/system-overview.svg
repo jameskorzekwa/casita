@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="720" viewBox="0 0 1100 720" role="img" aria-labelledby="title desc">
   <title id="title">Casita tank monitor: system overview (two devices)</title>
-  <desc id="desc">Two ESPHome devices. Main device, casita-tank-monitor: two DYP L06 ultrasonic sensors held magnetically under the two 20 pound propane cylinders on the tongue, and a DYP L02 ultrasonic sensor glued under the 32 gallon grey belly tank, all wired to one enclosure inside the trailer near the front holding a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from a fused 12 volt circuit. The propane sensors use 115200 baud UARTs and the grey sensor a 9600 baud UART, three hardware UARTs in all. Fresh device, casita-water-monitor-fresh: a Garnet SeeLeveL 710-ES3 sender on the side of the 23 gallon fresh tank, wired to an enclosure in the fresh tank bay holding a three-transistor interface, a buck regulator and a second XIAO ESP32-S3, powered from the water pump circuit. Both devices publish over Wi-Fi to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a third device like the fresh one.</desc>
+  <desc id="desc">Two ESPHome devices and one Bluetooth sensor. Main device, casita-tank-monitor: two DYP L06 ultrasonic sensors held magnetically under the two 20 pound propane cylinders on the tongue, wired to one enclosure inside the trailer near the front holding a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from a fused 12 volt circuit, on two 115200 baud UARTs. Grey tank: a battery-powered Mopeka Pro Check Universal ultrasonic sensor in a collar under the 32 gallon grey belly tank, broadcasting over Bluetooth straight to the trailer Home Assistant. Fresh device, casita-water-monitor-fresh: a Garnet SeeLeveL 710-ES3 sender on the side of the 23 gallon fresh tank, wired to an enclosure in the fresh tank bay holding a three-transistor interface, a buck regulator and a second XIAO ESP32-S3, powered from the water pump circuit. Both devices publish over Wi-Fi to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a third device like the fresh one.</desc>
   <defs>
     <style>
       .lp{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
@@ -33,39 +33,42 @@
   <rect class="lp" x="30" y="125" width="200" height="80" rx="16"/>
   <text class="t" x="130" y="157" text-anchor="middle">Propane 2</text>
   <text class="s" x="130" y="183" text-anchor="middle">20 lb, L06 underneath</text>
-  <rect class="grey" x="30" y="220" width="200" height="90" rx="16"/>
-  <text class="t" x="130" y="252" text-anchor="middle">Grey tank</text>
-  <text class="s" x="130" y="276" text-anchor="middle">32 gal belly tank</text>
-  <text class="s" x="130" y="298" text-anchor="middle">L02 glued underneath</text>
-  <rect class="pwrsrc" x="30" y="325" width="200" height="60" rx="12"/>
-  <text class="t" x="130" y="351" text-anchor="middle">12 V, fused</text>
-  <text class="s" x="130" y="373" text-anchor="middle">front circuit, 2 A inline</text>
+  <rect class="pwrsrc" x="30" y="225" width="200" height="60" rx="12"/>
+  <text class="t" x="130" y="251" text-anchor="middle">12 V, fused</text>
+  <text class="s" x="130" y="273" text-anchor="middle">front circuit, 2 A inline</text>
 
-  <rect class="housing" x="290" y="20" width="480" height="370" rx="20"/>
+  <rect class="housing" x="290" y="20" width="480" height="300" rx="20"/>
   <text class="t" x="530" y="52" text-anchor="middle" style="font-size:17px">Main device: enclosure inside, near the front</text>
 
-  <rect class="reg" x="320" y="300" width="180" height="70" rx="12"/>
-  <text class="t" x="410" y="328" text-anchor="middle">Buck regulator</text>
-  <text class="s" x="410" y="352" text-anchor="middle">12 V to 5 V, 470 uF in</text>
+  <rect class="reg" x="320" y="230" width="180" height="70" rx="12"/>
+  <text class="t" x="410" y="258" text-anchor="middle">Buck regulator</text>
+  <text class="s" x="410" y="282" text-anchor="middle">12 V to 5 V, 470 uF in</text>
 
-  <rect class="esp" x="560" y="75" width="190" height="295" rx="12"/>
+  <rect class="esp" x="560" y="75" width="190" height="225" rx="12"/>
   <text class="t" x="655" y="106" text-anchor="middle">XIAO ESP32-S3</text>
   <text class="s" x="655" y="130" text-anchor="middle">casita-tank-monitor</text>
   <text class="s" x="655" y="162" text-anchor="middle">D6/D7: propane 1</text>
   <text class="s" x="655" y="186" text-anchor="middle">D4/D5: propane 2</text>
-  <text class="s" x="655" y="210" text-anchor="middle">D3: grey (RX only)</text>
-  <text class="s" x="655" y="242" text-anchor="middle">3 hardware UARTs</text>
-  <text class="s" x="655" y="266" text-anchor="middle">3V3 powers all three</text>
-  <text class="s" x="655" y="298" text-anchor="middle">local web page</text>
+  <text class="s" x="655" y="218" text-anchor="middle">2 hardware UARTs</text>
+  <text class="s" x="655" y="242" text-anchor="middle">3V3 powers both</text>
+  <text class="s" x="655" y="274" text-anchor="middle">local web page</text>
 
   <path class="w lpw" d="M230 70 H560"/>
   <path class="w lpw" d="M230 165 H300 V180 H560"/>
   <text class="s" x="400" y="95" text-anchor="middle">115200 baud, about 3 m</text>
-  <path class="w uart" d="M230 265 H300 V225 H560"/>
-  <text class="s" x="415" y="252" text-anchor="middle">9600 baud, longer run</text>
-  <path class="w pwr" d="M230 355 H320"/>
-  <path class="w pwr" d="M500 335 H560"/>
-  <text class="s" x="530" y="326" text-anchor="middle">5 V</text>
+  <path class="w pwr" d="M230 255 H320"/>
+  <path class="w pwr" d="M500 265 H560"/>
+  <text class="s" x="530" y="256" text-anchor="middle">5 V</text>
+
+  <!-- ============ Grey tank: Mopeka ============ -->
+  <rect class="grey" x="30" y="335" width="200" height="70" rx="16"/>
+  <text class="t" x="130" y="362" text-anchor="middle">Grey tank</text>
+  <text class="s" x="130" y="386" text-anchor="middle">32 gal belly, ~4 in tall</text>
+  <rect class="housing" x="290" y="335" width="480" height="70" rx="20"/>
+  <text class="t" x="530" y="362" text-anchor="middle" style="font-size:17px">Mopeka Pro Check Universal under the tank</text>
+  <text class="s" x="530" y="388" text-anchor="middle">coin cell; Bluetooth straight to Home Assistant</text>
+  <path class="w uart" d="M230 370 H290"/>
+  <path class="w rf" d="M770 370 H812 V240 H830" marker-end="url(#arrow)"/>
 
   <!-- ============ Fresh device ============ -->
   <rect class="tank" x="30" y="420" width="200" height="130" rx="16"/>
@@ -111,11 +114,12 @@
   <!-- ============ Home Assistant ============ -->
   <rect class="ha" x="830" y="150" width="240" height="120" rx="16"/>
   <text class="t" x="950" y="190" text-anchor="middle" style="font-size:17px">Trailer Home Assistant</text>
-  <text class="s" x="950" y="216" text-anchor="middle">two ESPHome devices</text>
+  <text class="s" x="950" y="216" text-anchor="middle">ESPHome API + Mopeka</text>
   <text class="s" x="950" y="240" text-anchor="middle">%, lb, gal, alerts</text>
   <path class="w rf" d="M750 200 H830" marker-end="url(#arrow)"/>
-  <path class="w rf" d="M750 540 H800 V240 H830" marker-end="url(#arrow)"/>
+  <path class="w rf" d="M750 540 H800 V250 H830" marker-end="url(#arrow)"/>
   <text class="s" x="790" y="190" text-anchor="middle">Wi-Fi</text>
+  <text class="s" x="812" y="310" text-anchor="end">BLE</text>
 
   <rect class="ha" x="830" y="330" width="240" height="90" rx="16"/>
   <text class="t" x="950" y="366" text-anchor="middle">E-ink dashboard</text>
