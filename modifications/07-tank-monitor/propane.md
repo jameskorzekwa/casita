@@ -220,7 +220,18 @@ The main device is installed and in Home Assistant ([Steps M3 and M4](README.md#
 
 ## Firmware and Home Assistant
 
-The propane sensors are read by the main device's configuration, [`esphome/casita-tank-monitor.yaml`](esphome/casita-tank-monitor.yaml), which includes [`esphome/packages/dyp-l06-propane.yaml`](esphome/packages/dyp-l06-propane.yaml) once per cylinder. How a reading works (`read_propaneN` script): flush the UART receive buffer, send one byte (`0x55`), wait 900 ms, read everything received, find the last 10-byte frame that starts with `0xFF` and whose last byte equals the low 8 bits of the sum of the other nine, then decode it. The frame layout and worked example are in the package file's header comment, copied from the DYP datasheet (section 2.2). Three consecutive bad or missing frames set the cylinder's entities to unknown.
+The propane sensors are read by the main device's configuration, [`esphome/casita-tank-monitor.yaml`](esphome/casita-tank-monitor.yaml), which includes [`esphome/packages/dyp-l06-propane.yaml`](esphome/packages/dyp-l06-propane.yaml) once per cylinder.
+
+**One sample:** flush the UART receive buffer, send one byte (`0x55`), wait 900 ms, read everything received, find the last 10-byte frame that starts with `0xFF` and whose last byte equals the low 8 bits of the sum of the other nine, then decode it. The frame layout and worked example are in the package file's header comment, copied from the DYP datasheet (section 2.2).
+
+**One read cycle (every minute):** five samples about a second apart, reduced to one level. This exists because a nearly empty cylinder, with 40-80 mm of liquid just above the sensor's 30 mm blind zone, makes the L06 flip between the true surface echo and the echo that has bounced surface-bottom-surface, which reads as almost exactly twice the height (37 then 74 mm, 41 then 82 mm, seen 2026-10-27). A double bounce is always higher, never lower, so:
+
+1. Any sample that is about twice another sample in the cycle (within 6 mm or 8%) is dropped; the level is the median of the rest.
+2. If the whole cycle comes out at about twice the last accepted level, the last level is held. If that happens 5 cycles in a row with nothing near the old level, the new one is accepted: that is a refill, not a bounce.
+3. Three consecutive "no liquid" cycles are needed before the level shows 0, so a level sitting on the blind zone does not flicker between 0 and 35 mm.
+4. The level is published only when it moves by 2 mm or more. Temperature, echo strength and tilt are the cycle's medians.
+
+The raw samples of the last cycle are in **Propane N Samples** (diagnostic), so the filter can be checked against what the sensor said. **Propane N Coupling OK** is on while echo strength is at least 800 mV. Three cycles without any valid frame set the cylinder's entities to unknown. Because of rule 2, **wait at least five minutes after a refill before pressing Mark Full**, or check that the level has moved first.
 
 Entities, the dashboard card and the low-propane alert are in the README's [Home Assistant setup](README.md#home-assistant-setup).
 
@@ -243,6 +254,9 @@ Entities, the dashboard card and the low-propane alert are in the README's [Home
 | Liquid Detected off and Echo Strength near 0 on a tank you know has gas | Sensor not coupled: grease film dried or squeezed out, collar moved, dirt under it, or (epoxy) a gap | Pull the collar, clean, fresh grease, re-seat; if the collar keeps moving, add a strip of foam under it or fall back to epoxy |
 | Liquid Detected off, Echo Strength normal | Less than 30 mm of liquid | The tank is nearly empty |
 | Level jumps between two values | Sensor near the edge of the dome, or the tank is tilted | Check Tilt; re-position closer to the center |
+| **Samples** show a value and about its double (e.g. `43,74,41,43,42`) | Double-bounce echo on a nearly empty cylinder; the filter keeps the lower value | Nothing to fix; refill when convenient |
+| Level stays put for a few minutes after a refill | The double-bounce hold (a reading about 2x the old level is held for 5 cycles) | Wait five minutes, then Mark Full |
+| **Coupling OK** off | Echo strength under 800 mV: no grease, air gap, flange instead of boss against the tank, or off the dome's centre | Re-seat per Step P4 |
 | Percentage over 100% after a fill | Full Level is too low (different fill level than last time) | Press Mark Full again on the new fill |
 | Readings drift a few percent over the day with no use | Thermal expansion of the propane | Expected; compare readings at similar temperatures |
 | Entities unknown after a tow | A connector pulled apart | Re-connect; add strain relief |

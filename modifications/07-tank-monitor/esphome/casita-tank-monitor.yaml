@@ -47,6 +47,18 @@ substitutions:
   # ASSUMED, TO CONFIRM: press "Propane N Mark Full" on a full cylinder; the
   # value is stored in flash and this default is then ignored.
   full_level_mm: "280"
+  # Jitter control near empty (see packages/dyp-l06-propane.yaml header).
+  # Measurements per read cycle, about a second apart.
+  samples_per_read: "5"
+  # Cycles a level about 2x the last one must persist before it is believed
+  # (a real refill rather than a double-bounce echo). Minutes, at read_interval.
+  double_hold_cycles: "5"
+  # Cycles of "no liquid" in a row before the level is shown as 0.
+  none_hold_cycles: "3"
+  # Minimum change, mm, before a new level is published.
+  publish_deadband_mm: "2"
+  # Echo strength, mV, at or above which "Coupling OK" is on.
+  coupling_ok_mv: "800"
 
 packages:
   propane1: !include
