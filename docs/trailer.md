@@ -12,11 +12,11 @@ What is installed on the trailer, with the source of each fact. "To confirm" mea
 | Dry weight | About 2,480 lb (17' Deluxe) | Dealer listings; weigh the actual trailer |
 | Dry tongue weight | Not published; owners report 350-450 lb loaded | To measure |
 | Length / width | 204 in (17 ft) / 80 in | Dealer listings |
-| Fresh water | 16 gal, tank 12 in tall (natural polyethylene, rear passenger side bay) | Owner manual (16 gal); height measured by owner 2026-10 |
-| Grey water | 32 gal, belly tank under the floor, about 4 in tall, black polyethylene | Casita store (32 gal); height from an owner video, to confirm |
-| Black water | 15 gal, under the toilet | Owner manual |
-| Tank monitor | None from the factory; [mod 09](../modifications/09-water-tank-monitor/README.md) adds fresh and grey sensors | Owner reports |
-| Propane | 2 x 20 lb tanks | |
+| Fresh water | 23 gal, tank 12 in tall (natural polyethylene, inside, rear passenger side bay) | Owner, 2026-10-27. Supersedes the 25 gal recorded 2026-10-21, which came from the owner's manual ("the Casitas come with a 16 gallon fresh water tank; only the 17' has the option of a 25 gallon tank"); the manual's figures are generic, the owner's 23 gal is the value used. Height measured by owner 2026-10. Confirm capacity with a measured fill during the [mod 07](../modifications/07-tank-monitor/water-tanks.md#calibrate) calibration |
+| Grey water | 32 gal, belly tank under the floor, about 4 in tall, black polyethylene, not enclosed or insulated | Owner, 2026-10-21, and Casita store (32 gal). Height from an owner video, to confirm. The only tank exposed to outside air; see [mod 12](../modifications/12-cold-weather/README.md) |
+| Black water | 15 gal, inside, under the toilet; 3 in ABS drain to the termination valve under the trailer | Owner manual; location confirmed by owner 2026-10-21 |
+| Tank monitor | None from the factory; [mod 07](../modifications/07-tank-monitor/README.md) adds propane and fresh sensors on two ESPHome devices and a Mopeka Bluetooth sensor on the grey tank | Owner reports |
+| Propane | 2 x 20 lb tanks | Level monitor: [mod 07](../modifications/07-tank-monitor/README.md) (device installed 2026-10-27, sensors being seated) |
 | Microwave | None | Owner |
 
 ## Tow Vehicle
@@ -40,6 +40,7 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | Shore-only breaker box | SYIZYEN HT-5 DIN enclosure: 30 A US Breaker C60X1C30 (to TS-30), 2 x 20 A CHTAIXI C20 (converter, water heater element) | Next to the WFCO under the seat by the sink |
 | Former inverted outlets | 2 outlets, factory-wired from the inverter's hardwire terminal | Now on the WFCO's former water heater 20 A breaker (12 AWG), so they work on shore and inverter |
 | Power center | WFCO WF-8900-AD series (auto-detect lithium/lead-acid), 55 A converter | Exact model (for example WF-8955-AD) to confirm |
+| DC rocker panel | Nilight logo visible; exact model unknown | Owner confirmed DC rockers, 2026-10-13. Photo description: four illuminated rocker switches and digital readout apparently 13.5 V. Cutout, rear pinout, load identities, currents, and fuse sizes unknown. [Mod 06](../modifications/06-smart-dc-switches/README.md): four BANDC momentary rockers and a Waveshare ESP32-S3-POE-ETH-8DI-8RO in the adjacent cabinet, installed 2026-10-23; two switches run the LED light circuits, two are spares; voltmeter retained |
 | WFCO breakers | 30 A main (fed from the TS-30) and five 20 A branches | The former converter breaker now feeds only the sink and door outlets; the former water heater breaker feeds the former inverted outlets. A/C breaker size to confirm |
 | Shore power | 30 A, 25 ft 10-gauge cord | Casita FAQ |
 | Solar | 200 W portable suitcase panel with its own controller | Factory. Set the controller to lithium |

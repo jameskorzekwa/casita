@@ -1,0 +1,178 @@
+# Casita tank monitor, FRESH tank device (Garnet SeeLeveL sender)
+#
+# One of the two ESPHome devices in mod 07 (tank monitor), each with its own
+# XIAO ESP32-S3, 12 V to 5 V buck regulator and enclosure. This one sits in the
+# fresh tank bay and reads a Garnet SeeLeveL II 710-ES3 capacitive sender
+# stuck to the outside of the 23 gal fresh tank. The sender has two wires
+# (blue data, black ground) and speaks Garnet's pulse protocol, so the ESP32
+# talks to it through a small three-transistor interface circuit (see
+# ../water-tanks.md "SeeLeveL interface") using the open-source esphome-seelevel
+# component.
+#
+# The propane cylinders and the grey tank are on the main device:
+# casita-tank-monitor.yaml.
+#
+# Powered from the trailer's 12 V water pump circuit through a 2 A inline
+# fuse and a 5 V buck regulator; there are no batteries. See ../README.md
+# before flashing.
+#
+# Entity names omit the device name; Home Assistant prefixes them with the
+# friendly name, so "Tank" becomes sensor.casita_water_monitor_fresh_tank.
+# The e-ink dashboard (mod 08) uses:
+#   sensor.casita_water_monitor_fresh_tank   (% full)  <- this device
+#   sensor.casita_water_monitor_black_tank   (% full, future black device)
+
+substitutions:
+  name: casita-water-monitor-fresh
+  friendly_name: Casita Water Monitor Fresh
+
+  # Number of segmented pads left on the sender after cutting it to the tank.
+  # A 12 in tall tank with 1/2 in gaps top and bottom takes 8 pads (about
+  # 10.8 in). The sender reports 10 segments regardless; the missing ones
+  # read 255 and are ignored. Set this to the pads you actually kept.
+  fresh_segments: 8
+  # Seconds between sender polls. Each poll powers the sender for about 15 ms.
+  fresh_update_interval: 30s
+  # XIAO D4 = GPIO5 drives the interface TX; D5 = GPIO6 reads RX.
+  seelevel_tx_pin: GPIO5
+  seelevel_rx_pin: GPIO6
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: seeed_xiao_esp32s3
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+
+external_components:
+  # Garnet SeeLeveL sender transceiver and sensors (MIT, j9brown).
+  - source: github://j9brown/esphome-seelevel@main
+    components: [seelevel]
+    refresh: 1d
+
+logger:
+  # Keep logging on the USB port.
+  hardware_uart: USB_SERIAL_JTAG
+  level: INFO
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Casita Fresh Fallback"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+web_server:
+  port: 80
+  version: 3
+  auth:
+    type: digest
+    username: !secret web_username
+    password: !secret web_password
+
+time:
+  - platform: sntp
+    id: sntp_time
+
+# ---------------------------------------------------------------------------
+# SeeLeveL sender through the interface circuit
+# ---------------------------------------------------------------------------
+
+seelevel:
+  id: seelevel_bus
+  tx_pin: ${seelevel_tx_pin}
+  rx_pin:
+    number: ${seelevel_rx_pin}
+    mode:
+      input: true
+      pullup: true
+
+button:
+  - platform: restart
+    name: "Restart"
+    entity_category: diagnostic
+
+sensor:
+  - platform: seelevel
+    seelevel_id: seelevel_bus
+    # Tank 1 = fresh: a sender with no programming tabs cut.
+    tank: 1
+    segments: ${fresh_segments}
+    update_interval: ${fresh_update_interval}
+    level:
+      # Raw level, 0 to fresh_segments, in sender segments. Diagnostic.
+      name: "Tank Level"
+      id: fresh_level
+      icon: mdi:waves-arrow-up
+      unit_of_measurement: seg
+      accuracy_decimals: 2
+      entity_category: diagnostic
+      on_value:
+        - lambda: |-
+            if (std::isnan(x)) {
+              id(fresh_percent).publish_state(NAN);
+              return;
+            }
+            float pct = x / ${fresh_segments}.0f * 100.0f;
+            pct = std::max(0.0f, std::min(100.0f, pct));
+            id(fresh_percent).publish_state(pct);
+    volume:
+      name: "Tank Volume"
+      icon: mdi:water
+      unit_of_measurement: gal
+      accuracy_decimals: 1
+      # Linear map, which assumes a tank of constant cross-section. Add
+      # intermediate points if a calibration fill shows otherwise.
+      map:
+        - level: 0.0
+          volume: 0 gal
+        # Keep level equal to fresh_segments above and volume equal to the tank
+        # capacity: 23 gal (owner, 2026-10-27; supersedes the 25 gal taken
+        # from the owner's manual). Confirm with the
+        # calibration fill. Substitutions cannot be used here: the map wants
+        # real numbers.
+        - level: 8.0
+          volume: 23 gal
+      filters:
+        - delta: 0.2
+    segment_data:
+      # The ten raw segment values, top to bottom, for calibration and
+      # troubleshooting. 255 = segment cut off (or saturated), 0 = no water.
+      name: "Tank Segment Data"
+      entity_category: diagnostic
+
+  - platform: template
+    # The value the e-ink dashboard and Home Assistant alerts use.
+    name: "Tank"
+    id: fresh_percent
+    icon: mdi:water
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    state_class: measurement
+
+  - platform: wifi_signal
+    name: "Wi-Fi Signal"
+    update_interval: 60s
+    entity_category: diagnostic
+  - platform: uptime
+    name: "Uptime"
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic

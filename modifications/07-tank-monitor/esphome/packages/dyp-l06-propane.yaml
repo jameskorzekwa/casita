@@ -1,0 +1,371 @@
+# One DYP-L062MTW-V1.0 propane cylinder sensor on its own UART.
+#
+# Included once per cylinder from casita-tank-monitor.yaml with these vars:
+#   tank    - "1" or "2"; used in ids and entity names ("Propane 1 ...")
+#   tx_pin  - ESP32 pin wired to the sensor's yellow RX lead
+#   rx_pin  - ESP32 pin wired to the sensor's green TX lead
+# and these substitutions from the device file:
+#   samples_per_read, double_hold_cycles, none_hold_cycles,
+#   publish_deadband_mm, coupling_ok_mv, tank_capacity_lb, full_level_mm
+#
+# Protocol (DYP L06 datasheet, section 2.2 "UART controlled output"):
+#   - 115200 baud, 8N1, 3.3 V TTL.
+#   - Any byte on the sensor's RX wakes it and triggers one measurement.
+#     Trigger period must be more than 750 ms.
+#   - About 730 ms later the sensor sends 10 bytes:
+#       FF, LEVEL_H, LEVEL_L, TEMP_H, TEMP_L, RSSI_H, RSSI_L, ANGLE_H, ANGLE_L, SUM
+#     LEVEL  liquid height above the sensor, mm (0xFFFD = no liquid detected)
+#     TEMP   signed, 0.1 degC
+#     RSSI   echo strength, mV, 0-1500 (bigger is better)
+#     ANGLE  sensor tilt from horizontal, 0.1 degrees
+#     SUM    low 8 bits of the sum of the previous 9 bytes
+#   Example: FF 00 A0 01 38 05 DB 00 30 E8 = 160 mm, 31.2 degC, 1499 mV, 4.8 deg
+#
+# Reading strategy (added 2026-10-27 after watching two nearly empty cylinders):
+# with only 40-80 mm of liquid, right above the sensor's 30 mm blind zone, the
+# sensor flips between the true surface echo and the echo that has bounced
+# surface-bottom-surface, which reads as almost exactly twice the height
+# (37 -> 74 mm, 41 -> 82 mm were seen). So each read cycle:
+#   1. takes samples_per_read measurements about a second apart;
+#   2. drops any sample that is about 2x another sample in the set (a double
+#      bounce is always higher, never lower), then takes the median;
+#   3. if the cycle's result is about 2x the last accepted level, holds the
+#      last level instead, unless that happens double_hold_cycles times in a
+#      row with nothing near the old level (then it is a real refill);
+#   4. needs none_hold_cycles consecutive "no liquid" cycles before reporting
+#      0, so a level sitting on the blind zone does not flicker 0 <-> 35;
+#   5. publishes only when the level moves by publish_deadband_mm or more.
+# Temperature, echo strength and tilt are the cycle medians. "Coupling OK"
+# is echo strength >= coupling_ok_mv (DYP's good examples are about 1500 mV;
+# 200-500 mV gave garbage heights on 2026-10-27).
+
+uart:
+  - id: uart_propane${tank}
+    tx_pin: ${tx_pin}
+    rx_pin:
+      number: ${rx_pin}
+      mode:
+        input: true
+        pullup: true
+    baud_rate: 115200
+    data_bits: 8
+    parity: NONE
+    stop_bits: 1
+    rx_buffer_size: 256
+
+globals:
+  # Consecutive read cycles without a valid frame. After 3 the cylinder's
+  # sensors are set to unknown so a dead sensor or cable is obvious.
+  - id: propane${tank}_fail_count
+    type: int
+    restore_value: false
+    initial_value: "0"
+  # Samples collected in the current read cycle (see the header).
+  - id: propane${tank}_n
+    type: int
+    restore_value: false
+    initial_value: "0"
+  - id: propane${tank}_s_level
+    type: float[${samples_per_read}]
+    restore_value: false
+  - id: propane${tank}_s_temp
+    type: float[${samples_per_read}]
+    restore_value: false
+  - id: propane${tank}_s_rssi
+    type: float[${samples_per_read}]
+    restore_value: false
+  - id: propane${tank}_s_tilt
+    type: float[${samples_per_read}]
+    restore_value: false
+  # Last accepted level in mm (0 = empty / none, NAN = nothing yet).
+  - id: propane${tank}_last_good
+    type: float
+    restore_value: false
+    initial_value: "NAN"
+  # Consecutive cycles that looked like a double bounce of last_good.
+  - id: propane${tank}_hold_n
+    type: int
+    restore_value: false
+    initial_value: "0"
+  # Consecutive cycles with no liquid detected.
+  - id: propane${tank}_none_n
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+number:
+  - platform: template
+    name: "Propane ${tank} Full Level"
+    id: propane${tank}_full_level
+    icon: mdi:ruler
+    unit_of_measurement: mm
+    min_value: 50
+    max_value: 1000
+    step: 1
+    initial_value: ${full_level_mm}
+    restore_value: true
+    optimistic: true
+    entity_category: config
+    mode: box
+    on_value:
+      # Recompute the percentage right away with the new calibration.
+      - lambda: |-
+          if (id(propane${tank}_level).has_state() && !std::isnan(id(propane${tank}_level).state) && x > 0) {
+            float pct = id(propane${tank}_level).state / x * 100.0f;
+            pct = std::max(0.0f, std::min(100.0f, pct));
+            id(propane${tank}_percent).publish_state(pct);
+            id(propane${tank}_remaining).publish_state(pct / 100.0f * ${tank_capacity_lb});
+          }
+
+button:
+  - platform: template
+    name: "Propane ${tank} Mark Full"
+    icon: mdi:propane-tank
+    entity_category: config
+    on_press:
+      - lambda: |-
+          float level = id(propane${tank}_level).state;
+          if (!id(propane${tank}_level).has_state() || std::isnan(level) || level < 50.0f) {
+            ESP_LOGW("propane${tank}", "Mark Full ignored: no valid level reading (%.0f mm)", level);
+            return;
+          }
+          ESP_LOGI("propane${tank}", "Full level set to %.0f mm", level);
+          auto call = id(propane${tank}_full_level).make_call();
+          call.set_value(level);
+          call.perform();
+
+binary_sensor:
+  - platform: template
+    name: "Propane ${tank} Liquid Detected"
+    id: propane${tank}_liquid
+    icon: mdi:water-check
+    entity_category: diagnostic
+  - platform: template
+    # Echo strength at or above coupling_ok_mv: the probe face is seated on
+    # the steel with couplant. Off means re-seat it (see ../../propane.md).
+    name: "Propane ${tank} Coupling OK"
+    id: propane${tank}_coupling
+    icon: mdi:connection
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: template
+    # The raw levels of the last cycle, for checking the filter; "none" = no
+    # liquid detected, "-" = no frame.
+    name: "Propane ${tank} Samples"
+    id: propane${tank}_samples
+    icon: mdi:format-list-numbered
+    entity_category: diagnostic
+
+sensor:
+  - platform: template
+    name: "Propane ${tank}"
+    id: propane${tank}_percent
+    icon: mdi:propane-tank
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    state_class: measurement
+  - platform: template
+    name: "Propane ${tank} Remaining"
+    id: propane${tank}_remaining
+    icon: mdi:weight-pound
+    unit_of_measurement: lb
+    accuracy_decimals: 1
+    state_class: measurement
+  - platform: template
+    name: "Propane ${tank} Liquid Level"
+    id: propane${tank}_level
+    icon: mdi:waves-arrow-up
+    unit_of_measurement: mm
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+  - platform: template
+    name: "Propane ${tank} Temperature"
+    id: propane${tank}_temperature
+    device_class: temperature
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    state_class: measurement
+  - platform: template
+    name: "Propane ${tank} Echo Strength"
+    id: propane${tank}_echo
+    icon: mdi:signal
+    unit_of_measurement: mV
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+  - platform: template
+    name: "Propane ${tank} Tilt"
+    id: propane${tank}_tilt
+    icon: mdi:angle-acute
+    unit_of_measurement: "°"
+    accuracy_decimals: 1
+    state_class: measurement
+    entity_category: diagnostic
+
+script:
+  - id: read_propane${tank}
+    mode: single
+    then:
+      - lambda: |-
+          id(propane${tank}_n) = 0;
+      - repeat:
+          count: ${samples_per_read}
+          then:
+            # Drop anything left in the receive buffer from a previous reading.
+            - lambda: |-
+                uint8_t b;
+                while (id(uart_propane${tank}).available()) id(uart_propane${tank}).read_byte(&b);
+            # Any byte wakes the sensor and starts one measurement.
+            - uart.write:
+                id: uart_propane${tank}
+                data: [0x55]
+            # The sensor answers about 730 ms after the trigger.
+            - delay: 900ms
+            - lambda: |-
+                std::vector<uint8_t> buf;
+                uint8_t b;
+                while (id(uart_propane${tank}).available()) {
+                  id(uart_propane${tank}).read_byte(&b);
+                  buf.push_back(b);
+                }
+                // Find the last frame that starts with 0xFF and has a good checksum.
+                int start = -1;
+                for (int i = (int) buf.size() - 10; i >= 0; i--) {
+                  if (buf[i] != 0xFF) continue;
+                  uint8_t sum = 0;
+                  for (int j = i; j < i + 9; j++) sum += buf[j];
+                  if (sum == buf[i + 9]) { start = i; break; }
+                }
+                if (start < 0) {
+                  ESP_LOGD("propane${tank}", "sample: no valid frame (%u bytes)", (unsigned) buf.size());
+                  return;
+                }
+                const uint8_t *f = &buf[start];
+                uint16_t level_raw = ((uint16_t) f[1] << 8) | f[2];
+                int16_t temp_raw = (int16_t) (((uint16_t) f[3] << 8) | f[4]);
+                uint16_t rssi = ((uint16_t) f[5] << 8) | f[6];
+                uint16_t angle_raw = ((uint16_t) f[7] << 8) | f[8];
+                // 0xFFFD means no liquid detected: less than the 30 mm blind zone
+                // of propane above the sensor, or no echo at all. Stored as 0.
+                int k = id(propane${tank}_n);
+                if (k >= ${samples_per_read}) return;
+                id(propane${tank}_s_level)[k] = (level_raw < 0xFFF0) ? (float) level_raw : 0.0f;
+                id(propane${tank}_s_temp)[k] = temp_raw / 10.0f;
+                id(propane${tank}_s_rssi)[k] = (float) rssi;
+                id(propane${tank}_s_tilt)[k] = angle_raw / 10.0f;
+                id(propane${tank}_n) = k + 1;
+      - lambda: |-
+          const int n = id(propane${tank}_n);
+          if (n == 0) {
+            id(propane${tank}_fail_count) += 1;
+            ESP_LOGW("propane${tank}", "No valid frame in this cycle (%d failures in a row)", id(propane${tank}_fail_count));
+            id(propane${tank}_samples).publish_state("-");
+            if (id(propane${tank}_fail_count) >= 3) {
+              id(propane${tank}_level).publish_state(NAN);
+              id(propane${tank}_percent).publish_state(NAN);
+              id(propane${tank}_remaining).publish_state(NAN);
+              id(propane${tank}_temperature).publish_state(NAN);
+              id(propane${tank}_echo).publish_state(NAN);
+              id(propane${tank}_tilt).publish_state(NAN);
+              id(propane${tank}_liquid).publish_state(false);
+              id(propane${tank}_coupling).publish_state(false);
+              id(propane${tank}_last_good) = NAN;
+              id(propane${tank}_hold_n) = 0;
+              id(propane${tank}_none_n) = 0;
+            }
+            return;
+          }
+          id(propane${tank}_fail_count) = 0;
+
+          auto median = [](std::vector<float> v) -> float {
+            std::sort(v.begin(), v.end());
+            return v[v.size() / 2];
+          };
+          auto about_double = [](float x, float y) -> bool {
+            // x is about twice y (a surface-bottom-surface echo of y)
+            return y > 0 && fabsf(x - 2.0f * y) <= std::max(6.0f, 0.08f * x);
+          };
+
+          std::vector<float> temps, rssis, tilts, levels;
+          std::string raw;
+          for (int i = 0; i < n; i++) {
+            temps.push_back(id(propane${tank}_s_temp)[i]);
+            rssis.push_back(id(propane${tank}_s_rssi)[i]);
+            tilts.push_back(id(propane${tank}_s_tilt)[i]);
+            float l = id(propane${tank}_s_level)[i];
+            if (l > 0) levels.push_back(l);
+            if (i) raw += ",";
+            raw += (l > 0) ? std::to_string((int) l) : std::string("none");
+          }
+          float temp_c = median(temps), echo = median(rssis), tilt = median(tilts);
+
+          // 1. Within the cycle: drop double bounces, then take the median.
+          float est = 0.0f;
+          bool have_liquid = !levels.empty();
+          if (have_liquid) {
+            std::vector<float> keep;
+            for (float x : levels) {
+              bool dbl = false;
+              for (float y : levels) if (y < x && about_double(x, y)) { dbl = true; break; }
+              if (!dbl) keep.push_back(x);
+            }
+            if (keep.empty()) keep = levels;
+            est = median(keep);
+          }
+
+          // 2. Across cycles: hold the last level if this one is its double.
+          float last = id(propane${tank}_last_good);
+          bool held = false;
+          if (have_liquid && !std::isnan(last) && last > 0 && about_double(est, last)) {
+            id(propane${tank}_hold_n) += 1;
+            if (id(propane${tank}_hold_n) < ${double_hold_cycles}) {
+              ESP_LOGI("propane${tank}", "cycle %.0f mm looks like a double bounce of %.0f mm, holding (%d/%s)",
+                       est, last, id(propane${tank}_hold_n), "${double_hold_cycles}");
+              est = last; held = true;
+            } else {
+              ESP_LOGI("propane${tank}", "%.0f mm persisted for %d cycles, accepting it (refill?)", est, id(propane${tank}_hold_n));
+              id(propane${tank}_hold_n) = 0;
+            }
+          } else {
+            id(propane${tank}_hold_n) = 0;
+          }
+
+          // 3. Near empty: several "none" cycles in a row before showing 0.
+          if (!have_liquid) {
+            id(propane${tank}_none_n) += 1;
+            if (id(propane${tank}_none_n) < ${none_hold_cycles} && !std::isnan(last) && last > 0) {
+              est = last; have_liquid = true; held = true;
+            } else {
+              est = 0.0f;
+            }
+          } else {
+            id(propane${tank}_none_n) = 0;
+          }
+          if (!held) id(propane${tank}_last_good) = est;
+
+          float full = id(propane${tank}_full_level).state;
+          float pct = NAN;
+          if (!std::isnan(full) && full > 0) {
+            pct = est / full * 100.0f;
+            pct = std::max(0.0f, std::min(100.0f, pct));
+          }
+
+          // 4. Publish with a deadband on the level.
+          bool changed = !id(propane${tank}_level).has_state() || std::isnan(id(propane${tank}_level).state)
+                         || fabsf(id(propane${tank}_level).state - est) >= ${publish_deadband_mm};
+          if (changed) {
+            id(propane${tank}_level).publish_state(est);
+            id(propane${tank}_percent).publish_state(pct);
+            id(propane${tank}_remaining).publish_state(std::isnan(pct) ? NAN : pct / 100.0f * ${tank_capacity_lb});
+          }
+          id(propane${tank}_liquid).publish_state(have_liquid);
+          id(propane${tank}_coupling).publish_state(echo >= ${coupling_ok_mv});
+          id(propane${tank}_temperature).publish_state(temp_c);
+          id(propane${tank}_echo).publish_state(echo);
+          id(propane${tank}_tilt).publish_state(tilt);
+          id(propane${tank}_samples).publish_state(raw);
+
+          ESP_LOGI("propane${tank}", "samples=[%s] level=%.0f mm%s (%.0f%%) temp=%.1f C echo=%.0f mV tilt=%.1f deg",
+                   raw.c_str(), est, held ? " (held)" : "", pct, temp_c, echo, tilt);

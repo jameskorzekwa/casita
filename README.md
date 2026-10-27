@@ -10,6 +10,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | --- | --- |
 | [`docs/trailer.md`](docs/trailer.md) | Specifications, factory equipment, model numbers, breakers, and weight limits |
 | [`docs/off-grid-upgrade-plan.md`](docs/off-grid-upgrade-plan.md) | The overall off-grid upgrade plan, including research and decisions |
+| [`docs/smart-dc-switch-research.md`](docs/smart-dc-switch-research.md) | Smart DC rocker research; BANDC rocker / Waveshare controller plan in mod 06, installed 2026-10-23 |
 | [`modifications/`](modifications/) | One folder per modification, each with its own instructions, diagrams and status |
 | [`manuals/`](manuals/) | Equipment manuals and datasheets, organized by system |
 | [`photos/`](photos/) | General trailer photos (modification photos live in each modification's folder) |
@@ -23,10 +24,12 @@ This repository is the maintained record. The Google Docs that some of this star
 | 03 | [Whole-panel inverter with automatic transfer switch](modifications/03-whole-panel-inverter/README.md) | Done |
 | 04 | [Battery monitor to Home Assistant (XIAO ESP32-S3 + INA228)](modifications/04-battery-monitor-esp32/README.md) | Installed, running and calibrated; mirrored to the home Home Assistant |
 | 05 | [Starlink Mini on 12 V battery power](modifications/05-starlink-12v-power/README.md) | Installed; inline fuse still to add |
-| 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit ordered |
-| 09 | [Water tank monitor to Home Assistant (SeeLeveL + DYP L02 + XIAO ESP32-S3)](modifications/09-water-tank-monitor/README.md) | Designed; sensors ordered |
-| 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; not purchased |
+| 06 | [Four smart DC switches (BANDC + Waveshare)](modifications/06-smart-dc-switches/README.md) | Installed 2026-10-23: two LED light circuits on the Waveshare relays, two spare channels, rockers and Home Assistant; cabinet cover pending |
+| 07 | [Tank monitor to Home Assistant (propane on a XIAO ESP32-S3, fresh on its own, grey via Mopeka)](modifications/07-tank-monitor/README.md) | Main device flashed and reading both cylinders (uncalibrated); Mopeka ordered for the grey tank; fresh not built |
+| 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit delivered, enclosure to print |
+| 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; parts ordered (second clamp due mid-November) |
 | 11 | [Xantrex Freedom X 2000 inverter to Home Assistant](modifications/11-xantrex-freedom-x-inverter/README.md) | Inverter installed; HA integration installed, first live read pending |
+| 12 | [Cold-weather package (grey tank heat, drain protection, battery warming, freeze monitoring)](modifications/12-cold-weather/README.md) | Proposed; nothing ordered or measured |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
 

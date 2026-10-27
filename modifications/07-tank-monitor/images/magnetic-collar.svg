@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="830" viewBox="0 0 1300 830" role="img" aria-labelledby="title desc">
+  <title id="title">Magnetic collar for the DYP L06 sensor</title>
+  <desc id="desc">Three panels. Left: the sensor as delivered, side view from the DYP datasheet: a 33.8 millimetre diameter, 4.2 millimetre thick flange that holds the electronics and the cable, with a 17.5 millimetre diameter boss standing 7.9 millimetres off one face, 12.1 millimetres overall. The boss face is the ultrasonic probe and is the side that goes against the tank; the flange is the back. Middle: the printed collar seen from the tank side, 44 millimetres outside diameter, an 18.5 millimetre bore that the boss passes through, three 8 by 3 millimetre magnets in pockets at 120 degrees on a 30 millimetre pitch circle flush with the tank face, and a 4 millimetre cable notch through the back wall. Right: section through the collar on the tank. The collar is 11.8 millimetres thick. A 34.2 millimetre diameter, 4.2 millimetre deep recess in the back face holds the flange; the shoulder between that recess and the bore is 7.6 millimetres thick, so the 7.9 millimetre boss stands 0.3 millimetres proud of the magnet faces. The magnets pull the collar to the steel, the shoulder pushes on the flange, and so the boss face is pressed into a silicone grease film. Dimensions are a starting point to confirm by test fit.</desc>
+  <defs>
+    <style>
+      .t{font:600 18px system-ui,sans-serif;fill:#102a43}
+      .s{font:14px system-ui,sans-serif;fill:#334e68}
+      .d{font:13px ui-monospace,monospace;fill:#102a43}
+      .w{font:600 12px ui-monospace,monospace;fill:#fff}
+      .ring{fill:#e3f8ff;stroke:#186faf;stroke-width:3}
+      .ringdash{fill:none;stroke:#186faf;stroke-width:2;stroke-dasharray:6 4}
+      .sensor{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
+      .mag{fill:#cbd2d9;stroke:#243b53;stroke-width:2}
+      .steel{fill:#9fb3c8;stroke:#243b53;stroke-width:2}
+      .grease{fill:#f6c343;stroke:none}
+      .dim{stroke:#c53030;stroke-width:1.5;fill:none}
+      .thin{stroke:#829ab1;stroke-width:1.5;fill:none;stroke-dasharray:6 4}
+      .cable{stroke:#243b53;stroke-width:4;fill:none}
+    </style>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#c53030"/></marker>
+  </defs>
+  <rect width="1300" height="830" rx="24" fill="#fff"/>
+  <text class="t" x="40" y="40">Magnetic collar for the DYP L06 (dimensions in mm, starting point: confirm by test fit)</text>
+  <text class="s" x="40" y="64">The sensor hangs under the cylinder. In every panel the tank is at the top and "up" means toward the tank.</text>
+
+  <!-- ============ Panel A: the sensor as delivered, side view, 6 px per mm, boss up ============ -->
+  <text class="t" x="230" y="104" text-anchor="middle">The sensor (datasheet 1.6)</text>
+  <text class="s" x="230" y="124" text-anchor="middle">side view, boss up, 6 px per mm</text>
+  <!-- boss: 17.5 wide (105 px), 7.9 tall (47.4 px) -->
+  <rect class="sensor" x="177.5" y="170" width="105" height="47.4"/>
+  <!-- flange: 33.8 wide (202.8 px), 4.2 thick (25.2 px) -->
+  <rect class="sensor" x="128.6" y="217.4" width="202.8" height="25.2"/>
+  <!-- cable leaving the flange edge -->
+  <path class="cable" d="M331.4 230 H400"/>
+  <text class="s" x="404" y="235">cable</text>
+  <!-- probe face callout -->
+  <path class="dim" d="M230 150 V168" marker-end="url(#a)"/>
+  <text class="d" x="230" y="146" text-anchor="middle">probe face, dia 17.5: this side goes against the tank</text>
+  <!-- boss height -->
+  <text class="d" x="290" y="198">boss 7.9 tall</text>
+  <!-- overall height dimension -->
+  <path class="dim" d="M108 170 V242.6" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path class="thin" d="M108 170 H177.5"/>
+  <path class="thin" d="M108 242.6 H128.6"/>
+  <text class="d" x="100" y="211" text-anchor="end">12.1</text>
+  <!-- flange width dimension -->
+  <path class="dim" d="M128.6 258 H331.4" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text class="d" x="230" y="276" text-anchor="middle">flange dia 33.8, 4.2 thick</text>
+  <text class="s" x="40" y="316">The probe is the raised boss. DYP's own EVA ring goes</text>
+  <text class="s" x="40" y="336">over the boss onto the flange face, the couplant goes</text>
+  <text class="s" x="40" y="356">on the boss face inside the ring, and that side is</text>
+  <text class="s" x="40" y="376">pressed to the steel (installation instruction 5.2 to 5.8).</text>
+  <text class="s" x="40" y="408">The flange is the back. It holds the electronics and</text>
+  <text class="s" x="40" y="428">the cable and never touches the tank. A collar that</text>
+  <text class="s" x="40" y="448">puts the flange against the steel holds the probe</text>
+  <text class="s" x="40" y="468">12 mm away from it and cannot read.</text>
+
+  <!-- ============ Panel B: plan view from the tank side, 4 px per mm, centre (590,330) ============ -->
+  <text class="t" x="590" y="104" text-anchor="middle">Collar, seen from the tank side</text>
+  <text class="s" x="590" y="124" text-anchor="middle">4 px per mm; dashed features are on the back</text>
+  <!-- outer ring OD 44 -> r 88 -->
+  <circle class="ring" cx="590" cy="330" r="88"/>
+  <!-- flange recess 34.2 -> r 68.4, on the back (dashed) -->
+  <circle class="ringdash" cx="590" cy="330" r="68.4"/>
+  <!-- pitch circle 30 -> r 60 -->
+  <circle class="thin" cx="590" cy="330" r="60"/>
+  <!-- bore 18.5 -> r 37 -->
+  <circle cx="590" cy="330" r="37" fill="#fff" stroke="#186faf" stroke-width="3"/>
+  <!-- boss face visible through the bore, 17.5 -> r 35 -->
+  <circle class="sensor" cx="590" cy="330" r="35"/>
+  <!-- magnets 8 -> r 16 at 90, 210, 330 degrees on r 60 -->
+  <circle class="mag" cx="590" cy="270" r="16"/>
+  <circle class="mag" cx="538.04" cy="360" r="16"/>
+  <circle class="mag" cx="641.96" cy="360" r="16"/>
+  <text class="w" x="590" y="274" text-anchor="middle">8x3</text>
+  <!-- cable notch through the back wall at the bottom, 4 wide -> 16 px, from r 68.4 to r 88 -->
+  <rect x="582" y="398" width="16" height="22" fill="#fff" stroke="#186faf" stroke-width="2" stroke-dasharray="6 4"/>
+  <!-- labels -->
+  <text class="d" x="590" y="326" text-anchor="middle">boss</text>
+  <text class="d" x="590" y="342" text-anchor="middle">face</text>
+  <!-- OD dimension -->
+  <path class="dim" d="M502 440 H678" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text class="d" x="590" y="458" text-anchor="middle">OD 44</text>
+  <text class="d" x="430" y="492">bore 18.5; the 17.5 boss face shows through it</text>
+  <text class="d" x="430" y="512">3 pockets dia 8.2 x 3.0 deep, pitch circle 30</text>
+  <text class="d" x="430" y="532">magnets 8 x 3 N42-N52, flush, same pole out</text>
+  <text class="d" x="430" y="552">dashed 34.2 circle: flange recess, on the back</text>
+  <text class="d" x="430" y="572">cable notch 4 wide through the back wall</text>
+
+  <!-- ============ Panel C: section on the tank, 7 px per mm, cx 1060 ============ -->
+  <text class="t" x="1060" y="104" text-anchor="middle">Section on the tank</text>
+  <text class="s" x="1060" y="124" text-anchor="middle">7 px per mm; the 0.3 proud and the grease film are exaggerated</text>
+  <!-- steel: 3 mm -> 21 px -->
+  <rect class="steel" x="880" y="150" width="360" height="21"/>
+  <text class="s" x="1240" y="145" text-anchor="end">cylinder bottom, steel 2-3 thick</text>
+  <!-- grease film under the boss face -->
+  <rect class="grease" x="998.75" y="171" width="122.5" height="4"/>
+  <!-- collar, left: shoulder ring (bore r 9.25 -> 64.75 px; OD r 22 -> 154 px), y 179..230.3 -->
+  <rect class="ring" x="906" y="179" width="89.25" height="51.3"/>
+  <!-- collar, left: back wall (recess r 17.1 -> 119.7 px), y 230.3..259.7 -->
+  <rect class="ring" x="906" y="230.3" width="34.3" height="29.4"/>
+  <!-- collar, right: shoulder ring -->
+  <rect class="ring" x="1124.75" y="179" width="89.25" height="51.3"/>
+  <!-- collar, right: back wall cut away by the cable notch: dashed outline only -->
+  <rect class="ringdash" x="1179.7" y="230.3" width="34.3" height="29.4"/>
+  <!-- magnets: centre r 15 -> 105 px, 8 wide -> 56 px, 3 deep -> 21 px -->
+  <rect class="mag" x="927" y="179" width="56" height="21"/>
+  <rect class="mag" x="1137" y="179" width="56" height="21"/>
+  <text class="w" x="955" y="194" text-anchor="middle">8x3</text>
+  <text class="w" x="1165" y="194" text-anchor="middle">8x3</text>
+  <!-- boss: 17.5 wide -> 122.5 px, 7.9 tall -> 55.3 px, face at y 175 -->
+  <rect class="sensor" x="998.75" y="175" width="122.5" height="55.3"/>
+  <!-- flange: 33.8 wide -> 236.6 px, 4.2 thick -> 29.4 px -->
+  <rect class="sensor" x="941.7" y="230.3" width="236.6" height="29.4"/>
+  <!-- cable out of the flange edge, through the notch -->
+  <path class="cable" d="M1178.3 245 H1245"/>
+  <text class="d" x="1060" y="208" text-anchor="middle">boss (probe)</text>
+  <text class="d" x="1060" y="249" text-anchor="middle">flange</text>
+  <text class="d" x="950" y="222" text-anchor="middle">collar</text>
+  <text class="s" x="1245" y="278" text-anchor="end">cable, through the notch in the back wall</text>
+  <!-- collar thickness dimension -->
+  <path class="dim" d="M890 179 V259.7" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text class="d" x="884" y="224" text-anchor="end">11.8</text>
+  <!-- OD dimension -->
+  <path class="dim" d="M906 300 H1214" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text class="d" x="1060" y="318" text-anchor="middle">OD 44</text>
+  <!-- legend -->
+  <rect class="grease" x="840" y="334" width="18" height="10"/>
+  <text class="s" x="864" y="344">silicone grease film between the boss face and the steel</text>
+  <!-- dimension list -->
+  <text class="d" x="840" y="376">collar 11.8 thick, tank face to back face</text>
+  <text class="d" x="840" y="396">flange recess dia 34.2 x 4.2 deep, open at the back</text>
+  <text class="d" x="840" y="416">shoulder, recess floor to tank face: 7.6 thick</text>
+  <text class="d" x="840" y="436">boss 7.9 tall: its face stands 0.3 proud of the magnets</text>
+  <text class="d" x="840" y="456">bore 18.5; magnets 8 x 3 in 3.0 deep pockets, flush</text>
+  <!-- how it works -->
+  <text class="s" x="840" y="492">The magnets pull the collar to the steel. The collar's</text>
+  <text class="s" x="840" y="512">shoulder pushes on the flange, so the boss face is pressed</text>
+  <text class="s" x="840" y="532">into the grease film first and the magnets stop 0.3 short</text>
+  <text class="s" x="840" y="552">of the steel. Off the tank the sensor can only leave the</text>
+  <text class="s" x="840" y="572">collar backwards; two dabs of CA on the flange edge stop</text>
+  <text class="s" x="840" y="592">that. The cable leaves the flange edge radially, through</text>
+  <text class="s" x="840" y="612">the notch cut in the back wall.</text>
+  <text class="s" x="840" y="644">Print tank face down (pockets on the bed), 100% infill,</text>
+  <text class="s" x="840" y="664">ASA or PETG. Test-fit: the boss slides through the bore</text>
+  <text class="s" x="840" y="684">and the flange drops into the recess without force; the</text>
+  <text class="s" x="840" y="704">boss face sits just proud of the magnets. Three 8 x 3 N42</text>
+  <text class="s" x="840" y="724">magnets at a 0.3-0.5 mm gap pull roughly 1.5 kg: plenty</text>
+  <text class="s" x="840" y="744">for a 20 g sensor, the collar and its cable.</text>
+
+  <text class="s" x="40" y="784">Both drawings assume the boss face is flat and the boss is 7.9 tall (12.1 overall minus the 4.2 flange, datasheet 1.6). Measure the real part before printing:</text>
+  <text class="s" x="40" y="804">if the boss is domed or a different height, change the shoulder thickness so the face still stands about 0.3 proud.</text>
+</svg>

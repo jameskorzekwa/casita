@@ -1,0 +1,166 @@
+# Casita tank monitor, MAIN device: two propane cylinders
+#
+# One of the two ESPHome devices in mod 07 (tank monitor). A Seeed Studio
+# XIAO ESP32-S3 inside the trailer reads two DYP-L062MTW-V1.0 ("UART
+# controlled") ultrasonic sensors held under the 20 lb propane cylinders,
+# each on its own hardware UART. They sleep until the ESP32 sends any byte,
+# then measure once and reply with a 10-byte frame (level in mm, temperature,
+# echo strength, tilt). Each cylinder is an instance of
+# packages/dyp-l06-propane.yaml.
+#
+# The grey tank is NOT on this device: from 2026-10-27 it is read by a
+# battery-powered Mopeka Pro Check Universal over Bluetooth, straight into
+# Home Assistant (see ../water-tanks.md). A DYP L02 on the third UART was
+# tried and removed the same day. The fresh tank is the other ESPHome device:
+# casita-water-monitor-fresh.yaml.
+#
+# Powered from the trailer's 12 V through a 2 A inline fuse and a 5 V buck
+# regulator; the XIAO's 3.3 V pin powers both sensors. No batteries.
+# See ../README.md before flashing.
+#
+# Entity names omit the device name; Home Assistant prefixes them with the
+# friendly name, e.g. sensor.casita_tank_monitor_propane_1, the names the
+# e-ink dashboard (mod 08) uses.
+#
+# Pin map (XIAO ESP32-S3):
+#   D4 = GPIO5   ESP32 TX -> propane 2 RX (yellow)
+#   D5 = GPIO6   propane 2 TX (green) -> ESP32 RX
+#   D6 = GPIO43  ESP32 TX -> propane 1 RX (yellow)
+#   D7 = GPIO44  propane 1 TX (green) -> ESP32 RX
+#   D1 = GPIO2   reserved for the mod 12 1-Wire temperature bus
+#   D2 = GPIO3   not used: ESP32-S3 strapping pin
+#   D0, D3, D8, D9, D10 free (D3 and the third hardware UART are free)
+
+substitutions:
+  name: casita-tank-monitor
+  friendly_name: Casita Tank Monitor
+
+  # --- Propane (DYP L06) ---
+  # How often each cylinder is measured. The sensor sleeps (< 15 uA) between
+  # readings; a reading costs about 20 mA for 0.75 s.
+  read_interval: 60s
+  # Nominal propane capacity of a full cylinder, used for the "remaining"
+  # sensor. 20 lb cylinders hold 20 lb (about 4.7 US gal) at the 80% fill.
+  tank_capacity_lb: "20"
+  # Starting value for each "Propane N Full Level" number: the liquid height
+  # in mm the sensor reports with a freshly filled cylinder.
+  # ASSUMED, TO CONFIRM: press "Propane N Mark Full" on a full cylinder; the
+  # value is stored in flash and this default is then ignored.
+  full_level_mm: "280"
+  # Jitter control near empty (see packages/dyp-l06-propane.yaml header).
+  # Measurements per read cycle, about a second apart.
+  samples_per_read: "5"
+  # Cycles a level about 2x the last one must persist before it is believed
+  # (a real refill rather than a double-bounce echo). Minutes, at read_interval.
+  double_hold_cycles: "5"
+  # Cycles of "no liquid" in a row before the level is shown as 0.
+  none_hold_cycles: "3"
+  # Minimum change, mm, before a new level is published.
+  publish_deadband_mm: "2"
+  # Echo strength, mV, at or above which "Coupling OK" is on.
+  coupling_ok_mv: "800"
+
+packages:
+  propane1: !include
+    file: packages/dyp-l06-propane.yaml
+    vars:
+      tank: "1"
+      # XIAO D6 = GPIO43 (TX), D7 = GPIO44 (RX)
+      tx_pin: GPIO43
+      rx_pin: GPIO44
+  propane2: !include
+    file: packages/dyp-l06-propane.yaml
+    vars:
+      tank: "2"
+      # XIAO D4 = GPIO5 (TX), D5 = GPIO6 (RX)
+      tx_pin: GPIO5
+      rx_pin: GPIO6
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  on_boot:
+    priority: -100
+    then:
+      # First propane reading shortly after boot, once Wi-Fi and the API are up.
+      - delay: 10s
+      - script.execute: read_propane1
+      - script.execute: read_propane2
+
+esp32:
+  board: seeed_xiao_esp32s3
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+
+# The "Full Level" calibration numbers are saved to flash when changed.
+preferences:
+  flash_write_interval: 1min
+
+logger:
+  # Both hardware UARTs on GPIO pins are used for the sensors; keep logging
+  # on the USB port.
+  hardware_uart: USB_SERIAL_JTAG
+  level: INFO
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Casita Tank Fallback"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+web_server:
+  port: 80
+  version: 3
+  auth:
+    type: digest
+    username: !secret web_username
+    password: !secret web_password
+
+time:
+  - platform: sntp
+    id: sntp_time
+
+button:
+  - platform: template
+    name: "Read Propane Now"
+    icon: mdi:refresh
+    entity_category: config
+    on_press:
+      - script.execute: read_propane1
+      - script.execute: read_propane2
+  - platform: restart
+    name: "Restart"
+    entity_category: diagnostic
+
+sensor:
+  - platform: wifi_signal
+    name: "Wi-Fi Signal"
+    update_interval: 60s
+    entity_category: diagnostic
+  - platform: uptime
+    name: "Uptime"
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic
+
+interval:
+  - interval: ${read_interval}
+    then:
+      - script.execute: read_propane1
+      - script.execute: read_propane2

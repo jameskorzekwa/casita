@@ -1,6 +1,6 @@
 # Manuals
 
-Equipment manuals and datasheets, one folder per system. The files below were downloaded on 2026-10-09 from the manufacturer or from Casita's [user manuals page](https://casitatraveltrailers.com/user-manuals/). Manuals digitized from the paper documents that came with the trailer go in the same folders.
+Equipment manuals and datasheets, one folder per system. The files below were downloaded on 2026-10-09 (DYP L06 documents on 2026-10-13) from the manufacturer or from Casita's [user manuals page](https://casitatraveltrailers.com/user-manuals/). Manuals digitized from the paper documents that came with the trailer go in the same folders.
 
 ## Text versions
 
@@ -57,6 +57,13 @@ Every PDF has a Markdown text version next to it with the same name (for example
 | [shurflo-flojet-water-pump-11560.pdf](appliances/shurflo-flojet-water-pump-11560.pdf) | Flojet water system pump | [Casita](https://casitatraveltrailers.com/user-manuals/) |
 | [maxxair-maxxfan-deluxe-installation-rev-b-2016.pdf](appliances/maxxair-maxxfan-deluxe-installation-rev-b-2016.pdf) | MaxxAir MaxxFan Deluxe roof fan | [Casita](https://casitatraveltrailers.com/user-manuals/) |
 | [tv-ntd-2256-manual.pdf](appliances/tv-ntd-2256-manual.pdf) | NTD-2256 TV | [Casita](https://casitatraveltrailers.com/user-manuals/) |
+
+### Propane
+
+| File | Covers | Source |
+| --- | --- | --- |
+| [dyp-l06-lpg-level-sensor-datasheet.pdf](propane/dyp-l06-lpg-level-sensor-datasheet.pdf) | DYP L06 ultrasonic LPG level sensor datasheet: specs, pinout, UART/Modbus/I2C protocols (propane monitor project). Image-only PDF; the `.md` is OCR | [DYP](https://www.dypcn.com/uploads/L06-Datasheet.pdf) |
+| [dyp-l06-lpg-level-sensor-installation-instruction.pdf](propane/dyp-l06-lpg-level-sensor-installation-instruction.pdf) | DYP L06 installation instruction: couplant, EVA ring, epoxy, echo waveform checks. Image-only PDF; the `.md` is OCR | [DYP](https://www.dypcn.com/uploads/L06-installation-instruction.pdf) |
 
 ### Safety
 
