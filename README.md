@@ -28,6 +28,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | 07 | [Tank monitor to Home Assistant (propane on a XIAO ESP32-S3, fresh on its own, grey via Mopeka)](modifications/07-tank-monitor/README.md) | Main device flashed and reading both cylinders (uncalibrated); Mopeka ordered for the grey tank; fresh not built |
 | 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Designed; kit delivered, enclosure to print |
 | 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Designed; parts ordered (second clamp due mid-November) |
+| 11 | [Xantrex Freedom X 2000 inverter to Home Assistant](modifications/11-xantrex-freedom-x-inverter/README.md) | Inverter installed; HA integration installed, first live read pending |
 | 12 | [Cold-weather package (grey tank heat, drain protection, battery warming, freeze monitoring)](modifications/12-cold-weather/README.md) | Proposed; nothing ordered or measured |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
@@ -50,7 +51,7 @@ Open safety follow-ups:
 | GVWR / dry weight | 3,500 lb / about 2,480 lb |
 | Tow vehicle | 2026 Toyota RAV4 PHEV: 3,500 lb tow rating; hitch 750 lb tongue / 5,000 lb |
 | Battery bank | 2 x Renogy Core Mini 12.8 V 300 Ah LiFePO4 in parallel (600 Ah) |
-| Inverter | Renogy 2000 W pure sine (factory) |
+| Inverter | Xantrex Freedom X 2000 (817-2000), installed October 2026, replacing the factory Renogy 2000 W ([mod 11](modifications/11-xantrex-freedom-x-inverter/README.md)) |
 | Power center | WFCO WF-8900-AD series (auto-detect) |
 | A/C | Coleman-Mach Mach 8 Plus Cub, 37200 series (R-32), 9,200 BTU |
 | Refrigerator | 12 V only |

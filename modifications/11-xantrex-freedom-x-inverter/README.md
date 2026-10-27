@@ -1,0 +1,75 @@
+# Xantrex Freedom X 2000 Inverter and Bluetooth Remote Panel to Home Assistant
+
+> **Status: inverter installed (October 2026); Home Assistant integration live on the trailer's Home Assistant since 2026-10-18 and mirrored to the home one.** The physical installation (what the Freedom X replaced, how it is wired to the TS-30 and the battery bank, where the remote panel is mounted) is **not yet documented** - see [To document](#to-document).
+
+Related: [whole-panel inverter / TS-30](../03-whole-panel-inverter/README.md) · [battery monitor to Home Assistant](../04-battery-monitor-esp32/README.md) · [trailer equipment](../../docs/trailer.md) · manuals: [Freedom X owner's guide](../../manuals/electrical/xantrex-freedom-x-owners-guide.pdf), [Freedom X data sheet](../../manuals/electrical/xantrex-freedom-x-datasheet.pdf), [Freedom X/XC remote panel owner's guide](../../manuals/electrical/xantrex-freedom-x-remote-panel-owners-guide.pdf)
+
+## What it does and why
+
+The factory Renogy 2000 W inverter has no data interface. The Xantrex Freedom X 2000 (part 817-2000) is a 2000 W true-sine inverter with a built-in 30 A AC transfer relay, and its optional **Freedom X Bluetooth Remote Panel** (part 808-0817-02) exposes the inverter's live readings and settings over Bluetooth Low Energy to the Xantrex phone app.
+
+Xantrex publishes no protocol, so a Home Assistant integration was written for it: [`jameskorzekwa/ha-xantrex-freedom`](https://github.com/jameskorzekwa/ha-xantrex-freedom). The trailer's Home Assistant (Raspberry Pi 4, built-in Bluetooth) polls the panel directly, and the entities are mirrored to the home Home Assistant like everything else in the trailer (see [mod 04](../04-battery-monitor-esp32/README.md#mirroring-to-the-home-home-assistant)).
+
+## Parts
+
+| Part | Qty | Notes | Link |
+| --- | ---: | --- | --- |
+| Xantrex Freedom X 2000, 12 V, 120 V (817-2000) | 1 | 2000 W continuous at 40 °C, 4000 W surge for 5 s, 2200 W for 30 s. Built-in 30 A transfer relay (85-140 V AC input). LBCO adjustable 10.0-12.8 V. Peak efficiency 91 %. 14.6 × 10.8 × 3.9 in. Values from the data sheet; label `-P` suffix and GFCI option to confirm | [Amazon](https://www.amazon.com/dp/B074TDSRF1) |
+| Xantrex Freedom X Bluetooth Remote Panel (808-0817-02) | 1 | Comes with a 25 ft 6-conductor RJ12 cable; plugs into the inverter's Remote port. Powered by the inverter, so it only advertises while the inverter has DC power. BLE address `B8:3D:F6:B6:30:A5`, advertised name `ID` + serial | [Xantrex](https://xantrex.com/products/accessories/freedom-x-bluetooth-remote-panel/) |
+
+The owner's guide says: with the remote panel connected, leave the inverter's own Power button in Standby (up), so the panel's Power button controls the inverter.
+
+## Home Assistant integration
+
+### How it works
+
+- The panel is a plain BLE GATT peripheral: service `0x1910`, characteristics `0x2A01` to `0x2A0E`, no pairing or authentication. The field layout was taken from the Xantrex app (`com.xantrex.app` 1.6.1, a Capacitor app that ships its TypeScript source maps). `0x2A03`/`0x2A04` are the live status, `0x2A0D`/`0x2A0E` the settings; settings are changed by reading the block, changing the bytes of one setting and writing the whole block back, exactly as the app does.
+- The integration connects, reads every block (about a second), and disconnects, every 30 s by default (10-600 s in the integration options). The panel accepts one Bluetooth connection at a time, so the phone app still works between polls; while the app is connected, Home Assistant polls fail until it disconnects.
+- Entities: AC input and output voltage/frequency/current/power, load %, battery voltage, signed battery current and power, heat sink temperature, working mode (standby / line / battery / fault / power saving), a `Problem` binary sensor with the decoded fault list, individual overload / over-temperature / battery-low sensors, and controls for the inverter on/off, power-saving mode, audible alarm, ignition control, transfer mode, shutdown recovery, low-battery cut-off voltage/delay/recovery, power save timer and utility under-voltage level. The lead-acid "battery capacity" estimate is hidden because the battery type is LiFePO4 (the Renogy/INA228 monitor from mod 04 is the real state of charge).
+- The config entry's **Download diagnostics** includes the raw bytes of every characteristic, which is what to attach if a value looks wrong.
+
+### Installation on the trailer's Home Assistant (done 2026-10-18)
+
+1. HACS → custom repository `jameskorzekwa/ha-xantrex-freedom` (integration) → download; Home Assistant restarted. Installed version: **0.1.3**.
+2. Settings → Devices & services: the panel was discovered automatically (service `0x1910`); the confirm step connected once and read the model and serial number. Device **Freedom X 2000**, 35 entities enabled (13 more are available but disabled by default).
+3. Sharing with the home Home Assistant is done by adding the **`shared`** label to the entities on the trailer (a watcher on bee2 maintains the Remote Home-Assistant include list from that label; editing the include list by hand is overwritten). 19 entities were labeled: the problem / shore power / inverting / overload / over-temperature / battery-low binary sensors, AC input and output voltage and power, load, battery voltage/current/power, mode, active faults, the raw heat sink word, and the inverter and power-saving switches. They arrive at home as `*.rv_freedom_x_2000_*` in the **Casita RV** area, and an **Inverter** card was added to the Casita RV dashboard there.
+
+Lesson learned on 2026-10-18: version 0.1.0 declared a Bluetooth `local_name` matcher of `ID*`. Home Assistant refuses wildcard patterns in the first three characters, and the error took down the **whole** `bluetooth` component on the trailer (and with it ESPHome and the battery monitor) for about five minutes until 0.1.1 removed the matcher. Any integration's bad manifest matcher can do this; check the core log after installing Bluetooth integrations.
+
+### Access notes
+
+- The trailer's Home Assistant is only reachable over Tailscale on port 80 (HA itself). The **Terminal & SSH** add-on was installed on 2026-10-18 with bee2's key for future deployments, but its port 22 is not reachable from bee2 (Tailscale ACL or similar); everything so far was done through the Home Assistant WebSocket/REST API and HACS.
+
+### Operating rules learned on 2026-10-18
+
+- **Leave the remote panel's power key pressed in.** It is a latching switch that cuts the panel's own power: popping it out turns the inverter off *and* kills the panel's Bluetooth. The other three keys only navigate screens and settings 01-14/99; none of them turns the inverter off.
+- **Turn the inverter on/off from Home Assistant** (`switch.freedom_x_2000_inverter`, or `switch.rv_freedom_x_2000_inverter` at home). This is the app's software standby: the inverter idles (battery draw 0 A on the panel vs 1-2 A inverting with no load), the panel stays powered and Bluetooth stays up. Measured: command accepted in 0.4 s, inverter actually switching in about 30 s (on) / 20 s (off); HA shows the new mode within a few seconds of that.
+- **Keep the inverter's Power Save Timer (setting 05) at OFF.** Set to 3 h on 2026-10-18 it shut the inverter down at 20:27 local and the panel lost power two minutes later, taking Bluetooth with it until the key is cycled at the trailer. The automation **`automation.inverter_idle_standby`** on the trailer's Home Assistant replaces it: AC output power below 50 W for 3 h while inverting → inverter switch off (software standby). Power Save *Mode* (setting 06, load sensing) is a different feature and is fine to use.
+- With Home Assistant holding the Bluetooth connection (integration option, default on), the Xantrex phone app cannot connect; turn the option off in the trailer HA if the app is needed.
+
+## To document
+
+- What happened to the Renogy inverter and how the Freedom X is wired: DC cables and fuse (the data sheet's full-load DC current is 192 A), AC output to the TS-30 "INVERTER" leads (or whether the Freedom X's built-in transfer relay now replaces the TS-30), ground/neutral bonding, and whether the two former inverted outlets are affected. Update [mod 03](../03-whole-panel-inverter/README.md) and the as-built diagram accordingly.
+- Where the remote panel is mounted and the cable route.
+- Confirm the heat sink temperature scaling (compare the raw word with a known temperature when the inverter is cold and when it is hot), and test the inverter on/off switch once it is safe to do so. The battery type reads AGM; the Freedom X (no charger) does not use it, and the app hides it for FX models.
+
+## Testing
+
+- 2026-10-18: Bluetooth advertisement seen by both the trailer's Pi (RSSI −66 to −79 dBm) and the home Home Assistant through an ESPHome Bluetooth proxy (−89 dBm). The panel disappeared for about an hour in the afternoon (inverter off) and came back at 15:51 local.
+- 2026-10-18 15:55: first connection. Identified as model id 3 = **817-2000**, serial `92642512700627`, main-board firmware v1.81, remote-panel firmware v1.28, protocol id "30". Live: battery 13.63 V, 2 A discharge (the integer the panel reports; the INA228 said 0.55 A), 25 W / 1 % load at 120.0 V 60.0 Hz, mode `B` (inverting), bus 215 V, no shore power. Settings read back: LBCO 10.5 V, delay 300 s, recovery 13.1 V, power save timer 25 h, 60 Hz / 120 V output, power limit raw 20 (= 2000 W), limit timer 300 s, transfer mode Appliance, utility under-voltage 90 V, ignition control Off, audible alarm on, auto-restart flag clear, inverter on/off byte = 1.
+- Write path: power-limit timer set to 290 s and back to 300 s from Home Assistant; each write was read back from the device (bytes 15-16 of block `2A0D`: `2c01` → `2201` → `2c01`), about 3.5 s per write.
+- Decode corrections from the live data (released as 0.1.2/0.1.3): the `line_fail` bit is set whenever shore power is absent, so it is reported but no longer counted as a fault; the output power limit is stored in hundreds of watts (the Xantrex app writes plain watts, an app bug). The "heat sink temperature" word read 578 and fell to ~510 over the following 45 minutes while the outdoor air stayed at 63 °F, so it is a temperature but not plain °C as the app assumes; it is exposed raw until the scaling is confirmed (best guess `(raw − 400) / 10` °C).
+- 2026-10-18 16:44: inverter switch tested from Home Assistant with the owner's go-ahead: off → standby, 0 V output in about 30 s; on → inverting, 120 V in about 40 s. Repeated at 17:10 after the 0.2.0 held-connection change: 0.4 s command, 29 s on, 21 s off.
+- 2026-10-18 16:55: owner cycled the panel's power key; the panel's Bluetooth went down with it and, on return, Home Assistant kept getting a stale GATT table ("service 0x1910 not found") until 0.1.5 added automatic cache clearing.
+- 2026-10-18 20:27: the inverter's own Power Save Timer (set to 3 h at ~17:30) shut the inverter down and unpowered the panel; see the operating rules above.
+
+## Safety notes
+
+- The Freedom X's settings (low battery cut-off, output voltage/frequency, ignition control) are writable from Home Assistant. A wrong LBCO or output voltage can damage the battery or appliances; the integration only exposes the ranges the Xantrex app allows, but treat the controls with the same care as the app.
+- Turning the inverter to Standby does not disconnect DC or AC input power; shore power still passes through to the output.
+
+## Revisions
+
+| Date | Change |
+| --- | --- |
+| 2026-10-18 | Inverter reported installed. Protocol reverse-engineered from the Xantrex app; integration `ha-xantrex-freedom` published (0.1.1 → 0.1.3 after live validation), installed on the trailer's Home Assistant via HACS, panel discovered and polling, 19 entities shared to the home Home Assistant and an Inverter card added there. Manuals added. Physical install still to document |

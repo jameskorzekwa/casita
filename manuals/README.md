@@ -34,6 +34,9 @@ Every PDF has a Markdown text version next to it with the same name (for example
 | [renogy-rbm500-battery-monitor-manual-g3.pdf](electrical/renogy-rbm500-battery-monitor-manual-g3.pdf) | Renogy 500 A Battery Monitor with Shunt (RBM500), G3 manual | [Renogy](https://www.renogy.com/products/500a-battery-monitor-with-shunt) |
 | [go-power-gp-ts-30-transfer-switch-manual.pdf](electrical/go-power-gp-ts-30-transfer-switch-manual.pdf) | Go Power GP-TS-30 transfer switch, rev E | [Go Power](https://gopowersolar.com/products/30-amp-transfer-switch/) |
 | [ti-ina228-datasheet.pdf](electrical/ti-ina228-datasheet.pdf) | TI INA228 power monitor (battery monitor project) | [TI](https://www.ti.com/lit/ds/symlink/ina228.pdf) |
+| [xantrex-freedom-x-owners-guide.pdf](electrical/xantrex-freedom-x-owners-guide.pdf) | Xantrex Freedom X 1000/2000/3000 inverter owner's guide, 975-0787-01-01 Rev G | [Xantrex](https://xantrex.com/wp-content/uploads/2025/10/975-0787-01-01_Rev-G.pdf) |
+| [xantrex-freedom-x-datasheet.pdf](electrical/xantrex-freedom-x-datasheet.pdf) | Xantrex Freedom X data sheet (817-1000/2000/3000) | [Xantrex](https://xantrex.com/wp-content/uploads/2021/12/DataSheet_Xantrex_FREEDOM-X_20260819.pdf) |
+| [xantrex-freedom-x-remote-panel-owners-guide.pdf](electrical/xantrex-freedom-x-remote-panel-owners-guide.pdf) | Freedom X/XC Remote Panel (808-0817, 808-0817-02 Bluetooth) owner's guide, 976-0367-01-01 Rev G | [Xantrex](https://xantrex.com/wp-content/uploads/2021/12/976-0367-01-01_G.pdf) |
 
 ### Air conditioning
 

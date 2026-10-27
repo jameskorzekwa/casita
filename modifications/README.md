@@ -1,6 +1,6 @@
 # Modifications
 
-Each modification has its own folder with instructions, diagrams, parts, and a status line. Number new folders in order; 11 is on an open branch and 12 is taken, so the next free number is 13.
+Each modification has its own folder with instructions, diagrams, parts, and a status line. Number new folders in order; 09 is retired and not reused, so the next free number is 13.
 
 | # | Modification | Status | Summary |
 | --- | --- | --- | --- |
@@ -14,6 +14,7 @@ Each modification has its own folder with instructions, diagrams, parts, and a s
 | 08 | [E-ink dashboard](08-eink-dashboard/README.md) | Designed; kit delivered | TRMNL 7.5" e-paper kit running ESPHome, mounted in the trailer, showing battery, propane and water levels from the trailer's Home Assistant |
 | 09 | Retired: merged into [07, tank monitor](07-tank-monitor/README.md) | — | Number not reused |
 | 10 | [AC voltage and power meter](10-ac-power-meter/README.md) | Designed; parts ordered | Shelly EM Gen3 on the TS-30 output, so AC voltage and power are measured from shore or inverter alike; second clamp on the shore cord gives total shore draw and the live source |
+| 11 | [Xantrex Freedom X 2000 inverter to Home Assistant](11-xantrex-freedom-x-inverter/README.md) | Inverter installed; HA integration installed, first live read pending | Xantrex Freedom X 2000 (817-2000) with the Freedom X Bluetooth Remote Panel, read by the trailer's Home Assistant over BLE with the `ha-xantrex-freedom` integration; physical install still to document |
 | 12 | [Cold-weather package](12-cold-weather/README.md) | Proposed; nothing ordered or measured | 12 V heating pads and an insulated belly pan on the exposed grey tank, heat cable on the dump valves and drain stubs, warming pads and insulation in the battery compartment so the LiFePO4 bank can charge below freezing, five DS18B20 probes on the mod 07 tank monitor XIAOs, heaters switched by spare mod 06 relays, and Home Assistant freeze alarms and shore-budget automations |
 
 ## Template for a new modification
