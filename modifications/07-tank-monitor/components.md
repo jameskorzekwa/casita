@@ -6,7 +6,7 @@ Status values: `need`, `have` (owner confirmed), `probably-have` (in purchase hi
 
 The repository is public: order references record vendor and date only. Look up an Amazon order with `amazon-shop orders --since 2026-10-10 --match "<ASIN or title words>"`.
 
-**Summary 2026-10-27:** nothing to buy except optional split loom for the grey cable. All four sensors are here: the SeeLeveL sender and the DYP L02 (owner confirmed) and both DYP L06 (Amazon shows them delivered 2026-10-27; check each label reads **L062MTW**). Moving the grey sensor onto the main device freed the former grey device's XIAO, regulator, capacitor, fuse holder and enclosure as spares. Still to make: the two magnetic collars.
+**Summary 2026-10-27 (evening):** nothing to buy. The grey tank's sensor is now a **Mopeka Pro Check Universal**, ordered 2026-10-27 and arriving 2026-10-28; the DYP L02 it replaces never produced data and is retired. The SeeLeveL sender is on hand and both DYP L06 are connected to the main device. The former grey device's XIAO, regulator, capacitor, fuse holder and enclosure are spares. Still to make: the two magnetic collars.
 
 ## Main device (`casita-tank-monitor`)
 
@@ -16,10 +16,10 @@ The repository is public: order references record vendor and date only. Look up 
 | 2 | Pololu D24V5F5 12 V to 5 V regulator | 500 mA or more, input to 36 V | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 and 2026-10-20 (three on hand) |
 | 3 | 470 uF 25 V electrolytic capacitor | 25 V or higher | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
 | 4 | Inline ATO/ATC fuse holder and 2 A fuse | 2 A | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 5 | Small ABS enclosure, about 83 x 58 x 33 mm | IP65; four glands | 1 | `delivered` | [Amazon B0FDQCHNQP](https://www.amazon.com/dp/B0FDQCHNQP) (2 pack) | Amazon, ordered 2026-10-13 | Delivered 2026-10-14. 2 pack: main and fresh |
-| 6 | PG7 cable glands | 3.1-6.6 mm | 4-6 | `delivered` | [Amazon B0CTCG4HMM](https://www.amazon.com/dp/B0CTCG4HMM) (50 pack) | Amazon, ordered 2026-10-13 and 2026-10-14 | 100 on hand, shared with the fresh device |
+| 5 | Small ABS enclosure, about 83 x 58 x 33 mm | IP65; three glands | 1 | `delivered` | [Amazon B0FDQCHNQP](https://www.amazon.com/dp/B0FDQCHNQP) (2 pack) | Amazon, ordered 2026-10-13 | Delivered 2026-10-14. 2 pack: main and fresh |
+| 6 | PG7 cable glands | 3.1-6.6 mm | 3-4 | `delivered` | [Amazon B0CTCG4HMM](https://www.amazon.com/dp/B0CTCG4HMM) (50 pack) | Amazon, ordered 2026-10-13 and 2026-10-14 | 100 on hand, shared with the fresh device |
 | 7 | 18-20 AWG red and black wire, crimp butt splices | 12 V taps | As needed | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 8 | Header pins or small screw-terminal strip | Shared 3V3 / GND for three sensors | 1 | `need` | Owner stock? | — | Ask the owner; any small terminal strip works |
+| 8 | Header pins or small screw-terminal strip | Shared 3V3 / GND for both sensors | 1 | `need` | Owner stock? | — | Ask the owner; any small terminal strip works |
 
 ## Propane sensors
 
@@ -28,46 +28,47 @@ The repository is public: order references record vendor and date only. Look up 
 | 9 | DYP-L062MTW-V1.0 LPG level sensor | UART **controlled** variant only (not MUW/MCW/M4W) | 2 | `delivered` | [Amazon B0C1GHF2M8](https://www.amazon.com/dp/B0C1GHF2M8), Size = UART Controlled | Amazon, ordered 2026-10-12 (qty 2) | Amazon shows delivered 2026-10-27. Confirm the model label, and whether mating cables or a couplant kit are in the box |
 | 10 | Magnetic collar, 3D-printed | ASA or PETG, 100 % infill; drawing in propane.md | 2 | `need` | Print at home | — | Filament on hand (owner confirmed 2026-10-19). Print one and test-fit before the second |
 | 11 | Neodymium disc magnets 8 x 3 mm, N42 | 3 per collar | 6 | `delivered` | [Amazon B0GFCBFKKQ](https://www.amazon.com/dp/B0GFCBFKKQ) (100 pack) | Amazon, ordered 2026-10-13 | Delivered 2026-10-16 |
-| 12 | Silicone dielectric grease (couplant) | Permatex 22058 or Mopeka Sonic Grease | 1 | `delivered` | [Amazon B000AL8VD2](https://www.amazon.com/dp/B000AL8VD2) and [B0CVQVGMWB](https://www.amazon.com/dp/B0CVQVGMWB) | Amazon, ordered 2026-10-13 | Delivered 2026-10-14. Shared with the grey sensor |
-| 13 | 4-conductor shielded cable, 22 AWG | About 2 x 3 m propane, plus the grey run | ~6 m + grey | `have` | Owner stock | — | Owner confirmed 2026-10-19 at least 33 ft on hand. Measure the grey run in Step M1 and check the roll still covers all three |
+| 12 | Silicone dielectric grease (couplant) | Permatex 22058 or Mopeka Sonic Grease | 1 | `delivered` | [Amazon B000AL8VD2](https://www.amazon.com/dp/B000AL8VD2) and [B0CVQVGMWB](https://www.amazon.com/dp/B0CVQVGMWB) | Amazon, ordered 2026-10-13 | Delivered 2026-10-14. Shared with the Mopeka |
+| 13 | 4-conductor shielded cable, 22 AWG | About 2 x 3 m | ~6 m | `have` | Owner stock | — | Owner confirmed 2026-10-19 at least 33 ft on hand |
 | 14 | 1.25 mm pitch 4-pin mating pigtails | Mates with the L06's white 1.25 mm plug; confirm on the first sensor | 2 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
 | 15 | Adhesive-lined heat-shrink, zip ties, Kapton tape | | As needed | `have` / `delivered` | Owner stock; [Amazon B07S227ZLH](https://www.amazon.com/dp/B07S227ZLH) (Kapton) | Amazon, ordered 2026-10-13 | Kapton delivered 2026-10-16 |
 | 16 | USB to TTL serial adapter (CP2102) | Bench tool, troubleshooting only | 1 | `delivered` | [Amazon B078W5L8W1](https://www.amazon.com/dp/B078W5L8W1) (2 pack) | Amazon, ordered 2026-10-13 | Delivered 2026-10-16. Tool, not part of the install |
 
-## Grey sensor (on the main device)
+## Grey tank (Mopeka)
 
 | # | Component | Spec / acceptable substitute | Qty | Status | Source / option | Order ref | Notes |
 |---|---|---|---:|---|---|---|---|
-| 17 | DYP-L023MUW-V1.0 (L02, UART Automatic) | Size option must be **UART Automatic** | 1 | `have` | [Amazon B0C1GFJKMV](https://www.amazon.com/dp/B0C1GFJKMV) | Amazon, ordered 2026-10-14 | On hand (owner, 2026-10-27). Confirm the plug pitch (2.54 mm XH vs 1.25 mm); pigtails for both are on hand |
-| 18 | JST-XH 2.54 mm 4-pin pigtails | For the L02 plug if it is XH; 1.25 mm pigtails (#14) if not | 1 pack | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 19 | 3M 9495LE (300LSE) double-sided tape | Holds the L02 to the tank | 1 roll | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 20 | 3M Primer 94 (adhesion promoter) | Polyolefin primer | 1 | `delivered` | [Amazon B0GM1GQW94](https://www.amazon.com/dp/B0GM1GQW94) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16 |
-| 21 | Split loom, about 10 mm | Protects the L02 cable along the frame | Measure | `need` | Owner stock or any auto-parts loom | — | Added 2026-10-27 with the longer cable run; ask the owner before buying |
-| 22 | Rubberized undercoating | Garnet names 3M 03584; Barrier Bond bought as the equivalent | 1 can | `delivered` | [Amazon B083ZKP5L9](https://www.amazon.com/dp/B083ZKP5L9) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17. Shared with the fresh sender |
+| 17 | Mopeka Pro Check Universal, aluminium/plastic/poly version with collar | Not the magnetic steel-tank version | 1 | `ordered` | [Amazon B0C7HM61BP](https://www.amazon.com/dp/B0C7HM61BP) | Amazon, ordered 2026-10-27 | Arriving 2026-10-28. About $81 |
+| 18 | CR2032 coin cell, spare | | 1 | `need` | Any | — | One ships in the sensor; ask the owner whether a spare is on hand |
+| 19 | 3M 9495LE (300LSE) double-sided tape and 3M Primer 94 | Only if the collar's own adhesive will not hold | | `have` / `delivered` | Owner stock; [Amazon B0GM1GQW94](https://www.amazon.com/dp/B0GM1GQW94) (primer) | Amazon, ordered 2026-10-14 | Primer delivered 2026-10-16 |
+| 20 | Rubberized undercoating | Garnet names 3M 03584; Barrier Bond bought as the equivalent | 1 can | `delivered` | [Amazon B083ZKP5L9](https://www.amazon.com/dp/B083ZKP5L9) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17. For the fresh sender only; not on the Mopeka |
 
 ## Fresh device (`casita-water-monitor-fresh`)
 
 | # | Component | Spec / acceptable substitute | Qty | Status | Source / option | Order ref | Notes |
 |---|---|---|---:|---|---|---|---|
-| 23 | Garnet SeeLeveL II 710-ES3 sender, 12 in | Sold by RecPro as "SeeLevel 710 RV Tank Level Sensor (12")" | 1 | `have` | [Amazon B0GWJR52N8](https://www.amazon.com/dp/B0GWJR52N8) | Amazon, ordered 2026-10-14 | On hand (owner, 2026-10-20). Paid about $56 |
-| 24 | Seeed Studio XIAO ESP32-S3 | Plain board with U.FL antenna | 1 | `delivered` | Same 3 pack as #1 | Same order | |
-| 25 | Pololu D24V5F5 regulator | | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 26 | 470 uF 25 V electrolytic capacitor | | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 27 | 2N3906 PNP transistor (TO-92) | Q101; 2N2907, S8550 or BC557 (reversed pinout) substitute | 1 | `delivered` | [Amazon B0DGT7RTZC](https://www.amazon.com/dp/B0DGT7RTZC) (32-value kit) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17 |
-| 28 | 2N3904 NPN transistor (TO-92) | Q102, Q103; same kit | 2 | `delivered` | Same kit as #27 | Same order | |
-| 29 | Resistors 1/4 W: 2.2 k x2, 1 k x2, 220, 22 k, 10 k | R101-R107 | 7 | `have` | Owner stock | — | Per the original README |
-| 30 | Perfboard about 30 x 40 mm, 5-pin terminal or header | | 1 | `delivered` | [Amazon B07ZYNWJ1S](https://www.amazon.com/dp/B07ZYNWJ1S) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17 |
-| 31 | Inline ATO/ATC fuse holder and 2 A fuse | On the pump-circuit tap | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 32 | Small ABS enclosure, about 83 x 58 x 33 mm | IP65 | 1 | `delivered` | Same 2 pack as #5 | Same order | |
+| 21 | Garnet SeeLeveL II 710-ES3 sender, 12 in | Sold by RecPro as "SeeLevel 710 RV Tank Level Sensor (12")" | 1 | `have` | [Amazon B0GWJR52N8](https://www.amazon.com/dp/B0GWJR52N8) | Amazon, ordered 2026-10-14 | On hand (owner, 2026-10-20). Paid about $56 |
+| 22 | Seeed Studio XIAO ESP32-S3 | Plain board with U.FL antenna | 1 | `delivered` | Same 3 pack as #1 | Same order | |
+| 23 | Pololu D24V5F5 regulator | | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
+| 24 | 470 uF 25 V electrolytic capacitor | | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
+| 25 | 2N3906 PNP transistor (TO-92) | Q101; 2N2907, S8550 or BC557 (reversed pinout) substitute | 1 | `delivered` | [Amazon B0DGT7RTZC](https://www.amazon.com/dp/B0DGT7RTZC) (32-value kit) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17 |
+| 26 | 2N3904 NPN transistor (TO-92) | Q102, Q103; same kit | 2 | `delivered` | Same kit as #25 | Same order | |
+| 27 | Resistors 1/4 W: 2.2 k x2, 1 k x2, 220, 22 k, 10 k | R101-R107 | 7 | `have` | Owner stock | — | Per the original README |
+| 28 | Perfboard about 30 x 40 mm, 5-pin terminal or header | | 1 | `delivered` | [Amazon B07ZYNWJ1S](https://www.amazon.com/dp/B07ZYNWJ1S) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17 |
+| 29 | Inline ATO/ATC fuse holder and 2 A fuse | On the pump-circuit tap | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
+| 30 | Small ABS enclosure, about 83 x 58 x 33 mm | IP65 | 1 | `delivered` | Same 2 pack as #5 | Same order | |
 
-## Freed by the 2026-10-27 combination
+## Retired or freed on 2026-10-27
 
-These were the separate grey device's parts. They are no longer needed for this project and are spares.
+The separate grey device's parts (freed when the grey sensor moved onto the main device) and the L02 itself (retired when the Mopeka replaced it). Spares.
 
 | # | Component | Qty | Status | Notes |
 |---|---|---:|---|---|
-| 33 | Seeed Studio XIAO ESP32-S3 | 1 | `not-needed` | Third board of the 3 pack (#1) |
-| 34 | Pololu D24V5F5 regulator | 1 | `not-needed` | Owner stock |
-| 35 | 470 uF 25 V capacitor | 1 | `not-needed` | Owner stock |
-| 36 | Inline fuse holder and 2 A fuse | 1 | `not-needed` | Owner stock |
-| 37 | Small ABS enclosure | 1 | `not-needed` | Owner stock (third box) |
+| 31 | DYP-L023MUW-V1.0 (L02, UART Automatic) | 1 | `not-needed` | Amazon B0C1GFJKMV, ordered 2026-10-14. Powered at 3.3 V it never sent a byte and no LED lit; probably dead. Listing "currently unavailable" on 2026-10-27 |
+| 32 | JST-XH 2.54 mm 4-pin pigtails | 1 pack | `not-needed` | Were for the L02's plug |
+| 33 | Split loom | | `not-needed` | Was for the L02 cable |
+| 34 | Seeed Studio XIAO ESP32-S3 | 1 | `not-needed` | Third board of the 3 pack (#1) |
+| 35 | Pololu D24V5F5 regulator | 1 | `not-needed` | Owner stock |
+| 36 | 470 uF 25 V capacitor | 1 | `not-needed` | Owner stock |
+| 37 | Inline fuse holder and 2 A fuse | 1 | `not-needed` | Owner stock |
+| 38 | Small ABS enclosure | 1 | `not-needed` | Owner stock (third box) |

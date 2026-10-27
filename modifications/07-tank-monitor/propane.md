@@ -1,6 +1,6 @@
 # Propane Sensors (DYP L06 under the 20 lb cylinders)
 
-Part of [mod 07, the tank monitor](README.md). This guide covers the two propane sensors: choosing them, proving they read through the cylinder, the magnetic collars, mounting and calibration. The ESP32 that reads them is the tank monitor's **main device** (`casita-tank-monitor`), which also reads the grey tank sensor; its wiring, firmware, installation and Home Assistant setup are in the [README](README.md).
+Part of [mod 07, the tank monitor](README.md). This guide covers the two propane sensors: choosing them, proving they read through the cylinder, the magnetic collars, mounting and calibration. The ESP32 that reads them is the tank monitor's **main device** (`casita-tank-monitor`); its wiring, firmware, installation and Home Assistant setup are in the [README](README.md).
 
 Two DYP L06 ultrasonic liquid-level sensors, one held magnetically against the bottom of each 20 lb propane cylinder. Every minute the main device wakes each sensor, reads the liquid height through the steel tank wall, converts it to a percentage and pounds remaining, and publishes everything to Home Assistant over Wi-Fi. The sensors take their power from the main device, so **there are no batteries to replace**.
 
@@ -66,7 +66,7 @@ The L06 is an OEM sensor module made for exactly this job (bottom-mounted, non-c
 3. Percentage = liquid height / "Full Level". Full Level is a per-cylinder calibration number stored on the ESP32, set once by pressing **Mark Full** on a freshly filled cylinder. Pounds remaining = percentage x 20 lb.
 4. If the liquid is below the sensor's 30 mm blind zone the sensor reports "no liquid" (`0xFFFD`). The firmware shows that as 0 mm / 0%, and the **Liquid Detected** diagnostic turns off. A near-empty 20 lb cylinder still has roughly 1-2 lb of propane at that point, so the low-propane alert should fire well above 0%.
 
-Everything is powered from the trailer through the main device: 12 V from a fused circuit to a 5 V buck regulator, 5 V to the XIAO, and the XIAO's 3.3 V output to both propane sensors and the grey tank sensor. The sensors' serial lines are 3.3 V when they are powered at 3.3 V, which is what the ESP32 needs. Each propane sensor has its own hardware UART, so one failing cannot affect the other or the grey tank.
+Everything is powered from the trailer through the main device: 12 V from a fused circuit to a 5 V buck regulator, 5 V to the XIAO, and the XIAO's 3.3 V output to both sensors. The sensors' serial lines are 3.3 V when they are powered at 3.3 V, which is what the ESP32 needs. Each sensor has its own hardware UART, so one failing cannot affect the other.
 
 ## Known Limitations
 
@@ -79,7 +79,7 @@ Everything is powered from the trailer through the main device: 12 V from a fuse
 - **Temperature range.** DYP guarantees accuracy from 0 to 35 degC and operation from -10 (or -15, the datasheet says both) to 60 degC. Under a black tank cover in Texas sun the tank bottom may exceed 60 degC; expect odd readings then. Below -10 degC in winter the sensor may stop reading until it warms up.
 - **Not a certified hazardous-location device.** The sensor runs at 3.3 V and under 50 mA and the ESP32 lives inside the trailer, but nothing here carries an intrinsic-safety rating. See Safety notes.
 - **Tilt.** The sensor reports its tilt; a tank leaning more than a few degrees reads low. The trailer should be level anyway.
-- **Always on.** The main device draws roughly 50-100 mA from 12 V with Wi-Fi on, about 1-2.5 Ah per day from the 600 Ah bank, shared with the grey tank. See the [README](README.md#power).
+- **Always on.** The main device draws roughly 40-80 mA from 12 V with Wi-Fi on, about 1-2 Ah per day from the 600 Ah bank. See the [README](README.md#power).
 - **Away from home** the Home Assistant connection needs a network path, the same as the battery monitor: see [mod 04](../04-battery-monitor-esp32/README.md#reading-the-battery-away-from-home).
 
 ## Parts
@@ -90,7 +90,7 @@ Everything is powered from the trailer through the main device: 12 V from a fuse
 | Magnetic collar (3D-printed, ASA or PETG, 100% infill) | 2 | Ring that sits on the sensor's flange around the 17.5 mm probe boss, with three magnet pockets on the tank face and a cable notch; drawing in Step P5a. Print one and test-fit before printing the second | |
 | Neodymium disc magnets, 8 mm x 3 mm, N42-N52 | 6 (3 per collar) | About 1 kg pull each; nickel plated. Glued into the collar pockets with CA or epoxy, faces flush with the collar. Smallest sensible pack is far more than 6 | [Amazon: LiftSun N42 8x3 mm, 100 pack](https://www.amazon.com/dp/B0GFCBFKKQ) |
 | Silicone dielectric grease (couplant) | 1 tube | Any silicone dielectric grease; Mopeka's "Sonic Grease" is the same idea in single-use sachets. Not DYP's water-based gel, which dries out | [Amazon: Permatex 22058, 3 oz](https://www.amazon.com/dp/B000AL8VD2) or [Amazon: Mopeka Sonic Grease, 4 packets](https://www.amazon.com/dp/B0CVQVGMWB) |
-| 4-conductor shielded cable, 22 AWG | About 2 x 3 m (25 ft roll, shared with the grey tank) | Sensor leads are only 140 mm; this runs from the main device to each cylinder. Shield grounded at the ESP32 end only | [Amazon: 22/4 shielded, tinned stranded, 25 ft](https://www.amazon.com/dp/B0D9JY3MC4) |
+| 4-conductor shielded cable, 22 AWG | About 2 x 3 m (25 ft roll) | Sensor leads are only 140 mm; this runs from the main device to each cylinder. Shield grounded at the ESP32 end only | [Amazon: 22/4 shielded, tinned stranded, 25 ft](https://www.amazon.com/dp/B0D9JY3MC4) |
 | 1.25 mm pitch 4-pin mating cables for the sensor connector | 2 (pack of 20 pairs) | "Micro JST 1.25 mm" pigtails are the usual match for the sensor's white 1.25 mm connector, to confirm on the first sensor. The female half mates with the sensor's plug and is soldered to the long cable; that joint is the disconnect point at each tank. Buy once, use two | [Amazon: Micro JST 1.25 mm 4-pin, 20 pairs, 150 mm](https://www.amazon.com/dp/B09DYLY95R) |
 | Cable gland (PG7) and sealant | 1-2 | Where the sensor cables pass through to the tongue | [Amazon: PG7 nylon glands, 50 pack](https://www.amazon.com/dp/B0CTCG4HMM) |
 | Heat-shrink (adhesive-lined), Kapton tape, zip ties | As needed | | [Amazon: 3:1 adhesive-lined heat-shrink kit](https://www.amazon.com/dp/B0DC5YN5CD), [Amazon: Kapton tape 10 mm, 4 rolls](https://www.amazon.com/dp/B07S227ZLH) |
@@ -109,7 +109,7 @@ Amazon links checked on 2026-10-13; prices then were roughly: sensor $25, magnet
 
 ## Sensor wiring
 
-Each sensor's four leads go to the main device. The full schematic, with the grey tank sensor and the power supply, is in the [README](README.md#main-device-wiring).
+Each sensor's four leads go to the main device. The full schematic, with the power supply, is in the [README](README.md#main-device-wiring).
 
 | Sensor lead | Propane 1 | Propane 2 | Notes |
 | --- | --- | --- | --- |
@@ -151,14 +151,14 @@ The main device's XIAO, on the bench. No regulator or trailer wiring yet; the XI
    | yellow (sensor RX) | `D6` |
    | green (sensor TX) | `D7` |
 
-   Solder to the pads directly or fit the XIAO's header pins and use the matching sockets; either is fine. Header pins make it easier to add the second propane sensor and the grey tank sensor later. Keep the pigtail's wire order written down for Step P6.
+   Solder to the pads directly or fit the XIAO's header pins and use the matching sockets; either is fine. Header pins make it easier to add the second sensor later. Keep the pigtail's wire order written down for Step P6.
 3. Fit the U.FL antenna to the XIAO.
 
 ### Step P3: Flash the main device
 
 Follow [Step M2](README.md#step-m2-flash-the-main-device) in the README: it puts `casita-tank-monitor.yaml` and its propane package on the trailer's ESPHome Device Builder and flashes the XIAO.
 
-Then open **Logs**. Once a minute you should see `propane1` log a line like `level=none ... echo=0 mV` (the sensor is in the air) and `propane2` log `No valid frame` (nothing is connected yet); after 30 s the grey tank logs `No frame from the L02 for 30 s` until its sensor is connected. That is correct for now. If `propane1` also says `No valid frame`, check the four solder joints from Step P2. The device's web page (`http://casita-tank-monitor.local`) is the tool for the next steps.
+Then open **Logs**. Once a minute you should see `propane1` log a line like `level=none ... echo=0 mV` (the sensor is in the air) and `propane2` log `No valid frame` (nothing is connected yet). That is correct for now. If `propane1` also says `No valid frame`, check the four solder joints from Step P2. The device's web page (`http://casita-tank-monitor.local`) is the tool for the next steps.
 
 ### Step P4: Bench-test the sensor on a cylinder
 
@@ -169,6 +169,8 @@ The go / no-go test. It needs the cylinder from Step P1 **at least a third full*
 3. Press the sensor by hand onto the center of the dome, boss face to the steel, and press **Read Propane Now** on the web page a few times. **Propane 1 Liquid Level** should show a plausible height in millimeters and **Propane 1 Echo Strength** should be well above zero; DYP's examples show about 1,500 mV at a good spot.
 4. Slide the sensor around the center a few millimeters at a time. The spot with the highest echo strength and a level that stays within a few millimeters between readings is the installation spot. Mark it with a paint pen or a scratch in the dirt line so you can find it in Step P6.
 5. If the echo is weak or the level jumps around everywhere, try a cleaner spot. If it never settles, the sensor does not read through this cylinder; stop here rather than buying more parts.
+
+   **Seen on 2026-10-27:** with both sensors held under the cylinders by magnets, echo strength was 200-400 mV at best and then 0 mV, with impossible heights (405-789 mm) while the echo was weak; temperature and tilt kept arriving, so the sensors were fine and the coupling was not. A tilt reading over about 2 deg means the sensor is off the dome's centre. Treat anything under about 1,000 mV as not yet seated.
 6. Weigh the cylinder (propane weight = scale weight minus the tare weight stamped `TW` on the collar) and write down the weight next to the height reading. This is the first calibration point.
 
 Passed? **Order the second sensor now** and go on.

@@ -120,7 +120,7 @@ The configuration's `substitutions` block names every entity. Change a name ther
 | --- | --- | --- |
 | Battery | `sensor.casita_battery_monitor_state_of_charge`, `_voltage`, `_current`, `_power`, `_time_to_empty`, `_time_to_full`, `_daily_charged_energy`, `_daily_discharged_energy`, `binary_sensor.casita_battery_monitor_charging` | [mod 04](../04-battery-monitor-esp32/README.md), live |
 | Propane | `sensor.casita_tank_monitor_propane_1`, `_propane_1_remaining`, `_propane_2`, `_propane_2_remaining` | [mod 07](../07-tank-monitor/README.md) main device, not built |
-| Water | `sensor.casita_water_monitor_fresh_tank` (fresh device), `sensor.casita_tank_monitor_grey_tank` (main device), `sensor.casita_water_monitor_black_tank` (future black device); percent full | [mod 07](../07-tank-monitor/README.md), not built. Black is a later addition |
+| Water | `sensor.casita_water_monitor_fresh_tank` (fresh device), `sensor.casita_grey_tank` (a Home Assistant template on the grey tank's Mopeka Bluetooth sensor), `sensor.casita_water_monitor_black_tank` (future black device); percent full | [mod 07](../07-tank-monitor/README.md), not built. Black is a later addition |
 | AC | `sensor.casita_ac_meter_panel_voltage`, `sensor.casita_ac_meter_panel_power`, `sensor.casita_ac_source` (`shore` / `inverter` / `none`) | [mod 10](../10-ac-power-meter/README.md), not built |
 
 ## Changing the layout
@@ -202,3 +202,4 @@ Add photos to `photos/` as the build progresses:
 | 2026-10-14 | AC line added to both pages (voltage, panel watts, source) for mod 10; `--` until it is built |
 | 2026-10-19 | Added [components.md](components.md). Kit delivered; owner confirmed the 12 V to USB-C adapter, USB-C cable and mounting hardware on hand. Nothing left to buy. |
 | 2026-10-27 | Propane and grey entity IDs changed to the combined [mod 07 tank monitor](../07-tank-monitor/README.md) device: `sensor.casita_tank_monitor_propane_1` / `_2` (and `_remaining`), `sensor.casita_tank_monitor_grey_tank`. Fresh and black unchanged. Configuration not yet flashed, so nothing on the trailer to update |
+| 2026-10-27 | Grey changed again, to `sensor.casita_grey_tank`: mod 07's grey sensor is now a Mopeka read by Home Assistant over Bluetooth, with a template sensor for the percentage |

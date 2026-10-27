@@ -12,7 +12,7 @@ This repository is the maintained record for James's 2026 Casita Liberty 17 Delu
 | Battery bank, fuses, busbars, cables | `modifications/01-second-battery/README.md` |
 | A/C soft start | `modifications/02-ac-soft-start/README.md` |
 | Battery monitor / ESPHome / Home Assistant | `modifications/04-battery-monitor-esp32/` |
-| Tank levels (propane L06, grey L02, fresh SeeLeveL) / ESPHome | `modifications/07-tank-monitor/` (designed, not built; mod 09 merged into it) |
+| Tank levels (propane L06 on ESPHome, fresh SeeLeveL on ESPHome, grey Mopeka via Bluetooth) | `modifications/07-tank-monitor/` (main device installed 2026-10-27; mod 09 merged into it) |
 | Overall plan, research and decisions | `docs/off-grid-upgrade-plan.md` |
 | Manuals | `manuals/README.md` (index). Every PDF has a same-name `.md` text version; search the `.md` files, then check the PDF for diagrams and safety-critical values |
 
