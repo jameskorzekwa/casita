@@ -2,7 +2,7 @@
 
 Part of [mod 07, the tank monitor](README.md). Fresh and grey water tank levels in the trailer's Home Assistant, with nothing inside either tank and no batteries to replace.
 
-- **Fresh tank: its own device** (`casita-water-monitor-fresh`). A Garnet SeeLeveL II **710-ES3** capacitive sender stuck to the side of the 25 gal fresh tank, read through a three-transistor interface by a XIAO ESP32-S3 in an enclosure in the fresh tank bay, powered from the 12 V water pump circuit. This guide covers the whole fresh device.
+- **Fresh tank: its own device** (`casita-water-monitor-fresh`). A Garnet SeeLeveL II **710-ES3** capacitive sender stuck to the side of the 23 gal fresh tank, read through a three-transistor interface by a XIAO ESP32-S3 in an enclosure in the fresh tank bay, powered from the 12 V water pump circuit. This guide covers the whole fresh device.
 - **Grey tank: on the main device** (`casita-tank-monitor`). A DYP **L02** ultrasonic sensor glued to the underside of the 32 gal grey belly tank, wired to the same XIAO that reads the two propane sensors. This guide covers the sensor: testing it, gluing it on and running its cable. The main device itself (wiring, firmware, installation, Home Assistant) is in the [README](README.md).
 
 The black tank is left for later, as a third device of the same kind as the fresh one.
@@ -351,7 +351,7 @@ Once the main device is installed and in Home Assistant ([Steps M3 and M4](READM
 | `fresh_update_interval` | `30s` | How often the sender is polled |
 | `seelevel_tx_pin`, `seelevel_rx_pin` | `GPIO5`, `GPIO6` | XIAO `D4`, `D5` |
 
-The fresh volume map (`level 8.0 = 25 gal`) is written out in the sensor because the component wants real numbers there; keep it in step with `fresh_segments` and the tank size. Confirm with the calibration fill.
+The fresh volume map (`level 8.0 = 23 gal`) is written out in the sensor because the component wants real numbers there; keep it in step with `fresh_segments` and the tank size. Confirm with the calibration fill.
 
 What the fresh firmware does beyond the component: **Tank** (%) = level / `fresh_segments` x 100, clamped 0-100. **Tank Segment Data** (diagnostic) shows the ten raw values, top to bottom, for calibration and troubleshooting.
 
@@ -388,7 +388,7 @@ Park level for all of this.
 
 Drain the tank, then fill it with the hose in measured steps (a 1 gal jug, or time the hose against a bucket). At each step record gallons in, **Tank Level** and **Tank Segment Data**.
 
-- Level should reach about 8.0 with the tank full (25 gal) and 0 with it empty. If full reads well under 8, a pad is probably above the water line (check the 1/2 in top gap and the tank's true inside height) or `fresh_segments` is wrong.
+- Level should reach about 8.0 with the tank full (23 gal) and 0 with it empty. If full reads well under 8, a pad is probably above the water line (check the 1/2 in top gap and the tank's true inside height) or `fresh_segments` is wrong.
 - If the gallons-vs-level points are not a straight line (a tank with a sloped bottom or a dome), add intermediate points to the volume `map` in the fresh YAML, for example `level 2.0 = 5 gal`, and reinstall.
 
 ### Grey tank
@@ -410,7 +410,7 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 3. Sender taped on the fresh tank, tank a quarter full: bottom segments high, level sensible, moves with filling.
 4. After sticking: same readings as taped. After 24 h: unchanged.
 5. Enclosure powered from the pump circuit with the pump switch off and on: readings continue; the XIAO does not reset when the pump runs; current draw 40-80 mA.
-6. Calibration: empty reads 0, full reads about 8.0 (100%, 25 gal).
+6. Calibration: empty reads 0, full reads about 8.0 (100%, 23 gal).
 
 **Grey sensor**
 

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="720" viewBox="0 0 1100 720" role="img" aria-labelledby="title desc">
   <title id="title">Casita tank monitor: system overview (two devices)</title>
-  <desc id="desc">Two ESPHome devices. Main device, casita-tank-monitor: two DYP L06 ultrasonic sensors held magnetically under the two 20 pound propane cylinders on the tongue, and a DYP L02 ultrasonic sensor glued under the 32 gallon grey belly tank, all wired to one enclosure inside the trailer near the front holding a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from a fused 12 volt circuit. The propane sensors use 115200 baud UARTs and the grey sensor a 9600 baud UART, three hardware UARTs in all. Fresh device, casita-water-monitor-fresh: a Garnet SeeLeveL 710-ES3 sender on the side of the 25 gallon fresh tank, wired to an enclosure in the fresh tank bay holding a three-transistor interface, a buck regulator and a second XIAO ESP32-S3, powered from the water pump circuit. Both devices publish over Wi-Fi to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a third device like the fresh one.</desc>
+  <desc id="desc">Two ESPHome devices. Main device, casita-tank-monitor: two DYP L06 ultrasonic sensors held magnetically under the two 20 pound propane cylinders on the tongue, and a DYP L02 ultrasonic sensor glued under the 32 gallon grey belly tank, all wired to one enclosure inside the trailer near the front holding a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from a fused 12 volt circuit. The propane sensors use 115200 baud UARTs and the grey sensor a 9600 baud UART, three hardware UARTs in all. Fresh device, casita-water-monitor-fresh: a Garnet SeeLeveL 710-ES3 sender on the side of the 23 gallon fresh tank, wired to an enclosure in the fresh tank bay holding a three-transistor interface, a buck regulator and a second XIAO ESP32-S3, powered from the water pump circuit. Both devices publish over Wi-Fi to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a third device like the fresh one.</desc>
   <defs>
     <style>
       .lp{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
@@ -70,7 +70,7 @@
   <!-- ============ Fresh device ============ -->
   <rect class="tank" x="30" y="420" width="200" height="130" rx="16"/>
   <text class="t" x="120" y="452" text-anchor="middle">Fresh tank</text>
-  <text class="s" x="120" y="478" text-anchor="middle">25 gal, 12 in tall</text>
+  <text class="s" x="120" y="478" text-anchor="middle">23 gal, 12 in tall</text>
   <text class="s" x="120" y="500" text-anchor="middle">rear passenger bay</text>
   <text class="s" x="120" y="534" text-anchor="middle">710-ES3 on the side</text>
   <rect x="206" y="440" width="14" height="95" rx="4" fill="#6b46c1"/>
