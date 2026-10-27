@@ -76,7 +76,7 @@ The L06 is an OEM sensor module made for exactly this job (bottom-mounted, non-c
 
 ## How It Works
 
-1. The sensor sits in the recess inside the cylinder's foot ring, at the center of the domed bottom, its flat face pressed against the steel through a thin film of silicone grease by three magnets in a collar around it (or, as the fallback, bonded with DYP's couplant and two-part epoxy). It fires a high-frequency ultrasonic pulse through the steel into the liquid propane and times the echo from the liquid surface. Propane vapor above the liquid returns almost no echo, so the first strong echo marks the liquid height.
+1. The sensor is mushroom-shaped: a 33.8 mm flange that holds the electronics and the cable, with a 17.5 mm boss standing 7.9 mm off one face. **The boss face is the probe.** The sensor sits in the recess inside the cylinder's foot ring, at the center of the domed bottom, boss face pressed against the steel through a thin film of silicone grease by three magnets in a collar around the boss (or, as the fallback, bonded with DYP's couplant and two-part epoxy). It fires a high-frequency ultrasonic pulse through the steel into the liquid propane and times the echo from the liquid surface. Propane vapor above the liquid returns almost no echo, so the first strong echo marks the liquid height.
 2. The ESP32 sends one byte to the sensor's `RX` lead. That wakes the sensor (it sleeps at under 15 uA otherwise), it measures once (about 730 ms) and replies on `TX` with a 10-byte frame: liquid height in mm, temperature, echo strength and tilt angle, with a checksum. ESPHome parses the frame and publishes the values.
 3. Percentage = liquid height / "Full Level". Full Level is a per-tank calibration number stored on the ESP32, set once by pressing **Mark Full** on a freshly filled cylinder. Pounds remaining = percentage x 20 lb.
 4. If the liquid is below the sensor's 30 mm blind zone the sensor reports "no liquid" (`0xFFFD`). The firmware shows that as 0 mm / 0%, and the **Liquid Detected** diagnostic turns off. A near-empty 20 lb cylinder still has roughly 1-2 lb of propane at that point, so the low-propane alert should fire well above 0%.
@@ -102,7 +102,7 @@ Everything is powered from the trailer: 12 V from a fused circuit to a 5 V buck 
 | Component | Qty | Notes | Purchase link |
 | --- | ---: | --- | --- |
 | DYP-L062MTW-V1.0 LPG level sensor (UART controlled) | 2 | **See [What to order](#what-to-order): the exact model and what to check.** About $25 each on Amazon; choose the **UART Controlled** size option, not IIC | [Amazon](https://www.amazon.com/dp/B0C1GHF2M8), or [DYP direct](https://www.dypcn.com/dyp-l06-gas-tank-lpg-level-measuring-sensor-product/) |
-| Magnetic collar (3D-printed, ASA or PETG, 100% infill) | 2 | Ring around the sensor's 33.8 mm flange with three magnet pockets and a cable notch; drawing below. Print one and test-fit before printing the second | |
+| Magnetic collar (3D-printed, ASA or PETG, 100% infill) | 2 | Ring that sits on the sensor's flange around the 17.5 mm probe boss, with three magnet pockets on the tank face and a cable notch; drawing in Step 5a. Print one and test-fit before printing the second | |
 | Neodymium disc magnets, 8 mm x 3 mm, N42-N52 | 6 (3 per collar) | About 1 kg pull each; nickel plated. Glued into the collar pockets with CA or epoxy, faces flush with the collar. Smallest sensible pack is far more than 6 | [Amazon: LiftSun N42 8x3 mm, 100 pack](https://www.amazon.com/dp/B0GFCBFKKQ) |
 | Silicone dielectric grease (couplant) | 1 tube | Any silicone dielectric grease; Mopeka's "Sonic Grease" is the same idea in single-use sachets. Not DYP's water-based gel, which dries out | [Amazon: Permatex 22058, 3 oz](https://www.amazon.com/dp/B000AL8VD2) or [Amazon: Mopeka Sonic Grease, 4 packets](https://www.amazon.com/dp/B0CVQVGMWB) |
 | Seeed Studio XIAO ESP32-S3 | 1 | Same board as the battery monitor. The plain board (not the "Sense" camera version); the U.FL antenna comes in the box | [Amazon](https://www.amazon.com/dp/B0BYSB66S5) or [Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html) |
@@ -160,7 +160,7 @@ Do them in this order. Steps 1-4 use one sensor and prove the idea before anythi
 Close the valve, lift one cylinder out of the tray and set it on blocks or its side so you can see the bottom.
 
 1. Lay a straightedge across the bottom of the foot ring and measure from it up to the center of the domed bottom. That is the recess depth.
-2. The sensor is 12.1 mm tall and 33.8 mm across; the collar adds nothing to the height but is 54 mm across. You need **at least about 15 mm** of recess so the cylinder still stands on its foot ring and nothing presses on the sensor. Also check the foot ring has a drain notch or gap the cable can leave through.
+2. The sensor is 12.1 mm tall and 33.8 mm across; the collar adds nothing to the height and is 44 mm across. You need **at least about 15 mm** of recess so the cylinder still stands on its foot ring and nothing presses on the sensor. Also check the foot ring has a drain notch or gap the cable can leave through.
 3. Note the recess depth in [Revisions](#revisions). Less than 15 mm: stop and rethink (a cylinder with a taller foot ring, or a tray spacer).
 
 ### Step 2: Wire one sensor to the XIAO on the bench
@@ -196,8 +196,8 @@ This uses the **ESPHome Device Builder** add-on in Home Assistant (Settings, Add
 The go / no-go test. It needs the cylinder from Step 1 **at least a third full**: the sensor needs more than 10 cm of liquid above it to read reliably.
 
 1. Clean the center of the dome with isopropyl alcohol.
-2. Put a pea-sized blob of silicone grease on the sensor's flat face and spread it to cover the face. (This is the same coupling the collar provides later, so a good reading here means the collar will work.)
-3. Press the sensor by hand onto the center of the dome, flat face to the steel, and press **Read Tanks Now** on the web page a few times. **Tank 1 Liquid Level** should show a plausible height in millimeters and **Tank 1 Echo Strength** should be well above zero; DYP's examples show about 1,500 mV at a good spot.
+2. Put a pea-sized blob of silicone grease on the face of the sensor's raised 17.5 mm boss (the probe; the wide 33.8 mm flange with the cable is the back and never touches the tank) and spread it to cover the face. (This is the same coupling the collar provides later, so a good reading here means the collar will work.)
+3. Press the sensor by hand onto the center of the dome, boss face to the steel, and press **Read Tanks Now** on the web page a few times. **Tank 1 Liquid Level** should show a plausible height in millimeters and **Tank 1 Echo Strength** should be well above zero; DYP's examples show about 1,500 mV at a good spot.
 4. Slide the sensor around the center a few millimeters at a time. The spot with the highest echo strength and a level that stays within a few millimeters between readings is the installation spot. Mark it with a paint pen or a scratch in the dirt line so you can find it in Step 6.
 5. If the echo is weak or the level jumps around everywhere, try a cleaner spot. If it never settles, the sensor does not read through this cylinder; stop here rather than buying more parts.
 6. Weigh the cylinder (propane weight = scale weight minus the tare weight stamped `TW` on the collar) and write down the weight next to the height reading. This is the first calibration point.
@@ -208,13 +208,15 @@ Passed? **Order the second sensor now** and go on.
 
 ![Magnetic collar](images/magnetic-collar.svg)
 
-The collar is a ring that the sensor's 33.8 mm flange drops into from the tank side, retained by a lip at the back, with three magnets in pockets on the tank-side face. The pocket is 0.4 mm shallower than the flange is thick, so the sensor's flat face stands about 0.4 mm proud of the magnet faces: the magnets pull the face into the grease film instead of leaving a gap. A cable notch lets the lead out at the side.
+The sensor (datasheet section 1.6) is a 33.8 mm x 4.2 mm flange with a 17.5 mm boss standing 7.9 mm off one face, 12.1 mm overall, cable out of the flange edge. The boss face is the ultrasonic probe and is the side that goes against the tank; DYP's own EVA ring goes over the boss onto the flange face and the couplant goes on the boss face inside the ring (installation instruction 5.2-5.8). The flange is the back.
 
-1. Print one collar (ASA or PETG, 100% infill, 0.2 mm layers) and test-fit: the flange should slide in without force and the face should sit slightly proud of the ring. Adjust the pocket depth if your printer runs tight or loose, then print the second.
+The collar is a 44 mm ring, 11.8 mm thick, that does the EVA ring's job with magnets instead of adhesive. The sensor goes in from the back: the flange drops into a 34.2 mm x 4.2 mm recess in the back face and the boss passes through an 18.5 mm bore to the tank face. The shoulder between the recess and the bore is 7.6 mm thick, so the 7.9 mm boss face stands about 0.3 mm proud of the three 8 x 3 mm magnets set flush in the tank face. The magnets pull the collar to the steel, the shoulder pushes on the flange, and the boss face is pressed into the grease film first; the magnets stop just short of the steel. A notch through the back wall lets the cable out.
+
+1. Print one collar (ASA or PETG, 100% infill, 0.2 mm layers, tank face down so the magnet pockets are on the bed) and test-fit: the boss should slide through the bore and the flange should drop into the recess without force, and the boss face should sit just proud of the tank face. Measure the real part first: if the boss is not 7.9 mm tall or its face is domed, change the shoulder thickness so the face still stands about 0.3 mm proud. Then print the second.
 2. Glue the three magnets into their pockets with CA or epoxy, **all with the same pole facing out** (stack the magnets first; they will all be oriented the same way, then slide them off one at a time). Faces flush with the ring. Let it cure.
-3. Drop the sensor into the collar from the magnet side, cable through the notch. A drop of CA at two points on the back lip keeps it from falling out when it is off the tank.
+3. Put the sensor into the collar from the back, boss first through the bore, cable through the notch. Two dabs of CA where the flange edge meets the recess wall keep it from dropping out of the back when the collar is off the tank.
 
-**No 3D printer?** The minimum version is three 6 mm x 2 mm magnets glued directly to the rim of the sensor's flat face at 120 degrees, outside the central 20 mm, standing no more than about 0.3 mm proud of the face, with grease filling the rest. It holds less well and is harder to get flat; try the collar first.
+**No 3D printer?** The minimum version is three stacks of magnets glued to the flange face around the boss at 120 degrees, each stack built up to about 0.3 mm short of the boss face (two 8 x 3 mm magnets on a 1.5 mm steel washer is about 7.5 mm), with grease on the boss face. It holds less well and is harder to get square; try the collar first.
 
 ### Step 5b (fallback only): Epoxy
 
@@ -230,7 +232,7 @@ Use DYP's documented epoxy method ([installation instruction](../../manuals/prop
 For each cylinder, valve closed and lifted out of the tray:
 
 1. Make the long cable: solder a **female** Micro JST pigtail to one end of a 3 m length of the shielded 4-conductor cable, matching the wire order you wrote down in Step 2 (red, black, yellow, green). Heat-shrink each joint and the whole junction. Leave the other end bare for now. Mark the cable "1" or "2".
-2. Wipe the spot found in Step 4 with isopropyl alcohol. Put a pea-sized blob of silicone grease on the sensor face and spread it to cover the face; no air pockets.
+2. Wipe the spot found in Step 4 with isopropyl alcohol. Put a pea-sized blob of silicone grease on the boss face and spread it to cover the face; no air pockets.
 3. Press the collar onto the spot, give it a small twist to spread the grease, and check the reading on the web page (the sensor is on the bench XIAO for now, or on the installed one after Step 7): level and echo strength should match the Step 4 reading. If echo strength is much lower, lift it off, re-grease and try again.
 4. Plug the sensor's lead into the pigtail. Slide a short piece of adhesive heat-shrink over the mated connectors, or wrap them in self-fusing silicone tape, to keep water out; this is the disconnect point and is cut off to unplug.
 5. Route the cable out through the foot ring notch and zip-tie it up the side of the cylinder, leaving a loop of slack, then put the cylinder back in the tray.
@@ -421,3 +423,4 @@ Add photos to `photos/` as the build progresses:
 | 2026-10-13 | Design written: two DYP-L062MTW sensors on a XIAO ESP32-S3, ESPHome configuration validated and compiled. Nothing purchased or built |
 | 2026-10-13 | Magnetic collar with silicone grease made the primary mount (sensor can move between cylinders); DYP's epoxy method kept as the fallback. Collar untested |
 | 2026-10-19 | Added [components.md](components.md). Both sensors ordered 2026-10-12 (arriving 2026-10-19 to 10-21); magnets, grease, XIAO, enclosure, glands, Kapton and the USB-TTL adapter delivered; owner confirmed regulator, capacitor, cable, pigtails, fuse holder, heat-shrink and collar filament on hand. Nothing left to buy. |
+| 2026-10-27 | Collar redesigned: the original drawing put the sensor's 33.8 mm flange against the steel with the boss pointing away, which is backwards. Per the datasheet (1.6) and installation instruction (5.2-5.8) the 17.5 mm boss face is the probe. The collar is now a 44 mm x 11.8 mm ring with a flange recess in the back and a bore for the boss, 0.3 mm proud. Steps 4-6 and the How It Works text corrected to say boss face, not flat face. |
