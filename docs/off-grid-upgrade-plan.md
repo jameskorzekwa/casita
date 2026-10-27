@@ -159,11 +159,11 @@ The binding limit is the RAV4's 3,500 lb tow rating, which is IDENTICAL to the C
 
 Where a loaded Liberty Deluxe sits before this project:
 - Dry weight: ~2,480 lb
-- Fresh water (16 gal): ~130 lb
+- Fresh water (23 gal): ~190 lb
 - Two 20 lb propane tanks (full): ~80 lb
 - Second 300Ah battery: +60 lb
 - Gear/food/bedding/tools: 200–400 lb
-= ~2,950–3,150 lb before adding inverter/charger, extra solar, wiring, or a generator.
+= ~3,000–3,200 lb before adding inverter/charger, extra solar, wiring, or a generator.
 
 You will hit the 3,500 lb ceiling before you run out of physical space. This likely forces a choice between a generator and maximum battery/solar — you probably cannot have everything on a RAV4.
 
@@ -301,7 +301,7 @@ Phase 8 — Commission and prove on a short trip
 - Fridge: 3-way absorption — run it on PROPANE off-grid (12V is maintain-only; inverter/AC mode uses ~300W continuously — never do that on battery).
 - Never run A/C + microwave together on battery (combined load exceeds inverter and BMS limits).
 - Reduce cooling demand: window covers/Reflectix, awning, park nose-east, MaxxAir roof fan (~2–3A) — each A/C hour avoided is ~1.4 kWh you don't have to generate.
-- Water/waste (~16 gal fresh) may limit a long stay before electricity does; carry jugs and a portable grey tank.
+- Water/waste (~23 gal fresh) may limit a long stay before electricity does; carry jugs and a portable grey tank.
 - Propane: two 20 lb tanks run fridge/water heater/furnace/stove ~1–3 weeks; consider a Mopeka tank gauge.
 - Starlink: run on 12V (DC adapter), not through the inverter.
 - Inverter idle draw: ~15–20W; use search/AES mode or turn off overnight.

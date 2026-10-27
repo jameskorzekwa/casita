@@ -1,15 +1,16 @@
-# Casita water tank monitor, FRESH tank device (Garnet SeeLeveL sender)
+# Casita tank monitor, FRESH tank device (Garnet SeeLeveL sender)
 #
-# One of two separate ESPHome devices in mod 09; each tank has its own XIAO
-# ESP32-S3, 12 V to 5 V buck regulator and enclosure. This one sits in the
+# One of the two ESPHome devices in mod 07 (tank monitor), each with its own
+# XIAO ESP32-S3, 12 V to 5 V buck regulator and enclosure. This one sits in the
 # fresh tank bay and reads a Garnet SeeLeveL II 710-ES3 capacitive sender
-# stuck to the outside of the 25 gal fresh tank. The sender has two wires
+# stuck to the outside of the 23 gal fresh tank. The sender has two wires
 # (blue data, black ground) and speaks Garnet's pulse protocol, so the ESP32
 # talks to it through a small three-transistor interface circuit (see
-# ../README.md "SeeLeveL interface") using the open-source esphome-seelevel
+# ../water-tanks.md "SeeLeveL interface") using the open-source esphome-seelevel
 # component.
 #
-# The grey tank is a separate device: casita-water-monitor-grey.yaml.
+# The propane cylinders and the grey tank are on the main device:
+# casita-tank-monitor.yaml.
 #
 # Powered from the trailer's 12 V water pump circuit through a 2 A inline
 # fuse and a 5 V buck regulator; there are no batteries. See ../README.md
@@ -17,9 +18,8 @@
 #
 # Entity names omit the device name; Home Assistant prefixes them with the
 # friendly name, so "Tank" becomes sensor.casita_water_monitor_fresh_tank.
-# The e-ink dashboard (mod 08) expects exactly:
+# The e-ink dashboard (mod 08) uses:
 #   sensor.casita_water_monitor_fresh_tank   (% full)  <- this device
-#   sensor.casita_water_monitor_grey_tank    (% full)  <- grey device
 #   sensor.casita_water_monitor_black_tank   (% full, future black device)
 
 substitutions:
@@ -140,12 +140,12 @@ sensor:
         - level: 0.0
           volume: 0 gal
         # Keep level equal to fresh_segments above and volume equal to the tank
-        # capacity: 25 gal, the optional 17' tank (owner, 2026-10-21, and the
-        # owner's manual; the standard tank is 16 gal). Confirm with the
+        # capacity: 23 gal (owner, 2026-10-27; supersedes the 25 gal taken
+        # from the owner's manual). Confirm with the
         # calibration fill. Substitutions cannot be used here: the map wants
         # real numbers.
         - level: 8.0
-          volume: 25 gal
+          volume: 23 gal
       filters:
         - delta: 0.2
     segment_data:

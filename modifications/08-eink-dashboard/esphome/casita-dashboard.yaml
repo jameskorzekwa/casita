@@ -29,14 +29,16 @@ substitutions:
   batt_daily_in: sensor.casita_battery_monitor_daily_charged_energy
   batt_daily_out: sensor.casita_battery_monitor_daily_discharged_energy
   batt_charging: binary_sensor.casita_battery_monitor_charging
-  # Propane monitor (mod 07). Shown as "--" until that project is built.
-  propane_1: sensor.casita_propane_monitor_tank_1_propane
-  propane_1_lb: sensor.casita_propane_monitor_tank_1_propane_remaining
-  propane_2: sensor.casita_propane_monitor_tank_2_propane
-  propane_2_lb: sensor.casita_propane_monitor_tank_2_propane_remaining
-  # Water tanks (future project). Percent full. Shown as "--" until they exist.
+  # Tank monitor (mod 07). Shown as "--" until that project is built.
+  # Propane and grey come from the main device (casita-tank-monitor),
+  # fresh (and later black) from their own devices.
+  propane_1: sensor.casita_tank_monitor_propane_1
+  propane_1_lb: sensor.casita_tank_monitor_propane_1_remaining
+  propane_2: sensor.casita_tank_monitor_propane_2
+  propane_2_lb: sensor.casita_tank_monitor_propane_2_remaining
+  # Water tanks. Percent full.
   water_fresh: sensor.casita_water_monitor_fresh_tank
-  water_grey: sensor.casita_water_monitor_grey_tank
+  water_grey: sensor.casita_tank_monitor_grey_tank
   water_black: sensor.casita_water_monitor_black_tank
   # AC meter (mod 10). Shown as "--" until that project is built.
   ac_voltage: sensor.casita_ac_meter_panel_voltage

@@ -1,42 +1,98 @@
-# Casita water tank monitor, GREY tank device (DYP L02 ultrasonic sensor)
+# Casita tank monitor, MAIN device: two propane cylinders + the grey tank
 #
-# One of two separate ESPHome devices in mod 09; each tank has its own XIAO
-# ESP32-S3, 12 V to 5 V buck regulator and enclosure. This one sits inside the
-# trailer in the closet and reads a DYP-L023MUW-V1.0 ("UART automatic")
-# ultrasonic sensor glued to the underside of the 32 gal grey belly tank. The
-# sensor measures the liquid height through the plastic wall once a second
-# and streams a 4-byte frame at 9600 baud, which is the same frame as the DYP
-# DS1603L, so ESPHome's built-in ds1603l platform reads it directly.
+# One of the two ESPHome devices in mod 07 (tank monitor). A Seeed Studio
+# XIAO ESP32-S3 inside the trailer reads three ultrasonic sensors, each on its
+# own hardware UART:
 #
-# The fresh tank is a separate device: casita-water-monitor-fresh.yaml.
+#   Propane 1 and 2: DYP-L062MTW-V1.0 ("UART controlled") sensors held under
+#   the 20 lb cylinders. They sleep until the ESP32 sends any byte, then
+#   measure once and reply with a 10-byte frame (level in mm, temperature,
+#   echo strength, tilt). Each cylinder is an instance of
+#   packages/dyp-l06-propane.yaml.
 #
-# Powered from a fused 12 V circuit at the closet through a 2 A inline fuse
-# and a 5 V buck regulator; there are no batteries. See ../README.md before
-# flashing.
+#   Grey tank: a DYP-L023MUW-V1.0 ("UART automatic") sensor glued under the
+#   32 gal grey belly tank. It streams a 4-byte frame at 9600 baud once a
+#   second, the same frame as the DYP DS1603L, so ESPHome's built-in ds1603l
+#   platform reads it. Receive only: the sensor needs no TX line.
+#
+# The ESP32-S3 has three hardware UARTs; this device uses all three, which is
+# why the logger stays on the USB port (USB_SERIAL_JTAG).
+#
+# The fresh tank is the other device: casita-water-monitor-fresh.yaml.
+#
+# Powered from the trailer's 12 V through a 2 A inline fuse and a 5 V buck
+# regulator; the XIAO's 3.3 V pin powers all three sensors. No batteries.
+# See ../README.md before flashing.
 #
 # Entity names omit the device name; Home Assistant prefixes them with the
-# friendly name, so "Tank" becomes sensor.casita_water_monitor_grey_tank,
-# the name the e-ink dashboard (mod 08) expects.
+# friendly name, e.g. sensor.casita_tank_monitor_propane_1 and
+# sensor.casita_tank_monitor_grey_tank, the names the e-ink dashboard
+# (mod 08) uses.
+#
+# Pin map (XIAO ESP32-S3):
+#   D3 = GPIO4   grey L02 TX (yellow) -> ESP32 RX
+#   D4 = GPIO5   ESP32 TX -> propane 2 RX (yellow)
+#   D5 = GPIO6   propane 2 TX (green) -> ESP32 RX
+#   D6 = GPIO43  ESP32 TX -> propane 1 RX (yellow)
+#   D7 = GPIO44  propane 1 TX (green) -> ESP32 RX
+#   D1 = GPIO2   reserved for the mod 12 1-Wire temperature bus
+#   D2 = GPIO3   not used: ESP32-S3 strapping pin
+#   D0, D8, D9, D10 free
 
 substitutions:
-  name: casita-water-monitor-grey
-  friendly_name: Casita Water Monitor Grey
+  name: casita-tank-monitor
+  friendly_name: Casita Tank Monitor
 
+  # --- Propane (DYP L06) ---
+  # How often each cylinder is measured. The sensor sleeps (< 15 uA) between
+  # readings; a reading costs about 20 mA for 0.75 s.
+  read_interval: 60s
+  # Nominal propane capacity of a full cylinder, used for the "remaining"
+  # sensor. 20 lb cylinders hold 20 lb (about 4.7 US gal) at the 80% fill.
+  tank_capacity_lb: "20"
+  # Starting value for each "Propane N Full Level" number: the liquid height
+  # in mm the sensor reports with a freshly filled cylinder.
+  # ASSUMED, TO CONFIRM: press "Propane N Mark Full" on a full cylinder; the
+  # value is stored in flash and this default is then ignored.
+  full_level_mm: "280"
+
+  # --- Grey tank (DYP L02) ---
   # Liquid height in mm that the sensor reports when the tank is full. The
   # 32 gal tank measured about 4 in tall outside, so about 90 mm inside.
-  # ASSUMED, TO CONFIRM: set it from the first calibration fill (README
-  # "Calibrate") or press "Tank Mark Full"; the value is then stored in flash
-  # and this default is ignored.
+  # ASSUMED, TO CONFIRM: set it from the first calibration fill or press
+  # "Grey Tank Mark Full"; the value is then stored in flash.
   grey_full_level_mm: "90"
-  # Grey tank capacity in US gallons (32 gal on the 2026 17 ft; 25 gal on
-  # older ones).
+  # Grey tank capacity in US gallons (32 gal on the 2026 17 ft).
   grey_capacity_gal: "32"
-  # XIAO D7 = GPIO44 receives the sensor's TX (yellow lead). No TX needed.
-  l02_rx_pin: GPIO44
+  # XIAO D3 = GPIO4 receives the L02's TX (yellow lead).
+  l02_rx_pin: GPIO4
+
+packages:
+  propane1: !include
+    file: packages/dyp-l06-propane.yaml
+    vars:
+      tank: "1"
+      # XIAO D6 = GPIO43 (TX), D7 = GPIO44 (RX)
+      tx_pin: GPIO43
+      rx_pin: GPIO44
+  propane2: !include
+    file: packages/dyp-l06-propane.yaml
+    vars:
+      tank: "2"
+      # XIAO D4 = GPIO5 (TX), D5 = GPIO6 (RX)
+      tx_pin: GPIO5
+      rx_pin: GPIO6
 
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
+  on_boot:
+    priority: -100
+    then:
+      # First propane reading shortly after boot, once Wi-Fi and the API are up.
+      - delay: 10s
+      - script.execute: read_propane1
+      - script.execute: read_propane2
 
 esp32:
   board: seeed_xiao_esp32s3
@@ -44,12 +100,12 @@ esp32:
   framework:
     type: esp-idf
 
-# The "Tank Full Level" calibration is saved to flash when changed.
+# The "Full Level" calibration numbers are saved to flash when changed.
 preferences:
   flash_write_interval: 1min
 
 logger:
-  # The L02 uses a hardware UART on GPIO pins; keep logging on the USB port.
+  # All three hardware UARTs are used for sensors; keep logging on USB.
   hardware_uart: USB_SERIAL_JTAG
   level: INFO
 
@@ -65,7 +121,7 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   ap:
-    ssid: "Casita Grey Fallback"
+    ssid: "Casita Tank Fallback"
     password: !secret fallback_ap_password
 
 captive_portal:
@@ -83,7 +139,7 @@ time:
     id: sntp_time
 
 # ---------------------------------------------------------------------------
-# DYP-L02 on its own UART, 9600 8N1, streaming once a second
+# Grey tank: DYP-L02 on the third UART, 9600 8N1, streaming once a second
 # ---------------------------------------------------------------------------
 
 uart:
@@ -107,7 +163,7 @@ globals:
 
 number:
   - platform: template
-    name: "Tank Full Level"
+    name: "Grey Tank Full Level"
     id: grey_full_level
     icon: mdi:ruler
     unit_of_measurement: mm
@@ -131,7 +187,14 @@ number:
 
 button:
   - platform: template
-    name: "Tank Mark Full"
+    name: "Read Propane Now"
+    icon: mdi:refresh
+    entity_category: config
+    on_press:
+      - script.execute: read_propane1
+      - script.execute: read_propane2
+  - platform: template
+    name: "Grey Tank Mark Full"
     icon: mdi:water-alert
     entity_category: config
     on_press:
@@ -151,7 +214,7 @@ button:
 
 binary_sensor:
   - platform: template
-    name: "Tank Sensor Online"
+    name: "Grey Tank Sensor Online"
     id: grey_online
     device_class: connectivity
     entity_category: diagnostic
@@ -160,7 +223,7 @@ sensor:
   - platform: ds1603l
     # Reads the DYP-L02's 4-byte frame: FF, mm high, mm low, checksum.
     uart_id: uart_grey
-    name: "Tank Level"
+    name: "Grey Tank Level"
     id: grey_level
     icon: mdi:waves-arrow-up
     unit_of_measurement: mm
@@ -195,7 +258,7 @@ sensor:
 
   - platform: template
     # The value the e-ink dashboard and Home Assistant alerts use.
-    name: "Tank"
+    name: "Grey Tank"
     id: grey_percent
     icon: mdi:water-opacity
     unit_of_measurement: "%"
@@ -203,13 +266,14 @@ sensor:
     state_class: measurement
 
   - platform: template
-    name: "Tank Volume"
+    name: "Grey Tank Volume"
     id: grey_volume
     icon: mdi:water-opacity
     unit_of_measurement: gal
     accuracy_decimals: 1
     state_class: measurement
 
+  # ----- Device -----
   - platform: wifi_signal
     name: "Wi-Fi Signal"
     update_interval: 60s
@@ -225,6 +289,10 @@ text_sensor:
       entity_category: diagnostic
 
 interval:
+  - interval: ${read_interval}
+    then:
+      - script.execute: read_propane1
+      - script.execute: read_propane2
   # The L02 streams every second. If nothing valid arrives for 30 s the
   # sensor, its cable or its power is gone: mark it offline and clear the
   # readings so Home Assistant shows "unknown" instead of a stale level.

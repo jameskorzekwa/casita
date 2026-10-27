@@ -15,7 +15,7 @@ From [`docs/trailer.md`](../../docs/trailer.md) and the owner's manual. The impo
 
 | Item | Where | Exposure | Risk while the furnace runs |
 | --- | --- | --- | --- |
-| Fresh tank, 25 gal, 12 in tall, with the Shurflo pump | Inside, rear passenger side bay | Cabin air, but a floor-level bay with the fill, vent and drain penetrations in it | Low; the manual says cabin heat is normally enough. Watch for cold air entering at the penetrations |
+| Fresh tank, 23 gal, 12 in tall, with the Shurflo pump | Inside, rear passenger side bay | Cabin air, but a floor-level bay with the fill, vent and drain penetrations in it | Low; the manual says cabin heat is normally enough. Watch for cold air entering at the penetrations |
 | Black tank, 15 gal | Inside, under the toilet in the wet bath | Cabin air | Low. Its 3 in ABS drain from the floor to the termination valve is outside |
 | **Grey tank, 32 gal, about 4 in tall, black polyethylene** | **Under the floor, open to the air** | **Full exposure, large flat area, wide and shallow** | **High.** A shallow tank with a big surface freezes fast, and shower and sink water goes into it all day. This is the main job |
 | Termination assembly: black and grey dump valves, the 3 in and 1-1/2 in drain stubs, outlet cap | Under the trailer, rear | Full exposure | High. A frozen gate valve will not open, and ice in the stub can split the valve body |
@@ -34,7 +34,7 @@ In order of importance. Items A, B and G are the minimum for a trip with water o
 
 ### A. Grey tank: 12 V heating pad under the tank, foam insulation, belly enclosure
 
-**Pad.** A 12 V thermostatic RV holding-tank pad (the Ultra-Heat / UltraHeat type: a thin silicone or vinyl heater with a built-in thermostat that closes at about 45 °F and opens at about 68 °F, applied to the tank bottom with its own adhesive). Pads come in sizes up to about 12 x 24 in; this tank's footprint is unknown but is large. Working from 32 gal at about 3.5 in inside height gives a footprint on the order of 2,100 in², roughly 36 x 60 in, so **two pads** spaced along the bottom are more likely than one. Measure the tank in Step 1 before choosing; the pads must also stay clear of the DYP L02 sensor spot from [mod 09](../09-water-tank-monitor/README.md#step-1-measure-and-plan-the-sender-and-sensor-positions), the drain fitting, and any support straps.
+**Pad.** A 12 V thermostatic RV holding-tank pad (the Ultra-Heat / UltraHeat type: a thin silicone or vinyl heater with a built-in thermostat that closes at about 45 °F and opens at about 68 °F, applied to the tank bottom with its own adhesive). Pads come in sizes up to about 12 x 24 in; this tank's footprint is unknown but is large. Working from 32 gal at about 3.5 in inside height gives a footprint on the order of 2,100 in², roughly 36 x 60 in, so **two pads** spaced along the bottom are more likely than one. Measure the tank in Step 1 before choosing; the pads must also stay clear of the DYP L02 sensor spot from [mod 07](../07-tank-monitor/water-tanks.md#step-g1-measure-the-grey-tank-and-plan-the-cable-route), the drain fitting, and any support straps.
 
 Pads of this type draw about 3-4 A each at 12 V when on. Two pads are 6-8 A, well inside the 10 A contact rating of the Waveshare board's spare relays from [mod 06](../06-smart-dc-switches/README.md), but mod 06's rule is that no trailer load goes directly on those relays until its rating is proven, so the pads are switched through an external automotive relay (Section [Wiring](#wiring)).
 
@@ -42,7 +42,7 @@ Why 12 V, not 120 V pads: the pads must work on the inverter and off-grid, and a
 
 **Insulation.** 1 in foil-faced polyisocyanurate board (about R-6) cut to the tank bottom with openings for the pads' lead exits, the L02 and the drain, plus strips around the tank sides. The foil faces the tank. Polyiso, not polystyrene: it tolerates the pad's surface temperature and does not crumble on the road.
 
-**Enclosure.** A sheet of 4 mm coroplast (or 0.025 in aluminum if the coroplast proves too flimsy) under the foam, screwed to the tank's steel support angles or the frame, never to the fiberglass shell, with the edges sealed to the floor with foam tape and a drip gap at the lowest point so any leak or condensation drains instead of pooling. The enclosure also protects the L02 and its cable from road spray, which mod 09 currently does with undercoating alone. Make the pan removable: the L02 and the pads will need attention at some point.
+**Enclosure.** A sheet of 4 mm coroplast (or 0.025 in aluminum if the coroplast proves too flimsy) under the foam, screwed to the tank's steel support angles or the frame, never to the fiberglass shell, with the edges sealed to the floor with foam tape and a drip gap at the lowest point so any leak or condensation drains instead of pooling. The enclosure also protects the L02 and its cable from road spray, which mod 07 currently does with undercoating alone. Make the pan removable: the L02 and the pads will need attention at some point.
 
 **What this does not do:** it does not keep the tank warm with the pads off. The enclosure slows heat loss; the pads supply the heat. Both are needed below about 20 °F.
 
@@ -70,7 +70,7 @@ Draw: about 1-2 A at 12 V for a short run, thermostatic. Switched with the tank 
 
 ### E. City water and sewer practice
 
-Below freezing, run from the fresh tank with the pump and keep the city inlet capped. If a hookup is unavoidable: a heated hose (Camco or Pirit type, 120 V, about 0.5-2 A on shore), connected only as long as needed, with the inlet insulated. Dump valves stay closed; dump when the grey is nearly full (mod 09 raises that alarm), then pour about a quart of RV antifreeze down the shower and sink and flush a quart into the black tank so the small amount left in the tank bottoms and traps cannot freeze solid. The manual says not to put automotive antifreeze in the waste system.
+Below freezing, run from the fresh tank with the pump and keep the city inlet capped. If a hookup is unavoidable: a heated hose (Camco or Pirit type, 120 V, about 0.5-2 A on shore), connected only as long as needed, with the inlet insulated. Dump valves stay closed; dump when the grey is nearly full (mod 07 raises that alarm), then pour about a quart of RV antifreeze down the shower and sink and flush a quart into the black tank so the small amount left in the tank bottoms and traps cannot freeze solid. The manual says not to put automotive antifreeze in the waste system.
 
 ### F. Battery compartment: warming pads and insulation
 
@@ -83,19 +83,19 @@ The Core Mini's BMS refuses charge at or below 32 °F. On shore power that only 
 
 ### G. Temperature probes and freeze alarms
 
-Five DS18B20 waterproof probes on one 1-Wire bus, read by the **mod 09 XIAO** (it already has a cable route through the floor to the grey tank and sits in the fresh tank bay):
+Five DS18B20 waterproof probes on 1-Wire, read by the [mod 07 tank monitor](../07-tank-monitor/README.md)'s two XIAOs: the grey tank, dump valve and outside probes on the **main device** (`casita-tank-monitor`, whose L02 cable already runs to the grey tank), and the fresh bay probe on the **fresh device** in the fresh tank bay:
 
 | Probe | Where | Used for |
 | --- | --- | --- |
 | Grey tank | Under the tank, inside the enclosure, taped to the tank wall away from a pad | Pad control and the freeze alarm |
 | Dump valves | Taped to the black valve body under the insulation | Alarm; valve heater control |
 | Fresh tank bay | Floor level next to the pump | Alarm; "open the cabinet doors" reminder |
-| Battery compartment | Taped to a battery case side, not a terminal | Battery pad control; charge-block warning. Runs from the mod 09 XIAO only if the compartment is within reach of a cable; otherwise this probe goes on a second XIAO or the mod 06 controller (open question) |
+| Battery compartment | Taped to a battery case side, not a terminal | Battery pad control; charge-block warning. Runs from a mod 07 XIAO only if the compartment is within reach of a cable; otherwise this probe goes on a second XIAO or the mod 06 controller (open question) |
 | Outside air | Under the trailer in the shade, off the enclosure | Automation enable; logging |
 
 The INA228 temperature in [mod 04](../04-battery-monitor-esp32/README.md) is the chip's die temperature inside the display housing, not the battery; it cannot stand in for the battery probe.
 
-Add to the mod 09 firmware: a `dallas_temp` / `one_wire` bus on a free XIAO pin (D1 is free in the current mapping; D2/GPIO3 is a strapping pin, avoid), a 4.7 k pull-up, five `sensor` entries with 30 s updates. Entity names `Casita Water Monitor Grey Tank Temperature`, `... Dump Valve Temperature`, `... Fresh Bay Temperature`, `... Battery Temperature`, `... Outside Temperature`.
+Add to the mod 07 firmware: a `dallas_temp` / `one_wire` bus on XIAO `D1` (GPIO2), which is reserved for this on the main device and free on the fresh device (D2/GPIO3 is a strapping pin, avoid), a 4.7 k pull-up on each bus, and a `sensor` entry per probe with 30 s updates. Entity names on the main device `Casita Tank Monitor Grey Tank Temperature`, `... Dump Valve Temperature`, `... Outside Temperature` (and `... Battery Temperature` if it lands there); on the fresh device `Casita Water Monitor Fresh Bay Temperature`.
 
 ### H. Cabin heat and the 30 A shore budget
 
@@ -117,7 +117,7 @@ Not hardware in this mod, but part of the package:
 
 ### J. Propane
 
-- Cylinders below about 30 % lose pressure quickly in the cold; refill earlier than in summer. [Mod 07](../07-propane-tank-monitor/README.md) (level monitor) becomes a cold-weather tool.
+- Cylinders below about 30 % lose pressure quickly in the cold; refill earlier than in summer. [Mod 07](../07-tank-monitor/README.md) (tank monitor) becomes a cold-weather tool.
 - Regulator "freeze-up" is moisture in the gas freezing in the regulator (manual page 23). If the furnace cycles off with gas in the tank, that is the first suspect; the fix is a purged refill, not a new regulator.
 - For a stationary stay, an extend-a-stay fitting and a 100 lb cylinder on the ground removes the refill problem. Not part of this mod.
 
@@ -183,7 +183,7 @@ Relay coils (about 150 mA each) are switched by two of the four unused relays (5
 
 If mod 06 is not installed by the time this is built, the fallback is a plain fused 12 V switch for each branch and the pads' own thermostats, with Home Assistant watching the probes but not controlling the heat.
 
-**Probes.** One 3-wire cable from the mod 09 enclosure: 3V3, GND and data (XIAO D1 / GPIO2) with the 4.7 k pull-up at the XIAO, daisy-chained to each probe; the grey tank and valve probes go out through the same floor penetration as the L02 cable. Battery and outside probes as decided in the open questions.
+**Probes.** From the mod 07 main enclosure, one 3-wire cable: 3V3, GND and data (XIAO D1 / GPIO2) with the 4.7 k pull-up at the XIAO, daisy-chained to the grey tank, valve and outside probes, run alongside the L02 cable. The fresh bay probe is a short lead to the fresh device's D1. Battery probe as decided in the open questions.
 
 ## Home Assistant automations
 
@@ -199,7 +199,7 @@ All on the trailer's Home Assistant. Thresholds are starting points.
 | Charge blocked | Battery temperature at or below 33 °F and shore connected (mod 10) or solar present | Notification: "batteries below the charge cutoff; warming" |
 | Shore budget | Mod 10 shore current above 26 A for 30 s | Turn off the space heater's smart plug; notify. Turn back on when below 20 A for 5 min |
 | Cabinet reminder | Fresh bay temperature below 40 °F at 21:00 | Notification: open the lower cabinet doors |
-| Heater interlock | Grey tank sensor online (mod 09) is off, or the grey tank is empty after a dump | Keep the tank heaters off unless the valve probe is below 36 °F; most pads are not rated to run on an empty tank for long (check the product) |
+| Heater interlock | Grey tank sensor online (mod 07) is off, or the grey tank is empty after a dump | Keep the tank heaters off unless the valve probe is below 36 °F; most pads are not rated to run on an empty tank for long (check the product) |
 
 The same entities are mirrored to the home Home Assistant over the existing link, so the freeze warnings reach a phone wherever it is.
 
@@ -207,7 +207,7 @@ The same entities are mirrored to the home Home Assistant over the existing link
 
 ### Phase 0: measure and decide (no purchases)
 
-1. **Grey tank:** outside length, width, height; where the support angles, straps, drain fitting and vent are; the flat area for the mod 09 L02; the wall thickness estimate from mod 09 Step 1. Photograph from below. Decide pad count and size, and the L02 spot, together.
+1. **Grey tank:** outside length, width, height; where the support angles, straps, drain fitting and vent are; the flat area for the mod 07 L02; the wall thickness estimate from mod 07 Step G1. Photograph from below. Decide pad count and size, and the L02 spot, together.
 2. **Termination assembly:** valve body make and size (Valterra T1003 class 3 in and T1001 class 1-1/2 in are typical; confirm), stub lengths from the floor to the valves, clearance for insulation around the handles.
 3. **Fresh tank bay:** whether it shares air with the cabin; where the fill, vent and drain penetrations are; whether the pump is at floor level.
 4. **Battery compartment:** inside dimensions, clearances around the busbars and fuses, whether the lid seals, cable route to the nearest XIAO for a probe.
@@ -217,12 +217,12 @@ The same entities are mirrored to the home Home Assistant over the existing link
 
 ### Phase 1: probes and alarms (do first; cheap, and gives the data for everything else)
 
-8. Add the 1-Wire bus to the mod 09 firmware and enclosure; route the probes; name the entities.
+8. Add the 1-Wire buses to the mod 07 firmware and enclosures; route the probes; name the entities.
 9. Add the freeze-warning and charge-blocked automations. Camp one cold night with no heaters and read what the grey tank, valves, bay and battery actually do. That tells you whether the battery pads and the bay vent are needed.
 
 ### Phase 2: grey tank and drain protection
 
-10. With the mod 09 L02 glued and tested, clean the tank bottom and apply the pads per their instructions (surface above 50 °F, alcohol-cleaned, pressed firmly; a heat gun in cold weather).
+10. With the mod 07 L02 glued and tested, clean the tank bottom and apply the pads per their instructions (surface above 50 °F, alcohol-cleaned, pressed firmly; a heat gun in cold weather).
 11. Wire the pads and the valve heater to relay 1 through the 10 A fuse; wire relay 1's coil to the Waveshare; flash the mod 06 firmware change. Test with the automation before any insulation goes on.
 12. Spiral the heat cable on the stubs and valves with foil tape; foam insulation over it; sleeve.
 13. Fit the polyiso to the tank bottom and sides, cut around the pads' leads, the L02, the drain and the probe; tape the joints.
@@ -256,7 +256,7 @@ To be refined after the first cold trip:
 
 - Before leaving: tanks dumped and the antifreeze quart in each; fresh tank full (water in the inside tank is the furnace's thermal mass, not a liability); cylinders above 50 %.
 - Arriving: furnace on, heater automations enabled, cabinet doors open at night, vent cracked, window panels in.
-- Daily: check the probe card on the dashboard; dump the grey when mod 09 says 80 %; antifreeze after.
+- Daily: check the probe card on the dashboard; dump the grey when mod 07 says 80 %; antifreeze after.
 - Leaving the trailer unheated for more than a night below freezing: drain and winterize per the manual, no exceptions.
 
 ## Safety notes
@@ -274,7 +274,7 @@ To be refined after the first cold trip:
 ## Open questions
 
 1. Grey tank footprint, support layout and L02 spot: one pad or two, and where. (Phase 0, item 1.)
-2. Where does the battery compartment probe connect: a cable from the mod 09 XIAO in the rear passenger bay to the rear center compartment, a second small XIAO, or a spare input on the mod 06 Waveshare board (it has no spare DI, but 1-Wire needs a GPIO, not a DI)? Decide after Phase 0, item 4.
+2. Where does the battery compartment probe connect: a cable from the mod 07 fresh device's XIAO in the rear passenger bay to the rear center compartment, a second small XIAO, or a spare input on the mod 06 Waveshare board (it has no spare DI, but 1-Wire needs a GPIO, not a DI)? Decide after Phase 0, item 4.
 3. Is mod 06 going to be installed before the first winter trip? If not, the fallback switches in [Wiring](#wiring) are used and the automations only alarm.
 4. Does the fresh tank bay need a vent for furnace air, or does it already share air with the cabin?
 5. Is the water heater on this trailer the SW6DE as the manual set suggests, with a standard door? (`docs/trailer.md` still says "model to record".)
@@ -286,3 +286,4 @@ To be refined after the first cold trip:
 | Date | Change |
 | --- | --- |
 | 2026-10-21 | Proposed. Plan written from `docs/trailer.md`, the owner's manual (winter precautions page 46, winterization page 36, LP regulator page 23), the Suburban furnace and water heater manuals, and mods 01, 03, 04, 06, 09 and 10. Nothing measured, ordered or built |
+| 2026-10-27 | References updated for the combined [mod 07 tank monitor](../07-tank-monitor/README.md) (mod 09 merged into it): the grey tank, valve and outside probes go on the main device's D1, the fresh bay probe on the fresh device's D1 |
