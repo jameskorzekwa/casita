@@ -2,7 +2,7 @@
 
 Fresh and grey water tank levels in the trailer's Home Assistant, with nothing inside either tank and no batteries to replace. Each tank has **its own device**: its own Seeed Studio XIAO ESP32-S3, 12 V to 5 V buck regulator, inline fuse and enclosure, running its own ESPHome configuration.
 
-- **Fresh device** (`casita-water-monitor-fresh`): a Garnet SeeLeveL II **710-ES3** capacitive sender stuck to the side of the 23 gal fresh tank, read through a three-transistor interface. The enclosure is in the fresh tank bay, powered from the 12 V water pump circuit.
+- **Fresh device** (`casita-water-monitor-fresh`): a Garnet SeeLeveL II **710-ES3** capacitive sender stuck to the side of the 25 gal fresh tank, read through a three-transistor interface. The enclosure is in the fresh tank bay, powered from the 12 V water pump circuit.
 - **Grey device** (`casita-water-monitor-grey`): a DYP **L02** ultrasonic sensor glued to the underside of the 32 gal grey belly tank. Its cable comes up through the floor to the enclosure inside the closet, powered from a 12 V circuit at the closet.
 
 Each publishes its tank's percent full and gallons over Wi-Fi, and has a local web page that shows its readings at the campsite without Home Assistant. The black tank is left for later, as a third device of the same kind as the fresh one.
@@ -88,7 +88,7 @@ The 710-ES3 and the L02 come from different worlds: one is a Garnet RV part with
 - **The grey tank is shallow, and the L02 cannot see the bottom 2-4 cm.** On a tank about 4 in (100 mm) tall outside, perhaps 90 mm inside, the measurable range is roughly 30-90 mm: the top two thirds. Below that the sensor reports 0 and Home Assistant shows 0%. That is fine for the question that matters (is it nearly full?) and useless for "is it completely empty?". The volume sensor is a straight line from 0 to 32 gal over the full height, so it reads low in the dead zone.
 - **The grey tank wall may be too thick.** DYP's limit is 5 mm; the tank is probably 4.5-6 mm. Step G4 tests it. If the sensor reads 0 with water above it and the LED stays solid, the wall is too thick or too textured for this sensor and the fallback is capacitive point switches on the tank side (see [Why this design](#why-this-design)).
 - **Sloshing and slope.** Both sensors read the water where they are. The L02 is unreliable while the trailer moves; the firmware's median filter smooths it, but trust readings when parked. If the trailer is not level, a wide, shallow grey tank reads quite differently at opposite ends. Park level before judging.
-- **The fresh sender's percentage is an estimate.** The `seelevel` component interpolates between pads using its own algorithm, not Garnet's; another user saw a 33% reading on a full shallow tank until the segment count was set correctly. The [calibration fill](#calibrate) checks it. Resolution is one pad, 1.33 in, about 2.5 gal on this tank, with interpolation between.
+- **The fresh sender's percentage is an estimate.** The `seelevel` component interpolates between pads using its own algorithm, not Garnet's; another user saw a 33% reading on a full shallow tank until the segment count was set correctly. The [calibration fill](#calibrate) checks it. Resolution is one pad, 1.33 in, about 3 gal on this tank, with interpolation between.
 - **Metal near the sender reads as water.** Keep steel, aluminum and copper 2 in from the sender's face and 1 in from its edges; check again with doors and covers closed.
 - **One shot at sticking the sender.** Its 3M 300LSE adhesive does not survive removal, so the taped trial in Step F5 is the time to find problems.
 - **Polyethylene is hard to glue.** Epoxy, CA and most tapes peel off it. The L02 mount uses 3M 300LSE tape (the same adhesive Garnet uses on the sender, made for low-energy plastics) with a polyolefin primer; see Step G5.
@@ -370,7 +370,7 @@ Two configurations, one per device. Each is installed as its own device in the t
 | `fresh_update_interval` | `30s` | How often the sender is polled |
 | `seelevel_tx_pin`, `seelevel_rx_pin` | `GPIO5`, `GPIO6` | XIAO `D4`, `D5` |
 
-The fresh volume map (`level 8.0 = 23 gal`) is written out in the sensor because the component wants real numbers there; keep it in step with `fresh_segments` and the tank size (23 gal, the optional larger tank, per the owner 2026-10-20; the standard tank is 16 gal).
+The fresh volume map (`level 8.0 = 25 gal`) is written out in the sensor because the component wants real numbers there; keep it in step with `fresh_segments` and the tank size (25 gal, the optional 17' tank per the owner 2026-10-21 and the owner's manual; the standard tank is 16 gal). Confirm with the calibration fill.
 
 **Grey substitutions:**
 
@@ -512,7 +512,7 @@ Park level for all of this.
 
 Drain the tank, then fill it with the hose in measured steps (a 1 gal jug, or time the hose against a bucket). At each step record gallons in, **Tank Level** and **Tank Segment Data**.
 
-- Level should reach about 8.0 with the tank full (23 gal) and 0 with it empty. If full reads well under 8, a pad is probably above the water line (check the 1/2 in top gap and the tank's true inside height) or `fresh_segments` is wrong.
+- Level should reach about 8.0 with the tank full (25 gal) and 0 with it empty. If full reads well under 8, a pad is probably above the water line (check the 1/2 in top gap and the tank's true inside height) or `fresh_segments` is wrong.
 - If the gallons-vs-level points are not a straight line (a tank with a sloped bottom or a dome), add intermediate points to the volume `map` in the fresh YAML, for example `level 2.0 = 5 gal`, and reinstall.
 
 ### Grey tank
@@ -534,7 +534,7 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 3. Sender taped on the fresh tank, tank a quarter full: bottom segments high, level sensible, moves with filling.
 4. After sticking: same readings as taped. After 24 h: unchanged.
 5. Enclosure powered from the pump circuit with the pump switch off and on: readings continue; the XIAO does not reset when the pump runs; current draw 40-80 mA.
-6. Calibration: empty reads 0, full reads about 8.0 (100%, 23 gal).
+6. Calibration: empty reads 0, full reads about 8.0 (100%, 25 gal).
 
 **Grey device**
 
@@ -613,3 +613,4 @@ Add photos to `photos/` as the build progresses:
 | 2026-10-14 | Project designed: 710-ES3 sender on the fresh tank through a perfboard interface, DYP L02 under the grey tank, one XIAO ESP32-S3 on the water pump circuit. ESPHome configuration compiles; nothing built |
 | 2026-10-19 | Added [components.md](components.md). Sender and L02 ordered 2026-10-14; transistor kit, perfboard, enclosure, glands, grease, Primer 94 and undercoating delivered; owner confirmed the regulator, capacitor, shielded cable, JST-XH pigtails, fuse holder and 2 A fuses, 3M 9495LE tape, heat-shrink and 18-20 AWG wire on hand. Nothing left to buy. |
 | 2026-10-20 | **Split into two independent devices**, each with its own XIAO ESP32-S3, Pololu regulator, capacitor, 2 A fuse and enclosure: `casita-water-monitor-fresh` in the fresh tank bay on the pump circuit, and `casita-water-monitor-grey` in the closet on a closet 12 V circuit (source to confirm), with the L02 cable coming up through the floor. One configuration became two (`casita-water-monitor-fresh.yaml`, `casita-water-monitor-grey.yaml`); entity IDs unchanged, so mod 08 needs no change. Wiring diagram split into `wiring-fresh.svg` and `wiring-grey.svg`; overview redrawn. Fresh tank set to 23 gal (owner). Black tank becomes a future third device. Both configurations compile with ESPHome 2026.9.1. Sender on hand (owner, 2026-10-20); owner confirmed a third regulator, capacitor, enclosure and fuse holder with fuse on hand |
+| 2026-10-27 | Fresh tank capacity corrected from 23 gal to **25 gal** (owner, 2026-10-21; the owner's manual lists 16 gal standard and 25 gal as the only 17' option). Volume map in `casita-water-monitor-fresh.yaml`, the overview diagram and the per-pad resolution (about 3 gal) updated; the Device Builder copy on the trailer needs the same one-line change. The 12 in height and the 8-pad cut are unchanged. Confirm with the calibration fill. The grey tank pad and insulation planned in [mod 12](../12-cold-weather/README.md) must leave the L02's spot clear; pick both at Step 1 |
