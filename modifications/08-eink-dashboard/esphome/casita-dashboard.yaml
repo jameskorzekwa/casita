@@ -30,15 +30,15 @@ substitutions:
   batt_daily_out: sensor.casita_battery_monitor_daily_discharged_energy
   batt_charging: binary_sensor.casita_battery_monitor_charging
   # Tank monitor (mod 07). Shown as "--" until that project is built.
-  # Propane comes from the main device (casita-tank-monitor), fresh (and
-  # later black) from their own devices, and grey from a Home Assistant
-  # template sensor on top of the Mopeka Bluetooth sensor.
+  # Propane comes from the main device (casita-tank-monitor); fresh and grey
+  # are Home Assistant template sensors (fresh on the Garnet 709-BTP7
+  # Bluetooth display's reading, grey on the Mopeka Bluetooth sensor's).
   propane_1: sensor.casita_tank_monitor_propane_1
   propane_1_lb: sensor.casita_tank_monitor_propane_1_remaining
   propane_2: sensor.casita_tank_monitor_propane_2
   propane_2_lb: sensor.casita_tank_monitor_propane_2_remaining
   # Water tanks. Percent full.
-  water_fresh: sensor.casita_water_monitor_fresh_tank
+  water_fresh: sensor.casita_fresh_tank
   water_grey: sensor.casita_grey_tank
   water_black: sensor.casita_water_monitor_black_tank
   # AC meter (mod 10). Shown as "--" until that project is built.
