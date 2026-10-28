@@ -51,10 +51,10 @@ substitutions:
   water_grey: sensor.casita_grey_tank
   water_black: sensor.casita_water_monitor_black_tank
   # Tank capacities, US gallons, for the gallons shown beside each percent.
-  # 2026 Liberty 17 Deluxe with the optional 23 gal fresh tank (16 gal is
+  # 2026 Liberty 17 Deluxe with the optional 25 gal fresh tank (16 gal is
   # standard), the 32 gal grey tank fitted to current 17 ft models, and the
   # 15 gal black tank. See docs/trailer.md.
-  fresh_gal: "23"
+  fresh_gal: "25"
   grey_gal: "32"
   black_gal: "15"
   # AC meter (mod 10, Shelly EM Gen3 "Casita AC Meter"). The shore clamp is
