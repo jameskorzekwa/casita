@@ -5,7 +5,7 @@
 #   tx_pin  - ESP32 pin wired to the sensor's yellow RX lead
 #   rx_pin  - ESP32 pin wired to the sensor's green TX lead
 # and these substitutions from the device file:
-#   samples_per_read, double_hold_cycles, none_hold_cycles,
+#   samples_per_read, level_window_cycles, none_hold_cycles,
 #   publish_deadband_mm, coupling_ok_mv, tank_capacity_lb, full_level_mm
 #
 # Protocol (DYP L06 datasheet, section 2.2 "UART controlled output"):
@@ -21,23 +21,32 @@
 #     SUM    low 8 bits of the sum of the previous 9 bytes
 #   Example: FF 00 A0 01 38 05 DB 00 30 E8 = 160 mm, 31.2 degC, 1499 mV, 4.8 deg
 #
-# Reading strategy (added 2026-10-27 after watching two nearly empty cylinders):
+# Reading strategy (2026-10-27, after watching two nearly empty cylinders):
 # with only 40-80 mm of liquid, right above the sensor's 30 mm blind zone, the
-# sensor flips between the true surface echo and the echo that has bounced
-# surface-bottom-surface, which reads as almost exactly twice the height
-# (37 -> 74 mm, 41 -> 82 mm were seen). So each read cycle:
-#   1. takes samples_per_read measurements about a second apart;
-#   2. drops any sample that is about 2x another sample in the set (a double
-#      bounce is always higher, never lower), then takes the median;
-#   3. if the cycle's result is about 2x the last accepted level, holds the
-#      last level instead, unless that happens double_hold_cycles times in a
-#      row with nothing near the old level (then it is a real refill);
-#   4. needs none_hold_cycles consecutive "no liquid" cycles before reporting
-#      0, so a level sitting on the blind zone does not flicker 0 <-> 35;
-#   5. publishes only when the level moves by publish_deadband_mm or more.
+# sensor flips between the true surface echo and a longer multipath echo
+# (surface-bottom-surface and the like) that reads higher: 41 -> 74, 37 -> 74,
+# 56 -> 75..82 mm were seen, so the spurious reading is NOT reliably 2x. What
+# is reliable is that a multipath echo always travels further, so the wrong
+# reading is always HIGHER than the true one. Each read cycle therefore:
+#   1. takes samples_per_read measurements about a second apart and keeps the
+#      2nd-lowest (the lowest if fewer than 4 valid);
+#   2. pushes that into a window of the last level_window_cycles cycle values
+#      and publishes the 2nd-lowest of the window (the lowest until the window
+#      has filled, i.e. for the first minutes after boot). A single high cycle
+#      is ignored; a run of up to level_window_cycles - 2 high cycles is held
+#      off; a genuine refill shows once it has persisted for
+#      level_window_cycles - 1 cycles. A drop is believed at once;
+#   3. needs none_hold_cycles consecutive "no liquid" cycles before reporting
+#      0 (and clearing the window), so a level sitting on the blind zone does
+#      not flicker 0 <-> 35;
+#   4. publishes only when the level moves by publish_deadband_mm or more.
+# "Mark Full" uses the latest cycle's own value and resets the window to it,
+# so it works right after a refill without waiting for the window.
 # Temperature, echo strength and tilt are the cycle medians. "Coupling OK"
 # is echo strength >= coupling_ok_mv (DYP's good examples are about 1500 mV;
 # 200-500 mV gave garbage heights on 2026-10-27).
+# The rules were checked against the recorded sequences in a small C++
+# harness before installing (see ../../propane.md).
 
 uart:
   - id: uart_propane${tank}
@@ -77,16 +86,19 @@ globals:
   - id: propane${tank}_s_tilt
     type: float[${samples_per_read}]
     restore_value: false
-  # Last accepted level in mm (0 = empty / none, NAN = nothing yet).
-  - id: propane${tank}_last_good
-    type: float
+  # Window of recent cycle levels (mm) and how many are valid.
+  - id: propane${tank}_win
+    type: float[${level_window_cycles}]
     restore_value: false
-    initial_value: "NAN"
-  # Consecutive cycles that looked like a double bounce of last_good.
-  - id: propane${tank}_hold_n
+  - id: propane${tank}_win_n
     type: int
     restore_value: false
     initial_value: "0"
+  # The latest cycle's own level (mm), for Mark Full.
+  - id: propane${tank}_last_cycle
+    type: float
+    restore_value: false
+    initial_value: "NAN"
   # Consecutive cycles with no liquid detected.
   - id: propane${tank}_none_n
     type: int
@@ -124,15 +136,22 @@ button:
     entity_category: config
     on_press:
       - lambda: |-
-          float level = id(propane${tank}_level).state;
-          if (!id(propane${tank}_level).has_state() || std::isnan(level) || level < 50.0f) {
+          // Use the latest cycle's own reading, not the windowed level, so this
+          // works right after a refill; then restart the window from it.
+          float level = id(propane${tank}_last_cycle);
+          if (std::isnan(level) || level < 50.0f) {
             ESP_LOGW("propane${tank}", "Mark Full ignored: no valid level reading (%.0f mm)", level);
             return;
           }
           ESP_LOGI("propane${tank}", "Full level set to %.0f mm", level);
+          id(propane${tank}_win)[0] = level;
+          id(propane${tank}_win_n) = 1;
           auto call = id(propane${tank}_full_level).make_call();
           call.set_value(level);
           call.perform();
+          id(propane${tank}_level).publish_state(level);
+          id(propane${tank}_percent).publish_state(100.0f);
+          id(propane${tank}_remaining).publish_state(${tank_capacity_lb});
 
 binary_sensor:
   - platform: template
@@ -271,8 +290,8 @@ script:
               id(propane${tank}_tilt).publish_state(NAN);
               id(propane${tank}_liquid).publish_state(false);
               id(propane${tank}_coupling).publish_state(false);
-              id(propane${tank}_last_good) = NAN;
-              id(propane${tank}_hold_n) = 0;
+              id(propane${tank}_win_n) = 0;
+              id(propane${tank}_last_cycle) = NAN;
               id(propane${tank}_none_n) = 0;
             }
             return;
@@ -283,9 +302,11 @@ script:
             std::sort(v.begin(), v.end());
             return v[v.size() / 2];
           };
-          auto about_double = [](float x, float y) -> bool {
-            // x is about twice y (a surface-bottom-surface echo of y)
-            return y > 0 && fabsf(x - 2.0f * y) <= std::max(6.0f, 0.08f * x);
+          // 2nd-lowest once there are enough values, else the lowest: a
+          // multipath echo is always higher than the true one.
+          auto low_pick = [](std::vector<float> v, size_t full_at) -> float {
+            std::sort(v.begin(), v.end());
+            return v[v.size() >= full_at ? 1 : 0];
           };
 
           std::vector<float> temps, rssis, tilts, levels;
@@ -301,49 +322,39 @@ script:
           }
           float temp_c = median(temps), echo = median(rssis), tilt = median(tilts);
 
-          // 1. Within the cycle: drop double bounces, then take the median.
-          float est = 0.0f;
+          const int W = ${level_window_cycles};
           bool have_liquid = !levels.empty();
-          if (have_liquid) {
-            std::vector<float> keep;
-            for (float x : levels) {
-              bool dbl = false;
-              for (float y : levels) if (y < x && about_double(x, y)) { dbl = true; break; }
-              if (!dbl) keep.push_back(x);
-            }
-            if (keep.empty()) keep = levels;
-            est = median(keep);
-          }
-
-          // 2. Across cycles: hold the last level if this one is its double.
-          float last = id(propane${tank}_last_good);
           bool held = false;
-          if (have_liquid && !std::isnan(last) && last > 0 && about_double(est, last)) {
-            id(propane${tank}_hold_n) += 1;
-            if (id(propane${tank}_hold_n) < ${double_hold_cycles}) {
-              ESP_LOGI("propane${tank}", "cycle %.0f mm looks like a double bounce of %.0f mm, holding (%d/%s)",
-                       est, last, id(propane${tank}_hold_n), "${double_hold_cycles}");
-              est = last; held = true;
-            } else {
-              ESP_LOGI("propane${tank}", "%.0f mm persisted for %d cycles, accepting it (refill?)", est, id(propane${tank}_hold_n));
-              id(propane${tank}_hold_n) = 0;
+          float est = 0.0f;
+          if (have_liquid) {
+            // 1. This cycle's level: 2nd-lowest of the samples (lowest if < 4).
+            float c = low_pick(levels, 4);
+            id(propane${tank}_last_cycle) = c;
+            // 2. Push into the window and take its low pick.
+            int wn = id(propane${tank}_win_n);
+            if (wn >= W) {
+              for (int i = 1; i < W; i++) id(propane${tank}_win)[i - 1] = id(propane${tank}_win)[i];
+              wn = W - 1;
             }
+            id(propane${tank}_win)[wn] = c;
+            id(propane${tank}_win_n) = wn + 1;
+            std::vector<float> w(id(propane${tank}_win), id(propane${tank}_win) + wn + 1);
+            est = low_pick(w, W);
+            held = fabsf(est - c) >= 1.0f;
+            id(propane${tank}_none_n) = 0;
           } else {
-            id(propane${tank}_hold_n) = 0;
-          }
-
-          // 3. Near empty: several "none" cycles in a row before showing 0.
-          if (!have_liquid) {
+            // 3. No liquid: hold the window's level for a few cycles, then 0.
             id(propane${tank}_none_n) += 1;
-            if (id(propane${tank}_none_n) < ${none_hold_cycles} && !std::isnan(last) && last > 0) {
-              est = last; have_liquid = true; held = true;
+            if (id(propane${tank}_none_n) < ${none_hold_cycles} && id(propane${tank}_win_n) > 0) {
+              std::vector<float> w(id(propane${tank}_win), id(propane${tank}_win) + id(propane${tank}_win_n));
+              est = low_pick(w, W);
+              have_liquid = true; held = true;
             } else {
+              id(propane${tank}_win_n) = 0;
+              id(propane${tank}_last_cycle) = 0.0f;
               est = 0.0f;
             }
-          } else {
-            id(propane${tank}_none_n) = 0;
           }
-          if (!held) id(propane${tank}_last_good) = est;
 
           float full = id(propane${tank}_full_level).state;
           float pct = NAN;
@@ -368,4 +379,4 @@ script:
           id(propane${tank}_samples).publish_state(raw);
 
           ESP_LOGI("propane${tank}", "samples=[%s] level=%.0f mm%s (%.0f%%) temp=%.1f C echo=%.0f mV tilt=%.1f deg",
-                   raw.c_str(), est, held ? " (held)" : "", pct, temp_c, echo, tilt);
+                   raw.c_str(), est, held ? " (window)" : "", pct, temp_c, echo, tilt);

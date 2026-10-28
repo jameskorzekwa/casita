@@ -50,9 +50,10 @@ substitutions:
   # Jitter control near empty (see packages/dyp-l06-propane.yaml header).
   # Measurements per read cycle, about a second apart.
   samples_per_read: "5"
-  # Cycles a level about 2x the last one must persist before it is believed
-  # (a real refill rather than a double-bounce echo). Minutes, at read_interval.
-  double_hold_cycles: "5"
+  # Cycle levels kept; the published level is the 2nd-lowest of them, so a
+  # run of up to this minus 2 spurious high cycles is ignored and a refill
+  # shows after this minus 1 cycles. Minutes, at read_interval.
+  level_window_cycles: "7"
   # Cycles of "no liquid" in a row before the level is shown as 0.
   none_hold_cycles: "3"
   # Minimum change, mm, before a new level is published.

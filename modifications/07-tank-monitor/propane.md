@@ -224,14 +224,16 @@ The propane sensors are read by the main device's configuration, [`esphome/casit
 
 **One sample:** flush the UART receive buffer, send one byte (`0x55`), wait 900 ms, read everything received, find the last 10-byte frame that starts with `0xFF` and whose last byte equals the low 8 bits of the sum of the other nine, then decode it. The frame layout and worked example are in the package file's header comment, copied from the DYP datasheet (section 2.2).
 
-**One read cycle (every minute):** five samples about a second apart, reduced to one level. This exists because a nearly empty cylinder, with 40-80 mm of liquid just above the sensor's 30 mm blind zone, makes the L06 flip between the true surface echo and the echo that has bounced surface-bottom-surface, which reads as almost exactly twice the height (37 then 74 mm, 41 then 82 mm, seen 2026-10-27). A double bounce is always higher, never lower, so:
+**One read cycle (every minute):** five samples about a second apart, reduced to one level. This exists because a nearly empty cylinder, with 40-80 mm of liquid just above the sensor's 30 mm blind zone, makes the L06 flip between the true surface echo and a longer multipath echo that reads higher: on 2026-10-27, 37 then 74 mm, 41 then 74 or 82 mm, 56 then 75-82 mm. The spurious reading is not a fixed multiple of the true one (1.4x to 2x was seen), but it is always **higher**, because a multipath echo always travels further. So the firmware believes the low readings:
 
-1. Any sample that is about twice another sample in the cycle (within 6 mm or 8%) is dropped; the level is the median of the rest.
-2. If the whole cycle comes out at about twice the last accepted level, the last level is held. If that happens 5 cycles in a row with nothing near the old level, the new one is accepted: that is a refill, not a bounce.
-3. Three consecutive "no liquid" cycles are needed before the level shows 0, so a level sitting on the blind zone does not flicker between 0 and 35 mm.
+1. The cycle's level is the 2nd-lowest of its five samples (the lowest if fewer than four are valid).
+2. That goes into a window of the last 7 cycle levels, and the published level is the 2nd-lowest of the window (the lowest until the window has filled, in the first minutes after boot). One high cycle is ignored; a run of up to 5 is held off. A drop is believed at once, so draining tracks normally. A genuine refill shows once it has persisted for 6 cycles.
+3. Three consecutive "no liquid" cycles are needed before the level shows 0 (and the window is cleared), so a level sitting on the blind zone does not flicker between 0 and 35 mm.
 4. The level is published only when it moves by 2 mm or more. Temperature, echo strength and tilt are the cycle's medians.
 
-The raw samples of the last cycle are in **Propane N Samples** (diagnostic), so the filter can be checked against what the sensor said. **Propane N Coupling OK** is on while echo strength is at least 800 mV. Three cycles without any valid frame set the cylinder's entities to unknown. Because of rule 2, **wait at least five minutes after a refill before pressing Mark Full**, or check that the level has moved first.
+**Mark Full** uses the latest cycle's own reading and restarts the window from it, so it can be pressed right after a refill. The raw samples of the last cycle are in **Propane N Samples** (diagnostic), so the filter can be checked against what the sensor said. **Propane N Coupling OK** is on while echo strength is at least 800 mV. Three cycles without any valid frame set the cylinder's entities to unknown.
+
+The rules were run through a small C++ harness against the sequences recorded on 2026-10-27 (for example cylinder 1: 60, 41, 37, 74, 46, 41, 74, 43; cylinder 2: 35, 56, 38, 37, 32, 56, 75, 78, 80, 81, 56, 82, 56, 82), plus a refill, a drain, the blind-zone flicker and a sensor dropout, before the build was installed. In every case the gauge shows a steady low value and never a spurious high one. The first version of the filter, which dropped readings "about 2x" another, failed the 1.4-1.8x cases in the same harness and was replaced the same evening.
 
 Entities, the dashboard card and the low-propane alert are in the README's [Home Assistant setup](README.md#home-assistant-setup).
 
@@ -254,8 +256,8 @@ Entities, the dashboard card and the low-propane alert are in the README's [Home
 | Liquid Detected off and Echo Strength near 0 on a tank you know has gas | Sensor not coupled: grease film dried or squeezed out, collar moved, dirt under it, or (epoxy) a gap | Pull the collar, clean, fresh grease, re-seat; if the collar keeps moving, add a strip of foam under it or fall back to epoxy |
 | Liquid Detected off, Echo Strength normal | Less than 30 mm of liquid | The tank is nearly empty |
 | Level jumps between two values | Sensor near the edge of the dome, or the tank is tilted | Check Tilt; re-position closer to the center |
-| **Samples** show a value and about its double (e.g. `43,74,41,43,42`) | Double-bounce echo on a nearly empty cylinder; the filter keeps the lower value | Nothing to fix; refill when convenient |
-| Level stays put for a few minutes after a refill | The double-bounce hold (a reading about 2x the old level is held for 5 cycles) | Wait five minutes, then Mark Full |
+| **Samples** show a value and a much higher one (e.g. `43,74,41,43,42`) | Multipath echo on a nearly empty cylinder; the filter keeps the lower value | Nothing to fix; refill when convenient |
+| Level stays put for a few minutes after a refill | The window: a higher level has to persist for 6 cycles | Wait six minutes, or press Mark Full, which uses the latest reading at once |
 | **Coupling OK** off | Echo strength under 800 mV: no grease, air gap, flange instead of boss against the tank, or off the dome's centre | Re-seat per Step P4 |
 | Percentage over 100% after a fill | Full Level is too low (different fill level than last time) | Press Mark Full again on the new fill |
 | Readings drift a few percent over the day with no use | Thermal expansion of the propane | Expected; compare readings at similar temperatures |
