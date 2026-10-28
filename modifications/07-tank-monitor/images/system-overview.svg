@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="720" viewBox="0 0 1100 720" role="img" aria-labelledby="title desc">
-  <title id="title">Casita tank monitor: system overview (two devices)</title>
-  <desc id="desc">Two ESPHome devices and one Bluetooth sensor. Main device, casita-tank-monitor: two DYP L06 ultrasonic sensors held magnetically under the two 20 pound propane cylinders on the tongue, wired to one enclosure inside the trailer near the front holding a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from a fused 12 volt circuit, on two 115200 baud UARTs. Grey tank: a battery-powered Mopeka Pro Check Universal ultrasonic sensor in a collar under the 32 gallon grey belly tank, broadcasting over Bluetooth straight to the trailer Home Assistant. Fresh device, casita-water-monitor-fresh: a Garnet SeeLeveL 710-ES3 sender on the side of the 23 gallon fresh tank, wired to an enclosure in the fresh tank bay holding a three-transistor interface, a buck regulator and a second XIAO ESP32-S3, powered from the water pump circuit. Both devices publish over Wi-Fi to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a third device like the fresh one.</desc>
+  <title id="title">Casita tank monitor: system overview</title>
+  <desc id="desc">One ESPHome device and two Bluetooth products. Main device, casita-tank-monitor: two DYP L06 ultrasonic sensors held magnetically under the two 20 pound propane cylinders on the tongue, wired to one enclosure inside the trailer near the front holding a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from a fused 12 volt circuit, on two 115200 baud UARTs. Grey tank: a battery-powered Mopeka Pro Check Universal ultrasonic sensor in a collar under the 32 gallon grey belly tank, broadcasting over Bluetooth straight to the trailer Home Assistant. Fresh tank: a Garnet SeeLeveL 710-ES3 sender on the side of the 23 gallon fresh tank, read by a Garnet 709-BTP7 Bluetooth display on the trailer's 12 volts, which the garnet integration on the trailer Home Assistant decodes. The propane device publishes over Wi-Fi, the two tank products over Bluetooth, to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a second sender on the Garnet display.</desc>
   <defs>
     <style>
       .lp{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
@@ -80,36 +80,24 @@
 
   <rect class="pwrsrc" x="30" y="565" width="200" height="60" rx="12"/>
   <text class="t" x="130" y="591" text-anchor="middle">12 V, fused</text>
-  <text class="s" x="130" y="613" text-anchor="middle">pump circuit, 2 A inline</text>
+  <text class="s" x="130" y="613" text-anchor="middle">feeds the display</text>
 
   <rect class="housing" x="290" y="410" width="480" height="225" rx="20"/>
-  <text class="t" x="530" y="442" text-anchor="middle" style="font-size:17px">Fresh device: enclosure in the fresh tank bay</text>
+  <text class="t" x="530" y="442" text-anchor="middle" style="font-size:17px">Fresh tank: Garnet 709-BTP7 display, inside</text>
 
-  <rect class="iface" x="320" y="460" width="180" height="80" rx="12"/>
-  <text class="t" x="410" y="490" text-anchor="middle" style="font-size:15px">SeeLeveL interface</text>
-  <text class="s" x="410" y="516" text-anchor="middle">2N3906 + 2 x 2N3904</text>
-
-  <rect class="reg" x="320" y="555" width="180" height="65" rx="12"/>
-  <text class="t" x="410" y="582" text-anchor="middle">Buck regulator</text>
-  <text class="s" x="410" y="605" text-anchor="middle">12 V to 5 V, 470 uF in</text>
-
-  <rect class="esp" x="560" y="460" width="190" height="160" rx="12"/>
-  <text class="t" x="655" y="490" text-anchor="middle">XIAO ESP32-S3</text>
-  <text class="s" x="655" y="514" text-anchor="middle">casita-water-</text>
-  <text class="s" x="655" y="534" text-anchor="middle">monitor-fresh</text>
-  <text class="s" x="655" y="562" text-anchor="middle">D4 / D5: interface</text>
-  <text class="s" x="655" y="586" text-anchor="middle">local web page</text>
+  <rect class="iface" x="320" y="465" width="430" height="150" rx="12"/>
+  <text class="t" x="535" y="500" text-anchor="middle">Garnet 709-BTP7</text>
+  <text class="s" x="535" y="528" text-anchor="middle">reads the sender, shows the level, broadcasts</text>
+  <text class="s" x="535" y="552" text-anchor="middle">over Bluetooth; the garnet integration decodes it</text>
+  <text class="s" x="535" y="580" text-anchor="middle">Not ESPHome; replaced the planned XIAO 2026-10-28</text>
 
   <path class="w sig" d="M230 490 H320"/>
   <text class="s" x="270" y="482" text-anchor="middle" style="font-size:13px">blue/black</text>
-  <path class="w sig" d="M500 500 H560"/>
   <path class="w pwr" d="M230 595 H320"/>
-  <path class="w pwr" d="M275 595 V525 H320"/>
-  <path class="w pwr" d="M500 590 H560"/>
 
   <!-- ============ Black tank, future ============ -->
   <rect class="black" x="30" y="650" width="740" height="40" rx="14"/>
-  <text class="s" x="400" y="676" text-anchor="middle" fill="#868e96">Future: black tank as a third device (casita-water-monitor-black), built like the fresh one</text>
+  <text class="s" x="400" y="676" text-anchor="middle" fill="#868e96">Future: black tank as a second sender on the Garnet display</text>
 
   <!-- ============ Home Assistant ============ -->
   <rect class="ha" x="830" y="150" width="240" height="120" rx="16"/>
@@ -118,6 +106,7 @@
   <text class="s" x="950" y="240" text-anchor="middle">%, lb, gal, alerts</text>
   <path class="w rf" d="M750 200 H830" marker-end="url(#arrow)"/>
   <path class="w rf" d="M750 540 H800 V250 H830" marker-end="url(#arrow)"/>
+  <text class="s" x="812" y="500" text-anchor="end">BLE</text>
   <text class="s" x="790" y="190" text-anchor="middle">Wi-Fi</text>
   <text class="s" x="812" y="310" text-anchor="end">BLE</text>
 

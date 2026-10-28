@@ -137,12 +137,20 @@ template:
       - name: "Casita AC Source"
         unique_id: casita_ac_source
         icon: mdi:power-plug
+        # As created on the trailer's Home Assistant on 2026-10-28 (a template
+        # helper named "Casita AC Source"). Until the shore clamp is fitted the
+        # shore power reads 0, so the inverter's own state (mod 11) decides:
+        # inverting = inverter; anything else with AC present = shore.
         state: >-
           {% set v = states('sensor.casita_ac_meter_panel_voltage') %}
           {% set shore = states('sensor.casita_ac_meter_shore_power') | float(0) %}
-          {% if v in ['unknown', 'unavailable'] %} none
+          {% set inv = states('binary_sensor.freedom_x_2000_inverting') %}
+          {% set mode = states('sensor.freedom_x_2000_mode') %}
+          {% if v in ['unknown', 'unavailable'] or v | float(0) < 90 %} none
           {% elif shore > 20 %} shore
-          {% else %} inverter
+          {% elif inv == 'on' or mode == 'battery' %} inverter
+          {% elif mode == 'line' or inv == 'off' %} shore
+          {% else %} unknown
           {% endif %}
       - name: "Casita Converter and Water Heater Power"
         unique_id: casita_converter_water_heater_power
@@ -169,7 +177,7 @@ The Shelly reads 0 below about 30 VA per channel, so the `shore > 20` test is sa
 
 ## E-ink dashboard
 
-[Mod 08](../08-eink-dashboard/README.md)'s configuration names these entities under `substitutions` (`ac_voltage`, `ac_panel_power`, `ac_source`) and draws an **AC** line in the battery column: voltage, panel watts and `Shore` / `Inverter` / `No AC`. It shows `--` until this project exists. If the entity IDs confirmed in Step 6 differ from the table above, change them in the dashboard's `substitutions` and reinstall it.
+[Mod 08](../08-eink-dashboard/README.md)'s configuration names these entities under `substitutions` and, since 2026-10-28, draws an **AC** line on the overview page (voltage, panel watts, `Shore` / `Inverter` / `No AC`, and the inverter's load while inverting) and a full **Power** page (Button 2 twice): source, voltage, frequency, panel power and current, shore power and current and total energy from this meter, plus the inverter's mode, load, output power, battery current and faults from mod 11, and the solar controller. Shore power and current read 0 until the second clamp is fitted.
 
 ## Testing checklist
 
@@ -227,3 +235,4 @@ Add photos to `photos/` as the build progresses:
 | --- | --- |
 | 2026-10-14 | Project written: Shelly EM Gen3 on the TS-30 PANEL output with a second clamp on the shore cord; Home Assistant templates; dashboard entities reserved. Not purchased or built |
 | 2026-10-19 | Added [components.md](components.md). Shelly EM Gen3 (with one 50 A clamp), a second 50 A clamp and a 5 x 20 mm inline fuse kit ordered from Amazon; junction box and Wago 221 kit already delivered; owner confirmed 14/16 AWG wire on hand. Nothing left to buy. |
+| 2026-10-28 | Noted from the trailer's Home Assistant: the Shelly EM Gen3 is installed and adopted as **Casita AC Meter** (`sensor.casita_ac_meter_*`, matching the table above; 122.8 V, a few watts, on 2026-10-28), with the shore clamp still to fit (shore power 0). `sensor.casita_ac_source` created as a template helper, extended with the inverter's state so it is right before the shore clamp exists. The e-ink dashboard gained a Power page. The physical installation (Steps 1-6) is not yet written up; the status line above predates it |

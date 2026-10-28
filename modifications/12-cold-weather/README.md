@@ -83,7 +83,7 @@ The Core Mini's BMS refuses charge at or below 32 °F. On shore power that only 
 
 ### G. Temperature probes and freeze alarms
 
-Five DS18B20 waterproof probes on 1-Wire, read by the [mod 07 tank monitor](../07-tank-monitor/README.md)'s two XIAOs: the grey tank, dump valve and outside probes on the **main device** (`casita-tank-monitor`, whose L02 cable already runs to the grey tank), and the fresh bay probe on the **fresh device** in the fresh tank bay:
+Five DS18B20 waterproof probes on 1-Wire, read by the [mod 07 tank monitor](../07-tank-monitor/README.md)'s XIAO (`casita-tank-monitor`, inside near the front) on one bus, or, for the fresh bay probe, by a small second XIAO or the mod 06 controller, since the fresh tank no longer has an ESPHome device (the Garnet display replaced it on 2026-10-28):
 
 | Probe | Where | Used for |
 | --- | --- | --- |
@@ -95,7 +95,7 @@ Five DS18B20 waterproof probes on 1-Wire, read by the [mod 07 tank monitor](../0
 
 The INA228 temperature in [mod 04](../04-battery-monitor-esp32/README.md) is the chip's die temperature inside the display housing, not the battery; it cannot stand in for the battery probe.
 
-Add to the mod 07 firmware: a `dallas_temp` / `one_wire` bus on XIAO `D1` (GPIO2), which is reserved for this on the main device and free on the fresh device (D2/GPIO3 is a strapping pin, avoid), a 4.7 k pull-up on each bus, and a `sensor` entry per probe with 30 s updates. Entity names on the main device `Casita Tank Monitor Grey Tank Temperature`, `... Dump Valve Temperature`, `... Outside Temperature` (and `... Battery Temperature` if it lands there); on the fresh device `Casita Water Monitor Fresh Bay Temperature`.
+Add to the mod 07 firmware: a `dallas_temp` / `one_wire` bus on XIAO `D1` (GPIO2), which is reserved for this on the main device (D2/GPIO3 is a strapping pin, avoid), a 4.7 k pull-up, and a `sensor` entry per probe with 30 s updates. Entity names `Casita Tank Monitor Grey Tank Temperature`, `... Dump Valve Temperature`, `... Outside Temperature` (and `... Battery Temperature` if it lands there). The fresh bay probe needs another host (open question 2).
 
 ### H. Cabin heat and the 30 A shore budget
 
@@ -274,7 +274,7 @@ To be refined after the first cold trip:
 ## Open questions
 
 1. Grey tank footprint, support layout and Mopeka spot: one pad or two, and where. (Phase 0, item 1.)
-2. Where does the battery compartment probe connect: a cable from the mod 07 fresh device's XIAO in the rear passenger bay to the rear center compartment, a second small XIAO, or a spare input on the mod 06 Waveshare board (it has no spare DI, but 1-Wire needs a GPIO, not a DI)? Decide after Phase 0, item 4.
+2. Where do the fresh bay and battery compartment probes connect, now that there is no ESPHome device at the rear: a second small XIAO (the retired fresh device's board is a spare), or a spare input on the mod 06 Waveshare board (it has no spare DI, but 1-Wire needs a GPIO, not a DI)? Decide after Phase 0, item 4.
 3. Is mod 06 going to be installed before the first winter trip? If not, the fallback switches in [Wiring](#wiring) are used and the automations only alarm.
 4. Does the fresh tank bay need a vent for furnace air, or does it already share air with the cabin?
 5. Is the water heater on this trailer the SW6DE as the manual set suggests, with a standard door? (`docs/trailer.md` still says "model to record".)
@@ -288,3 +288,4 @@ To be refined after the first cold trip:
 | 2026-10-21 | Proposed. Plan written from `docs/trailer.md`, the owner's manual (winter precautions page 46, winterization page 36, LP regulator page 23), the Suburban furnace and water heater manuals, and mods 01, 03, 04, 06, 09 and 10. Nothing measured, ordered or built |
 | 2026-10-27 | References updated for the combined [mod 07 tank monitor](../07-tank-monitor/README.md) (mod 09 merged into it): the grey tank, valve and outside probes go on the main device's D1, the fresh bay probe on the fresh device's D1 |
 | 2026-10-27 | Mod 07's grey sensor is now a Mopeka (battery, Bluetooth): the belly pan must leave it reachable for battery changes, and the heater interlock watches the Mopeka's availability instead of an ESPHome online flag |
+| 2026-10-28 | Mod 07's fresh ESPHome device was retired (Garnet display instead), so the fresh bay probe needs another host; added to open question 2 |

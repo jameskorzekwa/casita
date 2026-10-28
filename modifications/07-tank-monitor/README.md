@@ -1,14 +1,14 @@
 # Tank Monitor to Home Assistant (propane, fresh and grey)
 
-Propane in both 20 lb cylinders and the fresh and grey water levels in the trailer's Home Assistant, with nothing inside any tank. Two ESPHome devices, each a Seeed Studio XIAO ESP32-S3 on fused trailer 12 V, plus one battery-powered Bluetooth sensor for the grey tank:
+Propane in both 20 lb cylinders and the fresh and grey water levels in the trailer's Home Assistant, with nothing inside any tank. One ESPHome device for propane and two Bluetooth products for the water tanks:
 
 | Device | ESPHome name | Reads | Where | Power |
 | --- | --- | --- | --- | --- |
 | **Main** | `casita-tank-monitor` | Two DYP **L06** ultrasonic sensors under the propane cylinders | Inside the trailer near the front, where the propane cables come in (spot to confirm, [Step M1](#step-m1-pick-the-main-enclosure-spot-and-measure-the-runs)) | A fused 12 V circuit near the enclosure (to confirm), 2 A inline fuse |
-| **Fresh** | `casita-water-monitor-fresh` | A Garnet SeeLeveL II **710-ES3** sender on the side of the fresh tank, through a three-transistor interface | Fresh tank bay, rear passenger side | Water pump 12 V circuit, 2 A inline fuse |
+| **Fresh** (not ESPHome) | Garnet SeeLeveL II 709-BTP7 display | A Garnet **710-ES3** sender on the side of the fresh tank, read by Garnet's Bluetooth display and the `garnet` integration | Display inside the trailer (to document) | Trailer 12 V |
 | **Grey** (not ESPHome) | Mopeka Pro Check Universal | Its own ultrasonic sensor under the grey belly tank, read by the trailer's Home Assistant over Bluetooth | Under the tank, in Mopeka's collar | Coin cell |
 
-Each ESPHome device publishes percentages, pounds or gallons and diagnostics over Wi-Fi, and has a local web page that shows its readings at the campsite without Home Assistant. The black tank is left for later, as a third device like the fresh one.
+The propane device publishes percentages, pounds and diagnostics over Wi-Fi and has a local web page that shows its readings at the campsite without Home Assistant; the water tanks are read by the trailer's Home Assistant Pi over Bluetooth. The black tank is left for later (a second sender on the Garnet display).
 
 ![System overview](images/system-overview.svg)
 
@@ -17,14 +17,11 @@ This README covers the project as a whole and the main device: wiring, firmware,
 | Guide | Covers |
 | --- | --- |
 | [propane.md](propane.md) | The L06 sensors: what to order, proving they read through the cylinder, the magnetic collars, mounting, calibration (Steps P1-P7) |
-| [water-tanks.md](water-tanks.md) | The whole fresh device (Steps F1-F7), and the grey tank's Mopeka sensor: mounting, Home Assistant, calibration (Steps G1-G4) |
+| [water-tanks.md](water-tanks.md) | The fresh tank's Garnet display and the grey tank's Mopeka sensor: Home Assistant, mounting, calibration (Steps G1-G4) |
 | [components.md](components.md) | Ownership and purchase status of every part |
 
 > [!IMPORTANT]
-> **Status: main device running and reading both propane cylinders; grey sensor changed to Mopeka; fresh device not built (updated 2026-10-27).** The main device's XIAO was flashed with `casita-tank-monitor` on 2026-10-27 (ESPHome 2026.10.0 from the trailer's Device Builder), joined the trailer Wi-Fi once its U.FL antenna was fitted, and is in the trailer's Home Assistant. Both L06 sensors read once a minute; after re-seating them with grease on the boss face, echo strength is **1,400 and 1,260 mV** (first attempts gave 0-400 mV and false heights), with 43 and 56 mm of liquid on two low cylinders. Percentages still use the assumed 280 mm full level until **Mark Full** is pressed on a fresh fill ([propane.md, Step P7](propane.md#step-p7-calibrate)). The DYP L02 grey sensor never produced a byte on the third UART (power confirmed, pinout checked against DYP's datasheet, zero bytes in a UART dump), so the same day the owner replaced it with a **Mopeka Pro Check Universal** (ordered 2026-10-27, arriving 2026-10-28) and the grey tank was removed from this device's firmware. Combined on 2026-10-27 from the former propane monitor (mod 07) and water tank monitor (mod 09): the grey tank sensor moved from its own device in the closet onto the propane monitor's XIAO. All four sensors are on hand or delivered: the SeeLeveL sender and the DYP L02 (owner), and both DYP L06 (Amazon shows them delivered 2026-10-27; check each label says **L062MTW**). Both ESPHome configurations compile with ESPHome 2026.9.1 but have not run on hardware, and no sensor has been tried on this trailer's tanks. Two checks still decide whether it works:
->
-> 1. **Propane:** the L06 must get a strong echo through the cylinder's steel bottom (aim well above 1,000 mV), which means the raised boss face flat on the centre of the dome with grease ([Step P4](propane.md#step-p4-bench-test-the-sensor-on-a-cylinder)).
-> 2. **Fresh tank:** the 710-ES3 needs a flat strip of tank wall 2.2 x about 11 in, clear of metal ([Step F1](water-tanks.md#step-f1-measure-the-fresh-tank)).
+> **Status: propane device running and reading both cylinders; fresh tank live through the Garnet display; grey Mopeka mounted, no echo yet (updated 2026-10-28).** The main device's XIAO was flashed with `casita-tank-monitor` on 2026-10-27 (ESPHome 2026.10.0 from the trailer's Device Builder), joined the trailer Wi-Fi once its U.FL antenna was fitted, and is in the trailer's Home Assistant. Both L06 sensors read once a minute; after re-seating them with grease on the boss face, echo strength is **1,400 and 1,260 mV** (first attempts gave 0-400 mV and false heights), with 43 and 56 mm of liquid on two low cylinders. Percentages still use the assumed 280 mm full level until **Mark Full** is pressed on a fresh fill ([propane.md, Step P7](propane.md#step-p7-calibrate)). The DYP L02 grey sensor never produced a byte on the third UART (power confirmed, pinout checked against DYP's datasheet, zero bytes in a UART dump), so the same day the owner replaced it with a **Mopeka Pro Check Universal** (ordered 2026-10-27, arriving 2026-10-28) and the grey tank was removed from this device's firmware. Combined on 2026-10-27 from the former propane monitor (mod 07) and water tank monitor (mod 09): the grey tank sensor moved from its own device in the closet onto the propane monitor's XIAO. All four sensors are on hand or delivered: the SeeLeveL sender and the DYP L02 (owner), and both DYP L06 (Amazon shows them delivered 2026-10-27; check each label says **L062MTW**). Both ESPHome configurations compile with ESPHome 2026.9.1 but have not run on hardware, and no sensor has been tried on this trailer's tanks. Still open: the Mopeka has to show an echo with water in the tank ([Step G2](water-tanks.md#step-g2-test-the-mopeka-under-the-grey-tank)), the propane cylinders need **Mark Full** on a fresh fill, and the fresh tank's physical installation is to be documented ([water-tanks.md](water-tanks.md#to-document)).
 
 **Contents:** [Why two devices](#why-two-devices) · [Build order](#build-order) · [Parts](#parts) · [Main device wiring](#main-device-wiring) · [Power](#power) · [Where things go](#where-things-go) · [Main device steps](#main-device-steps) · [ESPHome configuration](#esphome-configuration) · [Home Assistant setup](#home-assistant-setup) · [Testing](#testing-checklist) · [Troubleshooting](#troubleshooting) · [Safety](#safety-notes) · [Revisions](#revisions)
 
@@ -44,13 +41,11 @@ The main device reads the two propane sensors, one per hardware UART (each needs
 | `D7` | GPIO44 | Propane 1 `TX` (green) to ESP32 receive |
 | `D8`, `D9`, `D10` | GPIO7, 8, 9 | Free |
 
-The fresh tank stays on its own device. Its sender and the 12 V interface board belong in the rear passenger bay next to the tank; moving them onto the main device would mean a run the length of the trailer for the sender's 12 V pulse line. The main XIAO has the free pins if that is ever wanted; the SeeLeveL component does not use a UART.
-
-The grey tank is not on either device. The plan from 2026-10-14 to 2026-10-27 was a wired DYP L02 ultrasonic sensor under the belly tank, first on its own XIAO, then on this one; the L02 that arrived never sent a byte, and the owner chose a Mopeka Pro Check Universal instead: a self-contained Bluetooth sensor that the trailer's Home Assistant reads directly, with its own coin cell. The cost is one battery to change every year or two; the gain is no cable under the trailer and no ESP32 work. Details in [water-tanks.md](water-tanks.md#grey-tank-mopeka).
+The fresh tank is not on an ESPHome device either, since 2026-10-28: the owner fitted a Garnet 709-BTP7 Bluetooth display, which reads the SeeLeveL sender directly and talks to the Pi through the `garnet` integration. The ESPHome fresh device that had been designed and flashed for the same sender was retired and deleted the same day. The grey tank is not on an ESPHome device. The plan from 2026-10-14 to 2026-10-27 was a wired DYP L02 ultrasonic sensor under the belly tank, first on its own XIAO, then on this one; the L02 that arrived never sent a byte, and the owner chose a Mopeka Pro Check Universal instead: a self-contained Bluetooth sensor that the trailer's Home Assistant reads directly, with its own coin cell. The cost is one battery to change every year or two; the gain is no cable under the trailer and no ESP32 work. Details in [water-tanks.md](water-tanks.md#grey-tank-mopeka).
 
 ## Build order
 
-The fresh device is independent and can be built at any time ([water-tanks.md, Steps F1-F7](water-tanks.md#build-order)), and so is the grey tank's Mopeka ([Steps G1-G4](water-tanks.md#grey-tank-steps)). For the main device, the propane sensors are proven on the bench and on the cylinder before anything is permanent:
+The water tanks are independent of this device ([water-tanks.md](water-tanks.md#build-order)). For the main device, the propane sensors are proven on the bench and on the cylinder before anything is permanent:
 
 | Step | What | Result |
 | --- | --- | --- |
@@ -64,7 +59,7 @@ The fresh device is independent and can be built at any time ([water-tanks.md, S
 
 ## Parts
 
-The main device's own parts are below. Sensor parts are in [propane.md](propane.md#parts) and [water-tanks.md](water-tanks.md#parts), and the fresh device's controller parts in [water-tanks.md](water-tanks.md#fresh-device). Ownership and purchase status for everything: [components.md](components.md).
+The main device's own parts are below. Sensor parts are in [propane.md](propane.md#parts) and [water-tanks.md](water-tanks.md#parts). Ownership and purchase status for everything: [components.md](components.md).
 
 | Component | Qty | Notes | Purchase link |
 | --- | ---: | --- | --- |
@@ -109,7 +104,7 @@ Expect roughly **40-80 mA from 12 V** in total, about 1-2 Ah per day from the 60
 - **Main enclosure:** inside the trailer near the front, where the two propane cables come through from the tongue, so those 115200 baud runs stay under about 3 m. **To confirm in Step M1:** the enclosure spot and the pass-through.
 - **Propane sensors:** under the cylinders, in magnetic collars ([propane.md](propane.md#where-things-go)).
 - **Grey sensor (Mopeka):** under the grey tank in its collar, within Bluetooth reach of the Home Assistant Pi ([water-tanks.md](water-tanks.md#grey-tank-mopeka)).
-- **Fresh device:** in the fresh tank bay ([water-tanks.md](water-tanks.md#where-things-go)).
+- **Fresh tank:** the sender on the tank and the Garnet display inside ([water-tanks.md](water-tanks.md#where-things-go)).
 - Keep the main enclosure and all connectors inside the trailer, never in the propane tank cover or near the regulator and valves (see [Safety](#safety-notes)).
 
 ## Main device steps
@@ -160,8 +155,7 @@ After the sensors have passed the cylinder test (Step P4) and are mounted (P6):
 
 | Device | Files | Components |
 | --- | --- | --- |
-| Main | [`esphome/casita-tank-monitor.yaml`](esphome/casita-tank-monitor.yaml) and [`esphome/packages/dyp-l06-propane.yaml`](esphome/packages/dyp-l06-propane.yaml) (included once per cylinder with different `tank`, `tx_pin` and `rx_pin`) | Built-in `uart` (two of them), templates and scripts |
-| Fresh | [`esphome/casita-water-monitor-fresh.yaml`](esphome/casita-water-monitor-fresh.yaml) | The external [`seelevel`](https://github.com/j9brown/esphome-seelevel) component; see [water-tanks.md](water-tanks.md#esphome-configuration) |
+| Propane | [`esphome/casita-tank-monitor.yaml`](esphome/casita-tank-monitor.yaml) and [`esphome/packages/dyp-l06-propane.yaml`](esphome/packages/dyp-l06-propane.yaml) (included once per cylinder with different `tank`, `tx_pin` and `rx_pin`) | Built-in `uart` (two of them), templates and scripts |
 
 **Main device substitutions:**
 
@@ -183,15 +177,15 @@ What the main firmware does:
 
 - **Propane:** every `read_interval`, the `read_propane1` and `read_propane2` scripts take `samples_per_read` measurements from each sensor and reduce them to one level with the low-pick filter described in [propane.md](propane.md#firmware-and-home-assistant) (a multipath echo is always higher than the true one, so low readings are believed, drops at once, and a rise only if it reaches refill territory within 6 min or persists for 29 min). **Propane N** (%) = liquid level / **Propane N Full Level**; **Propane N Remaining** = % x 20 lb. Three cycles without a valid frame set that cylinder's entities to unknown. **Propane N Coupling OK** is on while echo strength is at least `coupling_ok_mv`. **Read Propane Now** reads both at once.
 
-The main configuration runs on the installed device (ESPHome 2026.10.0, compiled by the trailer's Device Builder; the propane-only build was installed over the air on 2026-10-27). The fresh configuration compiled on bee2 with ESPHome 2026.9.1 on 2026-10-27 (RAM 31.3%, flash 58.3%) and has not run on hardware.
+The configuration runs on the installed device (ESPHome 2026.10.1, compiled by the trailer's Device Builder; the propane-only build with the near-empty filter was installed over the air on 2026-10-27). The water tanks have no ESPHome configuration.
 
 ### Secrets
 
-Both configurations reference `api_encryption_key`, `ota_password`, `wifi_ssid`, `wifi_password`, `fallback_ap_password`, `web_username` and `web_password`, the same names as the trailer's other ESPHome devices. The Device Builder's `secrets.yaml` (from mod 04) already has them; add any missing from [`esphome/secrets.example.yaml`](esphome/secrets.example.yaml). `secrets.yaml` is git-ignored; only the example is committed. Generate an API key with `openssl rand -base64 32` if one is needed.
+The configuration references `api_encryption_key`, `ota_password`, `wifi_ssid`, `wifi_password`, `fallback_ap_password`, `web_username` and `web_password`, the same names as the trailer's other ESPHome devices. The Device Builder's `secrets.yaml` (from mod 04) already has them; add any missing from [`esphome/secrets.example.yaml`](esphome/secrets.example.yaml). `secrets.yaml` is git-ignored; only the example is committed. Generate an API key with `openssl rand -base64 32` if one is needed.
 
 ## Home Assistant Setup
 
-Both devices belong in the trailer's Home Assistant, like the battery monitor. Home Assistant generates entity IDs from the device and entity names; confirm the actual IDs on each device page.
+The propane device is an ESPHome device in the trailer's Home Assistant, like the battery monitor; the water tanks come in through the `garnet` and Mopeka integrations. Home Assistant generates entity IDs from the device and entity names; confirm the actual IDs on each device page.
 
 ### Entities: main device (Casita Tank Monitor)
 
@@ -211,13 +205,13 @@ Both devices belong in the trailer's Home Assistant, like the battery monitor. H
 | Read Propane Now | `button.casita_tank_monitor_read_propane_now` | (configuration) |
 | Wi-Fi Signal, Uptime, IP Address, Restart | diagnostic entities | |
 
-### Entities: fresh device (Casita Water Monitor Fresh)
+### Entities: fresh tank (Garnet)
 
 | Entity name | Entity ID | Unit / notes |
 | --- | --- | --- |
-| Tank | `sensor.casita_water_monitor_fresh_tank` | %. **Used by mod 08** |
-| Tank Volume | `sensor.casita_water_monitor_fresh_tank_volume` | gal |
-| Tank Level, Tank Segment Data | `sensor.casita_water_monitor_fresh_tank_level`, `text_sensor.casita_water_monitor_fresh_tank_segment_data` | Diagnostic |
+| Fresh Tank (corrected) | `sensor.casita_fresh_tank` | %. The owner's template helper on the Garnet display's reading (x 100/95); **used by mod 08** |
+| Fresh Water Tank Sensor Fresh Tank | `sensor.inside_fresh_water_tank_sensor_fresh_tank` | %, the display's own figure (95 = full) |
+| Fresh Water Tank Sensor Battery | `sensor.inside_fresh_water_tank_sensor_battery` | V, the display's 12 V supply |
 
 ### Entities: grey tank (Mopeka)
 
@@ -258,7 +252,7 @@ cards:
   - type: horizontal-stack
     cards:
       - type: gauge
-        entity: sensor.casita_water_monitor_fresh_tank
+        entity: sensor.casita_fresh_tank
         name: Fresh
         min: 0
         max: 100
@@ -279,7 +273,6 @@ cards:
     entities:
       - entity: sensor.casita_tank_monitor_propane_1_remaining
       - entity: sensor.casita_tank_monitor_propane_2_remaining
-      - entity: sensor.casita_water_monitor_fresh_tank_volume
 ```
 
 ### Alerts
@@ -324,7 +317,7 @@ mode: single
 alias: Casita fresh water low
 triggers:
   - trigger: numeric_state
-    entity_id: sensor.casita_water_monitor_fresh_tank
+    entity_id: sensor.casita_fresh_tank
     below: 20
     for: "00:05:00"
 actions:
@@ -332,24 +325,23 @@ actions:
     data:
       title: Casita fresh water low
       message: >-
-        Fresh tank at {{ states('sensor.casita_water_monitor_fresh_tank') }}%
-        ({{ states('sensor.casita_water_monitor_fresh_tank_volume') }} gal).
+        Fresh tank at {{ states('sensor.casita_fresh_tank') }}%.
 mode: single
 ```
 
 ### Mirroring to the home Home Assistant
 
-The Remote Home Assistant link used for the battery monitor imports every Casita entity except an exclude list, so both devices' entities appear at home automatically, as `sensor.rv_casita_tank_monitor_propane_1`, `sensor.rv_casita_water_monitor_fresh_tank`, `sensor.rv_casita_grey_tank` and so on, with friendly names starting `RV `. After each device first comes online, on the home Home Assistant:
+The Remote Home Assistant link used for the battery monitor imports every Casita entity except an exclude list, so everything appears at home automatically, as `sensor.rv_casita_tank_monitor_propane_1`, `sensor.rv_casita_fresh_tank`, `sensor.rv_casita_grey_tank` and so on, with friendly names starting `RV `. After each device first comes online, on the home Home Assistant:
 
-1. Assign the new `rv_casita_tank_monitor_*`, `rv_casita_water_monitor_*` and `rv_casita_grey_tank` entities to the **Casita RV** area (they arrive without a device, so the area is set per entity).
+1. Assign the new `rv_casita_tank_monitor_*`, `rv_casita_fresh_tank` and `rv_casita_grey_tank` entities to the **Casita RV** area (they arrive without a device, so the area is set per entity).
 2. Set display precision on the mirrored sensors, since ESPHome's `accuracy_decimals` does not cross the link: percent 0, pounds and gallons 1, millimetres 0, fresh level 2, temperature 1.
 3. Add the propane, fresh and grey sensors to the **Casita RV** dashboard.
 
 See [mod 04](../04-battery-monitor-esp32/README.md#mirroring-to-the-home-home-assistant).
 
-### Local web pages
+### Local web page
 
-On the trailer's Wi-Fi, open `http://casita-tank-monitor.local` or `http://casita-water-monitor-fresh.local` (or the device's IP address) and log in with the `web_server` username and password. Each shows every entity of its device and the Mark Full and Read buttons.
+On the trailer's Wi-Fi, open `http://casita-tank-monitor.local` (or the device's IP address) and log in with the `web_server` username and password. It shows every propane entity and the Mark Full and Read buttons.
 
 ## Testing Checklist
 
@@ -415,3 +407,4 @@ Add photos to `photos/` as the build progresses. Main device: `main-enclosure-sp
 | 2026-10-27 | **Near-empty jitter fixed in firmware.** With 40-80 mm of liquid the L06 alternated between the true echo and a higher multipath echo (37 -> 74, 41 -> 74 or 82, 56 -> 75-82 mm). First version (installed 17:57 local) rejected readings about 2x another; a C++ harness run on the recorded sequences showed that ratio test misses the 1.4-1.8x cases. Second version (18:14) used the 2nd-lowest of the last 7 cycles; live it held cylinder 2 at 55 mm while the sensor said 85, but cylinder 1 rebooted into a multipath run longer than the window and showed 76 mm (true about 44). Final rule, ratio-free and physics-based: 5 samples per cycle, 2nd-lowest kept; a drop is believed at once; a rise is believed after 6 cycles only if it reaches at least half of **Full Level** (a refill), otherwise only after 29 cycles; 3 "no liquid" cycles before 0; 2 mm deadband; the accepted level is saved to flash and seeds the window after a reboot; **Mark Full** uses the latest cycle and resets the window. Harness: every recorded sequence, a 25-cycle multipath run, a reboot into one, a refill, a drain and the blind-zone flicker all give a steady low value and never a spurious high. New diagnostics **Propane N Coupling OK** (echo at least 800 mV) and **Propane N Samples** (the cycle's raw levels). Installed over the air from the trailer's Device Builder |
 | 2026-10-27 | Filter installed (18:37 local). First boot with the new flash slot had no saved level, so it accepted the sensors' current 76 and 82 mm; the sensors had read 44 and 55 mm an hour earlier with equally strong echoes. **Which reading is true is unconfirmed**: the filter assumes the lower (multipath physics); weighing a cylinder (scale minus the stamped TW: about 1.5-2 lb at 44 mm, 3.5-4 lb at 76 mm) would settle it, and the rule is easy to flip if the higher one proves right |
 | 2026-10-28 | **Grey tank Mopeka paired and mounted** (owner): Pro Check Universal 5FA8, renamed Grey Water Sensor, medium Waste Water, battery 100%, temperature updating from under the trailer (Bluetooth reach is fine). First readings: level `unknown`, quality 0%, which is what an empty or uncoupled tank looks like; to be checked with water in the tank. Template helper **Casita Grey Tank** created and renamed to `sensor.casita_grey_tank` (inches to mm, 90 mm assumed full, 0% on no echo, unavailable when out of reach). The trailer's HA also shows a **Garnet 709-BTP7 Bluetooth display** (`garnet` integration, device renamed Fresh Water Tank Sensor) reading the fresh tank at 95%, with an owner-made template `sensor.casita_fresh_tank` (Fresh Tank (corrected), = reading x 100/95, 100% today); the ESPHome fresh device `casita-water-monitor-fresh` is present but has been unavailable since 2026-10-28 01:37. The BTP7's unused channels (grey, grey2, fresh2, black, black2, LPG) were disabled in the entity registry to tidy the device page. **To confirm with the owner:** whether the BTP7 has replaced the ESPHome fresh device for good; if so, [water-tanks.md](water-tanks.md) needs rewriting around it |
+| 2026-10-28 | **Fresh tank now read by a Garnet 709-BTP7 Bluetooth display** (owner's install, via the `garnet` HACS integration and the owner's `sensor.casita_fresh_tank` template). The ESPHome fresh device `casita-water-monitor-fresh` (designed 2026-10-14, flashed 2026-10-21, offline since 2026-10-28 01:37) was retired: deleted from the trailer's Home Assistant and Device Builder, and its configuration, SeeLeveL interface schematic and wiring diagram removed from this repository (history before this date has them). The BTP7's unused channels were disabled. [water-tanks.md](water-tanks.md) rewritten around the Garnet display and the Mopeka; its physical install is listed under [To document](water-tanks.md#to-document) |

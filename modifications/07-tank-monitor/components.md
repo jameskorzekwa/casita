@@ -6,7 +6,7 @@ Status values: `need`, `have` (owner confirmed), `probably-have` (in purchase hi
 
 The repository is public: order references record vendor and date only. Look up an Amazon order with `amazon-shop orders --since 2026-10-10 --match "<ASIN or title words>"`.
 
-**Summary 2026-10-27 (evening):** nothing to buy. The grey tank's sensor is now a **Mopeka Pro Check Universal**, ordered 2026-10-27 and arriving 2026-10-28; the DYP L02 it replaces never produced data and is retired. The SeeLeveL sender is on hand and both DYP L06 are connected to the main device. The former grey device's XIAO, regulator, capacitor, fuse holder and enclosure are spares. Still to make: the two magnetic collars.
+**Summary 2026-10-28:** nothing to buy. Propane: both DYP L06 on the main device, reading. Fresh: the SeeLeveL sender is installed and read by a **Garnet 709-BTP7** display (owner's install; part number and source to record). Grey: the **Mopeka Pro Check Universal** arrived and was mounted 2026-10-28. Retired: the DYP L02 (never produced data) and the ESPHome fresh device (superseded by the Garnet display); their parts are spares. Still to make: the two magnetic collars.
 
 ## Main device (`casita-tank-monitor`)
 
@@ -43,32 +43,27 @@ The repository is public: order references record vendor and date only. Look up 
 | 19 | 3M 9495LE (300LSE) double-sided tape and 3M Primer 94 | Only if the collar's own adhesive will not hold | | `have` / `delivered` | Owner stock; [Amazon B0GM1GQW94](https://www.amazon.com/dp/B0GM1GQW94) (primer) | Amazon, ordered 2026-10-14 | Primer delivered 2026-10-16 |
 | 20 | Rubberized undercoating | Garnet names 3M 03584; Barrier Bond bought as the equivalent | 1 can | `delivered` | [Amazon B083ZKP5L9](https://www.amazon.com/dp/B083ZKP5L9) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17. For the fresh sender only; not on the Mopeka |
 
-## Fresh device (`casita-water-monitor-fresh`)
+## Fresh tank (Garnet)
 
 | # | Component | Spec / acceptable substitute | Qty | Status | Source / option | Order ref | Notes |
 |---|---|---|---:|---|---|---|---|
-| 21 | Garnet SeeLeveL II 710-ES3 sender, 12 in | Sold by RecPro as "SeeLevel 710 RV Tank Level Sensor (12")" | 1 | `have` | [Amazon B0GWJR52N8](https://www.amazon.com/dp/B0GWJR52N8) | Amazon, ordered 2026-10-14 | On hand (owner, 2026-10-20). Paid about $56 |
-| 22 | Seeed Studio XIAO ESP32-S3 | Plain board with U.FL antenna | 1 | `delivered` | Same 3 pack as #1 | Same order | |
-| 23 | Pololu D24V5F5 regulator | | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 24 | 470 uF 25 V electrolytic capacitor | | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 25 | 2N3906 PNP transistor (TO-92) | Q101; 2N2907, S8550 or BC557 (reversed pinout) substitute | 1 | `delivered` | [Amazon B0DGT7RTZC](https://www.amazon.com/dp/B0DGT7RTZC) (32-value kit) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17 |
-| 26 | 2N3904 NPN transistor (TO-92) | Q102, Q103; same kit | 2 | `delivered` | Same kit as #25 | Same order | |
-| 27 | Resistors 1/4 W: 2.2 k x2, 1 k x2, 220, 22 k, 10 k | R101-R107 | 7 | `have` | Owner stock | — | Per the original README |
-| 28 | Perfboard about 30 x 40 mm, 5-pin terminal or header | | 1 | `delivered` | [Amazon B07ZYNWJ1S](https://www.amazon.com/dp/B07ZYNWJ1S) | Amazon, ordered 2026-10-14 | Delivered 2026-10-16/17 |
-| 29 | Inline ATO/ATC fuse holder and 2 A fuse | On the pump-circuit tap | 1 | `have` | Owner stock | — | Owner confirmed 2026-10-19 |
-| 30 | Small ABS enclosure, about 83 x 58 x 33 mm | IP65 | 1 | `delivered` | Same 2 pack as #5 | Same order | |
+| 21 | Garnet SeeLeveL II 710-ES3 sender, 12 in | Sold by RecPro as "SeeLevel 710 RV Tank Level Sensor (12")" | 1 | `have` | [Amazon B0GWJR52N8](https://www.amazon.com/dp/B0GWJR52N8) | Amazon, ordered 2026-10-14 | Installed on the fresh tank by the owner (October 2026). Paid about $56 |
+| 22 | Garnet SeeLeveL II 709-BTP7 Bluetooth display | | 1 | `have` | To record | To record | Installed by the owner; reads the sender and talks to the Pi. Part number, source and date to add |
 
-## Retired or freed on 2026-10-27
+## Retired or freed
 
-The separate grey device's parts (freed when the grey sensor moved onto the main device) and the L02 itself (retired when the Mopeka replaced it). Spares.
+The separate grey device's parts (freed 2026-10-27 when the grey sensor moved onto the main device), the L02 (retired 2026-10-27 when the Mopeka replaced it) and the ESPHome fresh device's parts (retired 2026-10-28 when the Garnet display replaced it). Spares.
 
 | # | Component | Qty | Status | Notes |
 |---|---|---:|---|---|
-| 31 | DYP-L023MUW-V1.0 (L02, UART Automatic) | 1 | `not-needed` | Amazon B0C1GFJKMV, ordered 2026-10-14. Powered at 3.3 V it never sent a byte and no LED lit; probably dead. Listing "currently unavailable" on 2026-10-27 |
-| 32 | JST-XH 2.54 mm 4-pin pigtails | 1 pack | `not-needed` | Were for the L02's plug |
-| 33 | Split loom | | `not-needed` | Was for the L02 cable |
-| 34 | Seeed Studio XIAO ESP32-S3 | 1 | `not-needed` | Third board of the 3 pack (#1) |
-| 35 | Pololu D24V5F5 regulator | 1 | `not-needed` | Owner stock |
-| 36 | 470 uF 25 V capacitor | 1 | `not-needed` | Owner stock |
-| 37 | Inline fuse holder and 2 A fuse | 1 | `not-needed` | Owner stock |
-| 38 | Small ABS enclosure | 1 | `not-needed` | Owner stock (third box) |
+| 23 | DYP-L023MUW-V1.0 (L02, UART Automatic) | 1 | `not-needed` | Amazon B0C1GFJKMV, ordered 2026-10-14. Powered at 3.3 V it never sent a byte and no LED lit; probably dead. Listing "currently unavailable" on 2026-10-27 |
+| 24 | JST-XH 2.54 mm 4-pin pigtails | 1 pack | `not-needed` | Were for the L02's plug |
+| 25 | Split loom | | `not-needed` | Was for the L02 cable |
+| 26 | Seeed Studio XIAO ESP32-S3 | 1 | `not-needed` | Third board of the 3 pack (#1) |
+| 27 | Pololu D24V5F5 regulator | 1 | `not-needed` | Owner stock |
+| 28 | 470 uF 25 V capacitor | 1 | `not-needed` | Owner stock |
+| 29 | Inline fuse holder and 2 A fuse | 1 | `not-needed` | Owner stock |
+| 30 | Small ABS enclosure | 1 | `not-needed` | Owner stock (third box) |
+| 31 | Seeed Studio XIAO ESP32-S3 (the former fresh device) | 1 | `not-needed` | Flashed 2026-10-21 as `casita-water-monitor-fresh`; retired 2026-10-28. Erase before reuse |
+| 32 | Pololu D24V5F5 regulator, 470 uF capacitor, 2 A fuse holder, ABS enclosure (former fresh device) | 1 each | `not-needed` | Owner stock / the 2 pack with #5 |
+| 33 | SeeLeveL interface parts: 2N3906, 2 x 2N3904, resistors, perfboard | 1 set | `not-needed` | From the TO-92 kit and the perfboard assortment; the schematic is in the repository history before 2026-10-28 |
