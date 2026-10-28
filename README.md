@@ -59,6 +59,8 @@ Open safety follow-ups:
 
 Full details are in [`docs/trailer.md`](docs/trailer.md).
 
+**Seeing the trailer's status:** the **Casita Status** dashboard on the trailer's Home Assistant (sidebar), the **Casita RV** dashboard on the home Home Assistant (mirrored over Tailscale), and the e-ink panel in the trailer ([mod 08](modifications/08-eink-dashboard/README.md)). See [mod 07](modifications/07-tank-monitor/README.md#dashboards).
+
 ## Adding Manuals and Documents
 
 - **Manuals** go in `manuals/<system>/` as PDF, named `manufacturer-model-document-type.pdf` in lowercase with hyphens. Add a row to the index in [`manuals/README.md`](manuals/README.md).
