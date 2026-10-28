@@ -253,32 +253,35 @@ See [Home Assistant](#home-assistant) and [Calibrate: fresh tank](#fresh-tank).
 
 The trailer's Home Assistant already has Bluetooth: the Pi 4's built-in radio and a Realtek USB adapter are both loaded (checked 2026-10-27). The built-in **Mopeka** integration discovers Pro Check sensors automatically and publishes, per sensor: **Tank level** (mm), **Temperature** (degC), **Battery** (%) and battery voltage, **Reading quality** (%), **Signal strength** (dBm) and two accelerometer axes. Its options let you pick the medium; **Waste Water** is the one for this tank.
 
-The percentage the dashboard and alerts use is a template sensor in the trailer's Home Assistant (**Settings > Devices & services > Helpers > Template > Sensor**, or YAML), planned as:
+**As paired on 2026-10-28:** the sensor is **Pro Check Universal 5FA8** (Bluetooth `F2:FA:BD:30:5F:A8`), renamed **Grey Water Sensor** in the area *Outside*, medium **Waste Water**. Its entities are `sensor.outside_grey_water_sensor_tank_level` (shown in inches because the trailer's Home Assistant uses US units; the integration's native unit is mm), `..._reading_quality`, `..._temperature` and `..._battery`.
 
-```yaml
-template:
-  - sensor:
-      - name: "Casita Grey Tank"
-        unique_id: casita_grey_tank
-        unit_of_measurement: "%"
-        state_class: measurement
-        icon: mdi:water-opacity
-        # Replace the entity ID with the Mopeka's actual Tank level entity, and
-        # 90 with the full-tank reading from the calibration fill.
-        state: >-
-          {% set mm = states('sensor.pro_check_universal_tank_level') | float(none) %}
-          {% if mm is none %}unknown{% else %}{{ ([0, (mm / 90 * 100) | round(0), 100] | sort)[1] }}{% endif %}
-        availability: "{{ has_value('sensor.pro_check_universal_tank_level') }}"
+The percentage the dashboard and alerts use is a **template helper** (**Settings > Devices & services > Helpers**, type Template > Sensor), created 2026-10-28 and attached to the Mopeka device, then renamed in the entity settings to `sensor.casita_grey_tank` with the name **Grey Tank** (a helper attached to a device gets the device name prefixed to its ID otherwise):
+
+| Field | Value |
+| --- | --- |
+| Name | Casita Grey Tank (entity renamed to `sensor.casita_grey_tank`, name **Grey Tank**) |
+| Unit | % |
+| State class | measurement |
+| Device | Grey Water Sensor (the Mopeka) |
+| State template | see below |
+| Availability template | `{{ states('sensor.outside_grey_water_sensor_tank_level') != 'unavailable' }}` |
+
+```jinja
+{% set e = 'sensor.outside_grey_water_sensor_tank_level' %}{% set s = states(e) %}
+{% if s == 'unknown' %}0{% else %}
+{% set u = state_attr(e, 'unit_of_measurement') %}
+{% set mm = s | float(0) * (25.4 if u == 'in' else 1) %}
+{{ ([0, (mm / 90 * 100) | round(0), 100] | sort)[1] | int }}{% endif %}
 ```
 
-That gives `sensor.casita_grey_tank`, the ID in the README's [dashboard card and alerts](README.md#home-assistant-setup) and in mod 08. Entity IDs are confirmed in Step G1.
+So: an `unknown` level (no echo: the Mopeka's dead zone, or no water) shows **0%**; an `unavailable` level (out of Bluetooth reach, flat cell) makes the percent unavailable rather than 0; the reading is converted from inches if needed; and `90` is the assumed full-tank height in mm, to be replaced from the [calibration fill](#grey-tank). `sensor.casita_grey_tank` is the ID in the README's [dashboard card and alerts](README.md#home-assistant-setup) and in mod 08.
 
 ## Grey tank steps
 
 ### Step G1: Pair the Mopeka on the bench
 
 1. Pull the battery tab (or fit the CR2032). The sensor starts broadcasting at once.
-2. In the trailer's Home Assistant, **Settings > Devices & services** should show a discovered **Mopeka** device within a minute. **Add**, then open its options and set the medium to **Waste Water**. Rename the device **Casita Grey Tank** so its entities get sensible IDs; note the **Tank level** entity ID for the template above.
+2. In the trailer's Home Assistant, **Settings > Devices & services** should show a discovered **Mopeka** device within a minute. **Add**, then open its options and set the medium to **Waste Water**. Rename the device so its entities get sensible IDs (done 2026-10-28: **Grey Water Sensor**, which gives `sensor.outside_grey_water_sensor_tank_level`); note the **Tank level** entity ID for the template above.
 3. With the sensor face up on the bench, **Tank level** should read 0 and **Reading quality** low. Press it, with a dab of grease, against the underside of a plastic tub of water about 60 mm deep: the level should read close to that within a few readings.
 
 ### Step G2: Test the Mopeka under the grey tank
@@ -287,7 +290,7 @@ Nothing here is permanent.
 
 1. Dump the grey tank, then put a known amount of water in through the sink: about 10 gal (roughly 25-30 mm in a tank this size). Park level.
 2. Under the trailer, clean the chosen spot (flat, smooth, supported, away from the drain end) with alcohol. Grease the sensor face and hold it up against the tank, flat, no air gap; a strip of Gorilla tape across the collar holds it for the test.
-3. Inside the trailer, read **Tank level** and **Reading quality**. **Pass:** a steady, non-zero level that rises when you add 5 more gallons, with quality well above zero, and **Signal strength** comfortably readable from where the Pi is. **Fail:** 0 with water above it (wall or coupling), or no updates at all (Bluetooth reach).
+3. Inside the trailer, read **Tank level** and **Reading quality**. **Pass:** a steady, non-zero level that rises when you add 5 more gallons, with quality well above zero, and **Signal strength** comfortably readable from where the Pi is. **Fail:** level `unknown` with quality 0% while there is water above it (wall or coupling), or no updates at all (Bluetooth reach). Note that quality 0% and level `unknown` is also exactly what an **empty** tank looks like: the Mopeka cannot see the first inch or two of water, so put water in before judging.
 4. If the reach is the problem, try the USB Bluetooth adapter on a short extension nearer the floor, or plan an ESPHome Bluetooth proxy; if the wall is the problem, try another spot before giving up.
 5. Note the reading and the gallons in; that is the first calibration point.
 
