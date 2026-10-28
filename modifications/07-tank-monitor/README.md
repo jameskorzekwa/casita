@@ -331,13 +331,17 @@ mode: single
 
 ### Mirroring to the home Home Assistant
 
-The Remote Home Assistant link used for the battery monitor imports every Casita entity except an exclude list, so everything appears at home automatically, as `sensor.rv_casita_tank_monitor_propane_1`, `sensor.rv_casita_fresh_tank`, `sensor.rv_casita_grey_tank` and so on, with friendly names starting `RV `. After each device first comes online, on the home Home Assistant:
+The Remote Home Assistant link to the home Home Assistant mirrors whichever Casita entities carry the **`shared`** label (a service on bee2 keeps the link's include list and the **Casita RV** area in step with the label; see the agent-config `home-assistant/casita.md`). Mirrors arrive as `sensor.rv_casita_tank_monitor_propane_1`, `sensor.rv_casita_fresh_tank`, `sensor.rv_casita_grey_tank` and so on, with friendly names starting `RV `.
 
-1. Assign the new `rv_casita_tank_monitor_*`, `rv_casita_fresh_tank` and `rv_casita_grey_tank` entities to the **Casita RV** area (they arrive without a device, so the area is set per entity).
-2. Set display precision on the mirrored sensors, since ESPHome's `accuracy_decimals` does not cross the link: percent 0, pounds and gallons 1, millimetres 0, fresh level 2, temperature 1.
-3. Add the propane, fresh and grey sensors to the **Casita RV** dashboard.
+Labeled `shared` on 2026-10-28 for this project: the two propane percentages and pounds remaining, the two **Coupling OK** sensors, `sensor.casita_fresh_tank` (already shared by the owner), `sensor.casita_grey_tank`, the Mopeka's reading quality and battery, and `sensor.casita_ac_source`. On the home side, display precision was set (percent 0, pounds 1) because ESPHome's `accuracy_decimals` does not cross the link, and the **Casita RV** dashboard gained fresh and grey gauges, propane gauges, a **Tanks** card and the AC source and shore rows.
 
-See [mod 04](../04-battery-monitor-esp32/README.md#mirroring-to-the-home-home-assistant).
+### Dashboards
+
+| Where | Dashboard | What it shows |
+| --- | --- | --- |
+| Trailer Home Assistant | **Casita Status** (`/casita-status/status`, in the sidebar; created 2026-10-28) | Everything on the trailer in one page: battery, fresh and grey gauges; propane gauges; battery, solar, propane (with echo strength, coupling, Mark Full and full-level numbers), water (with the raw Garnet and Mopeka readings and their batteries), AC power (meter and source), the inverter (switch, status, settings) and a 24 h graph; lights and switches; the thermostat; and a **Devices** card with each ESPHome device's Wi-Fi and uptime |
+| Home Home Assistant | **Casita RV** (`/casita-rv/casita`) | The `shared` mirrors: battery, fresh and grey, propane, tanks, solar, AC power, inverter, thermostat, Casita updates |
+| E-ink panel in the trailer | [mod 08](../08-eink-dashboard/README.md) | Overview, details and power pages |
 
 ### Local web page
 
@@ -410,3 +414,4 @@ Add photos to `photos/` as the build progresses. Main device: `main-enclosure-sp
 | 2026-10-28 | **Fresh tank now read by a Garnet 709-BTP7 Bluetooth display** (owner's install, via the `garnet` HACS integration and the owner's `sensor.casita_fresh_tank` template). The ESPHome fresh device `casita-water-monitor-fresh` (designed 2026-10-14, flashed 2026-10-21, offline since 2026-10-28 01:37) was retired: deleted from the trailer's Home Assistant and Device Builder, and its configuration, SeeLeveL interface schematic and wiring diagram removed from this repository (history before this date has them). The BTP7's unused channels were disabled. [water-tanks.md](water-tanks.md) rewritten around the Garnet display and the Mopeka; its physical install is listed under [To document](water-tanks.md#to-document) |
 | 2026-10-28 | Fresh tank capacity corrected back to **25 gal** (owner; the 23 gal of 2026-10-27 was an error). Changed in `docs/trailer.md`, the off-grid plan's weight estimate, mod 12, this project's guide and overview diagram, and the e-ink dashboard's `fresh_gal` (reinstalled on the panel the same day). Nothing in Home Assistant itself carries the gallons: the fresh template is a percentage |
 | 2026-10-28 | Fresh template re-scaled: the display reads 11-12 when the pump runs dry (the sender's bottom pad is below the pump pickup), so `sensor.casita_fresh_tank` now maps 12 to 0% and 95 to 100%, with an availability template. Applied on the trailer's Home Assistant |
+| 2026-10-28 | Home Assistant dashboards: the ten new tank and AC entities labeled `shared` so they mirror home; the home **Casita RV** dashboard updated (fresh and grey gauges, propane gauges, Tanks card, AC source and shore rows; six stale battery-monitor mirrors removed); a new **Casita Status** dashboard created on the trailer's Home Assistant showing every sensor on one page. Both checked in a browser: no missing entities |
