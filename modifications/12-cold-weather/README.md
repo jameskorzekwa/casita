@@ -15,7 +15,7 @@ From [`docs/trailer.md`](../../docs/trailer.md) and the owner's manual. The impo
 
 | Item | Where | Exposure | Risk while the furnace runs |
 | --- | --- | --- | --- |
-| Fresh tank, 23 gal, 12 in tall, with the Shurflo pump | Inside, rear passenger side bay | Cabin air, but a floor-level bay with the fill, vent and drain penetrations in it | Low; the manual says cabin heat is normally enough. Watch for cold air entering at the penetrations |
+| Fresh tank, 25 gal, 12 in tall, with the Shurflo pump | Inside, rear passenger side bay | Cabin air, but a floor-level bay with the fill, vent and drain penetrations in it | Low; the manual says cabin heat is normally enough. Watch for cold air entering at the penetrations |
 | Black tank, 15 gal | Inside, under the toilet in the wet bath | Cabin air | Low. Its 3 in ABS drain from the floor to the termination valve is outside |
 | **Grey tank, 32 gal, about 4 in tall, black polyethylene** | **Under the floor, open to the air** | **Full exposure, large flat area, wide and shallow** | **High.** A shallow tank with a big surface freezes fast, and shower and sink water goes into it all day. This is the main job |
 | Termination assembly: black and grey dump valves, the 3 in and 1-1/2 in drain stubs, outlet cap | Under the trailer, rear | Full exposure | High. A frozen gate valve will not open, and ice in the stub can split the valve body |

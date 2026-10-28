@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="720" viewBox="0 0 1100 720" role="img" aria-labelledby="title desc">
   <title id="title">Casita tank monitor: system overview</title>
-  <desc id="desc">One ESPHome device and two Bluetooth products. Main device, casita-tank-monitor: two DYP L06 ultrasonic sensors held magnetically under the two 20 pound propane cylinders on the tongue, wired to one enclosure inside the trailer near the front holding a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from a fused 12 volt circuit, on two 115200 baud UARTs. Grey tank: a battery-powered Mopeka Pro Check Universal ultrasonic sensor in a collar under the 32 gallon grey belly tank, broadcasting over Bluetooth straight to the trailer Home Assistant. Fresh tank: a Garnet SeeLeveL 710-ES3 sender on the side of the 23 gallon fresh tank, read by a Garnet 709-BTP7 Bluetooth display on the trailer's 12 volts, which the garnet integration on the trailer Home Assistant decodes. The propane device publishes over Wi-Fi, the two tank products over Bluetooth, to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a second sender on the Garnet display.</desc>
+  <desc id="desc">One ESPHome device and two Bluetooth products. Main device, casita-tank-monitor: two DYP L06 ultrasonic sensors held magnetically under the two 20 pound propane cylinders on the tongue, wired to one enclosure inside the trailer near the front holding a 12 volt to 5 volt buck regulator and a XIAO ESP32-S3, powered from a fused 12 volt circuit, on two 115200 baud UARTs. Grey tank: a battery-powered Mopeka Pro Check Universal ultrasonic sensor in a collar under the 32 gallon grey belly tank, broadcasting over Bluetooth straight to the trailer Home Assistant. Fresh tank: a Garnet SeeLeveL 710-ES3 sender on the side of the 25 gallon fresh tank, read by a Garnet 709-BTP7 Bluetooth display on the trailer's 12 volts, which the garnet integration on the trailer Home Assistant decodes. The propane device publishes over Wi-Fi, the two tank products over Bluetooth, to the trailer's Home Assistant, which feeds the e-ink dashboard and the home Home Assistant over Tailscale. A black tank would be a second sender on the Garnet display.</desc>
   <defs>
     <style>
       .lp{fill:#fff3c4;stroke:#b44d12;stroke-width:3}
@@ -73,7 +73,7 @@
   <!-- ============ Fresh device ============ -->
   <rect class="tank" x="30" y="420" width="200" height="130" rx="16"/>
   <text class="t" x="120" y="452" text-anchor="middle">Fresh tank</text>
-  <text class="s" x="120" y="478" text-anchor="middle">23 gal, 12 in tall</text>
+  <text class="s" x="120" y="478" text-anchor="middle">25 gal, 12 in tall</text>
   <text class="s" x="120" y="500" text-anchor="middle">rear passenger bay</text>
   <text class="s" x="120" y="534" text-anchor="middle">710-ES3 on the side</text>
   <rect x="206" y="440" width="14" height="95" rx="4" fill="#6b46c1"/>
