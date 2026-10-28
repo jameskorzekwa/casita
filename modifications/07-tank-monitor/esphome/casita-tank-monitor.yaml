@@ -50,10 +50,17 @@ substitutions:
   # Jitter control near empty (see packages/dyp-l06-propane.yaml header).
   # Measurements per read cycle, about a second apart.
   samples_per_read: "5"
-  # Cycle levels kept; the published level is the 2nd-lowest of them, so a
-  # run of up to this minus 2 spurious high cycles is ignored and a refill
-  # shows after this minus 1 cycles. Minutes, at read_interval.
+  # Short window: a rise to at least refill_fraction x Full Level (a refill)
+  # is believed once it is the 2nd-lowest of this many cycles, i.e. after
+  # this minus 1 cycles (minutes, at read_interval). Also how many copies of
+  # the saved level seed the window after a reboot.
   level_window_cycles: "7"
+  # Long window: a rise that stays below refill_fraction x Full Level (the
+  # multipath echo of a nearly empty cylinder) is not believed until it has
+  # persisted for this minus 1 cycles. A drop is always believed at once.
+  suspect_window_cycles: "30"
+  # Fraction of Full Level above which a rise counts as a refill.
+  refill_fraction: "0.5"
   # Cycles of "no liquid" in a row before the level is shown as 0.
   none_hold_cycles: "3"
   # Minimum change, mm, before a new level is published.
