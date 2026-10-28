@@ -224,14 +224,17 @@ The propane sensors are read by the main device's configuration, [`esphome/casit
 
 **One sample:** flush the UART receive buffer, send one byte (`0x55`), wait 900 ms, read everything received, find the last 10-byte frame that starts with `0xFF` and whose last byte equals the low 8 bits of the sum of the other nine, then decode it. The frame layout and worked example are in the package file's header comment, copied from the DYP datasheet (section 2.2).
 
-**One read cycle (every minute):** five samples about a second apart, reduced to one level. This exists because a nearly empty cylinder, with 40-80 mm of liquid just above the sensor's 30 mm blind zone, makes the L06 flip between the true surface echo and the echo that has bounced surface-bottom-surface, which reads as almost exactly twice the height (37 then 74 mm, 41 then 82 mm, seen 2026-10-27). A double bounce is always higher, never lower, so:
+**One read cycle (every minute):** five samples about a second apart, reduced to one level. This exists because a nearly empty cylinder, with 40-80 mm of liquid just above the sensor's 30 mm blind zone, makes the L06 flip between the true surface echo and a longer multipath echo that reads higher: on 2026-10-27, 37 then 74 mm, 41 then 74 or 82 mm, 56 then 75-82 mm. The spurious reading is not a fixed multiple of the true one (1.4x to 2x was seen), but it is always **higher**, because a multipath echo always travels further. So the firmware believes the low readings:
 
-1. Any sample that is about twice another sample in the cycle (within 6 mm or 8%) is dropped; the level is the median of the rest.
-2. If the whole cycle comes out at about twice the last accepted level, the last level is held. If that happens 5 cycles in a row with nothing near the old level, the new one is accepted: that is a refill, not a bounce.
-3. Three consecutive "no liquid" cycles are needed before the level shows 0, so a level sitting on the blind zone does not flicker between 0 and 35 mm.
-4. The level is published only when it moves by 2 mm or more. Temperature, echo strength and tilt are the cycle's medians.
+1. The cycle's level is the 2nd-lowest of its five samples (the lowest if fewer than four are valid).
+2. A **drop** is believed at once, so draining tracks normally.
+3. A **rise** is suspect, because a level only rises for real when the cylinder is refilled, and a refill takes it to near full. A rise to at least half of **Full Level** is believed once it is the 2nd-lowest of the last 7 cycles (about 6 min). A rise that stays below that (the multipath echo of a nearly empty cylinder, which was seen to persist for well over ten minutes) is not believed until it has persisted for 29 cycles: the published level is the 2nd-lowest of the last 30 cycle values.
+4. Three consecutive "no liquid" cycles are needed before the level shows 0 (and the window is cleared), so a level sitting on the blind zone does not flicker between 0 and 35 mm.
+5. The level is published only when it moves by 2 mm or more, and the accepted level is saved to flash so that after a reboot the filter starts with history instead of believing whatever the sensor says first. Temperature, echo strength and tilt are the cycle's medians.
 
-The raw samples of the last cycle are in **Propane N Samples** (diagnostic), so the filter can be checked against what the sensor said. **Propane N Coupling OK** is on while echo strength is at least 800 mV. Three cycles without any valid frame set the cylinder's entities to unknown. Because of rule 2, **wait at least five minutes after a refill before pressing Mark Full**, or check that the level has moved first.
+**Mark Full** uses the latest cycle's own reading and restarts the window from it, so it can be pressed right after a refill. The raw samples of the last cycle are in **Propane N Samples** (diagnostic), so the filter can be checked against what the sensor said. **Propane N Coupling OK** is on while echo strength is at least 800 mV. Three cycles without any valid frame set the cylinder's entities to unknown.
+
+The rules were run through a small C++ harness against the sequences recorded on 2026-10-27 (for example cylinder 1: 60, 41, 37, 74, 46, 41, 74, 43; cylinder 2: 35, 56, 38, 37, 32, 56, 75, 78, 80, 81, 56, 82, 56, 82), plus a 25-cycle multipath run, a reboot in the middle of one, a refill to full, a "refill" that only reaches 130 mm (held), a drain, the blind-zone flicker and a sensor dropout, before the build was installed. In every case the gauge shows a steady low value and never a spurious high one. Two earlier versions were replaced the same evening: one that dropped readings "about 2x" another (the harness showed the multipath reading is 1.4x to 2x, not a fixed ratio), and one with a plain 7-cycle window (live, cylinder 1 rebooted into a multipath run longer than the window and showed 76 mm instead of about 44).
 
 Entities, the dashboard card and the low-propane alert are in the README's [Home Assistant setup](README.md#home-assistant-setup).
 
@@ -254,8 +257,9 @@ Entities, the dashboard card and the low-propane alert are in the README's [Home
 | Liquid Detected off and Echo Strength near 0 on a tank you know has gas | Sensor not coupled: grease film dried or squeezed out, collar moved, dirt under it, or (epoxy) a gap | Pull the collar, clean, fresh grease, re-seat; if the collar keeps moving, add a strip of foam under it or fall back to epoxy |
 | Liquid Detected off, Echo Strength normal | Less than 30 mm of liquid | The tank is nearly empty |
 | Level jumps between two values | Sensor near the edge of the dome, or the tank is tilted | Check Tilt; re-position closer to the center |
-| **Samples** show a value and about its double (e.g. `43,74,41,43,42`) | Double-bounce echo on a nearly empty cylinder; the filter keeps the lower value | Nothing to fix; refill when convenient |
-| Level stays put for a few minutes after a refill | The double-bounce hold (a reading about 2x the old level is held for 5 cycles) | Wait five minutes, then Mark Full |
+| **Samples** show a value and a much higher one (e.g. `43,74,41,43,42`) | Multipath echo on a nearly empty cylinder; the filter keeps the lower value | Nothing to fix; refill when convenient |
+| Level stays put for a few minutes after a refill | A rise has to persist for 6 cycles (and reach at least half of Full Level) before it is believed | Wait six minutes, or press Mark Full, which uses the latest reading at once |
+| Level stays low after swapping in a partly full cylinder (under half) | A rise below half of Full Level is treated as a multipath echo for 29 cycles | Wait half an hour, or press Mark Full if the cylinder is actually full |
 | **Coupling OK** off | Echo strength under 800 mV: no grease, air gap, flange instead of boss against the tank, or off the dome's centre | Re-seat per Step P4 |
 | Percentage over 100% after a fill | Full Level is too low (different fill level than last time) | Press Mark Full again on the new fill |
 | Readings drift a few percent over the day with no use | Thermal expansion of the propane | Expected; compare readings at similar temperatures |
