@@ -217,7 +217,8 @@ The propane device is an ESPHome device in the trailer's Home Assistant, like th
 
 | Entity name | Entity ID | Unit / notes |
 | --- | --- | --- |
-| Grey Tank | `sensor.casita_grey_tank` | %. Template helper on the Mopeka's level; **used by mod 08**. 0% when the Mopeka reports no echo; unavailable when the Mopeka is out of reach |
+| Grey Tank | `sensor.casita_grey_tank` | %. Template helper on the median of the Mopeka's level (150 mm = full, a calibration estimate); **used by mod 08**. 0% when the Mopeka reports no echo; unavailable when the Mopeka is out of reach |
+| Grey Water Level (median) | `sensor.casita_grey_level_median` | in. Statistics helper: median of the last 15 raw readings within 30 min, which removes the Mopeka's double-bounce and junk readings |
 | Grey Water Sensor Tank Level | `sensor.outside_grey_water_sensor_tank_level` | in (the integration's mm, converted by HA's US unit setting) |
 | Grey Water Sensor Reading quality | `sensor.outside_grey_water_sensor_reading_quality` | %; 0 = no echo |
 | Grey Water Sensor Temperature, Battery | `sensor.outside_grey_water_sensor_temperature`, `..._battery` | degF, % |
@@ -415,3 +416,4 @@ Add photos to `photos/` as the build progresses. Main device: `main-enclosure-sp
 | 2026-10-28 | Fresh tank capacity corrected back to **25 gal** (owner; the 23 gal of 2026-10-27 was an error). Changed in `docs/trailer.md`, the off-grid plan's weight estimate, mod 12, this project's guide and overview diagram, and the e-ink dashboard's `fresh_gal` (reinstalled on the panel the same day). Nothing in Home Assistant itself carries the gallons: the fresh template is a percentage |
 | 2026-10-28 | Fresh template re-scaled: the display reads 11-12 when the pump runs dry (the sender's bottom pad is below the pump pickup), so `sensor.casita_fresh_tank` now maps 12 to 0% and 95 to 100%, with an availability template. Applied on the trailer's Home Assistant |
 | 2026-10-28 | Home Assistant dashboards: the ten new tank and AC entities labeled `shared` so they mirror home; the home **Casita RV** dashboard updated (fresh and grey gauges, propane gauges, Tanks card, AC source and shore rows; six stale battery-monitor mirrors removed); a new **Casita Status** dashboard created on the trailer's Home Assistant showing every sensor on one page. Both checked in a browser: no missing entities |
+| 2026-10-28 | **Grey gauge fixed.** The raw Mopeka level showed double-bounce readings (about 2x) and junk (283 mm, quality 0%) between good ones, and the assumed 90 mm full height put a 60%-full tank at 100%. Added a Statistics helper `sensor.casita_grey_level_median` (median of 15 readings, 30 min) and rebuilt `sensor.casita_grey_tank` on it with full = 150 mm, from the owner's about 20 gal at a settled 95 mm. Reads 63%. Tank height still to measure |
