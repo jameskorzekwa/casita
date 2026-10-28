@@ -52,7 +52,7 @@ Both tanks now use finished products with their own radios, read by the Pi; noth
 
 ## How It Works
 
-**Fresh tank (Garnet).** The sender is a flexible circuit board with a column of copper pads, stuck to the outside of the tank. Each pad and the water behind the wall form a capacitor; the sender measures each pad's capacitance and reports it to the 709-BTP7 display over the sender's two-wire bus. The display shows the level and broadcasts it over Bluetooth Low Energy, which the `garnet` integration on the Pi decodes into a per-tank percentage (`sensor.inside_fresh_water_tank_sensor_fresh_tank`, 95% with the tank full) plus the display's supply voltage. The owner's template `sensor.casita_fresh_tank` rescales that so 95% reads 100%.
+**Fresh tank (Garnet).** The sender is a flexible circuit board with a column of copper pads, stuck to the outside of the tank. Each pad and the water behind the wall form a capacitor; the sender measures each pad's capacitance and reports it to the 709-BTP7 display over the sender's two-wire bus. The display shows the level and broadcasts it over Bluetooth Low Energy, which the `garnet` integration on the Pi decodes into a per-tank percentage (`sensor.inside_fresh_water_tank_sensor_fresh_tank`: 95 with the tank full, 11-12 when the pump runs dry) plus the display's supply voltage. The template `sensor.casita_fresh_tank` rescales that so 95 reads 100% and 12 reads 0%: "empty" means the pump has nothing left to draw.
 
 **Grey tank (Mopeka).** The Pro Check Universal is a self-contained ultrasonic sensor: it sits in a collar stuck to the underside of the tank with a film of couplant, fires a pulse up through the wall and the water every few seconds, times the echo from the surface, and broadcasts the result over Bluetooth Low Energy. The trailer's Home Assistant Pi (which already has Bluetooth, see [Grey tank (Mopeka)](#grey-tank-mopeka)) picks the broadcasts up with the built-in **Mopeka** integration and publishes **Tank level** in millimetres, plus temperature, battery, signal strength and a reading-quality score. The integration's medium setting (Waste Water for this tank) sets the speed of sound it uses. A template sensor in Home Assistant divides the millimetres by the tank's full height to give the percent the dashboard and alerts use.
 
@@ -63,7 +63,7 @@ Both tanks now use finished products with their own radios, read by the Pi; noth
 - **The grey tank is shallow, and a bottom-mounted ultrasonic sensor cannot see the first few cm.** On a tank about 4 in (100 mm) tall outside, perhaps 90 mm inside, the usable range is roughly the top two thirds. Below that the Mopeka reports 0 and the percent shows 0%. That is fine for the question that matters (is it nearly full?) and useless for "is it completely empty?".
 - **The tank wall and the Bluetooth reach are untested on this trailer.** Mopeka does not publish a wall-thickness limit for the Universal on plastic; one Casita owner's working install is the evidence. The sensor broadcasts from under the belly tank and the Pi is inside; Step G2 checks both before anything is stuck on. If the reach is marginal, a cheap ESPHome Bluetooth proxy near the floor fixes it.
 - **Sloshing and slope.** Both sensors read the water where they are. The Mopeka's reading-quality score drops while the trailer moves; trust readings when parked. If the trailer is not level, a wide, shallow grey tank reads quite differently at opposite ends. Park level before judging.
-- **The fresh reading is in Garnet's steps.** The display reports the sender's pads as a percentage (95% full on this tank, hence the owner's x 100/95 template); resolution is one pad, 1.33 in, about 3 gal on this tank.
+- **The fresh reading is in Garnet's steps.** The display reports the sender's pads as a percentage: 95 full and 12 at the pump's limit on this tank, which the template maps to 100% and 0%; resolution is one pad, 1.33 in, about 3 gal on this tank.
 - **Metal near the sender reads as water.** Keep steel, aluminum and copper 2 in from the sender's face and 1 in from its edges; check again with doors and covers closed.
 - **One shot at sticking the sender.** Its 3M 300LSE adhesive does not survive removal.
 - **Polyethylene is hard to glue.** Epoxy, CA and most tapes peel off it. The Mopeka collar comes with its own adhesive; if it lets go of this tank, 3M 9495LE (300LSE) tape with Primer 94, the same combination Garnet uses on the sender, is on hand (Step G3).
@@ -124,9 +124,9 @@ The trailer's Home Assistant runs the community **`garnet`** integration (HACS, 
 
 | Entity | ID | Notes |
 | --- | --- | --- |
-| Fresh Water Tank Sensor Fresh Tank | `sensor.inside_fresh_water_tank_sensor_fresh_tank` | %, the display's figure; 95 with the tank full |
+| Fresh Water Tank Sensor Fresh Tank | `sensor.inside_fresh_water_tank_sensor_fresh_tank` | %, the display's figure: 95 with the tank full, 11-12 when the pump runs dry (the sender's bottom pad sits below the pump pickup, so it still sees water the pump cannot reach) |
 | Fresh Water Tank Sensor Battery | `sensor.inside_fresh_water_tank_sensor_battery` | the display's 12 V supply |
-| Fresh Tank (corrected) | `sensor.casita_fresh_tank` | the owner's template helper: `{{ [100, (states('sensor.inside_fresh_water_tank_sensor_fresh_tank') | float(0) * 100 / 95) | round(0)] | min | int }}`, so a full tank reads 100%. **Used by mod 08** |
+| Fresh Tank (corrected) | `sensor.casita_fresh_tank` | template helper: `{{ ([0, ((states('sensor.inside_fresh_water_tank_sensor_fresh_tank') \| float(0) - 12) / (95 - 12) * 100) \| round(0), 100] \| sort)[1] \| int }}` with availability `{{ has_value('sensor.inside_fresh_water_tank_sensor_fresh_tank') }}`: the display's 95 (full) reads 100% and its 12 (the pump runs dry) reads 0%. **Used by mod 08** |
 
 ## Grey tank (Mopeka)
 
@@ -190,7 +190,7 @@ Both tanks are read by integrations on the trailer's Home Assistant, not by ESPH
 
 | Entity | Built on | Notes |
 | --- | --- | --- |
-| `sensor.casita_fresh_tank` | the BTP7's fresh channel | owner's helper, x 100/95; see [Fresh tank (Garnet)](#fresh-tank-garnet) |
+| `sensor.casita_fresh_tank` | the BTP7's fresh channel | 12 to 95 on the display mapped to 0 to 100%; see [Fresh tank (Garnet)](#fresh-tank-garnet) |
 | `sensor.casita_grey_tank` | the Mopeka's tank level | inches to mm, 90 mm assumed full; see [Grey tank (Mopeka)](#grey-tank-mopeka) |
 
 The dashboard card, the fresh-low and grey-full alerts, and mirroring to the home Home Assistant are in the README's [Home Assistant setup](README.md#home-assistant-setup).
@@ -201,7 +201,7 @@ Park level for all of this.
 
 ### Fresh tank
 
-The BTP7 does its own level estimation; what is calibrated is the owner's template, whose `95` is the display's reading with the tank full. Drain the tank and refill it in measured steps (a 1 gal jug, or time the hose against a bucket), noting the display's figure at each step; if full reads something other than 95, change the number in the template, and if the steps are far from linear, note it here.
+The BTP7 does its own level estimation; what is calibrated is the template, whose two numbers are the display's reading with the tank full (**95**) and when the pump runs dry (**12**, observed by the owner on 2026-10-28). To refine them: run the pump until it loses prime and note the display; then refill in measured steps (a 1 gal jug, or time the hose against a bucket), noting the display's figure at each step. Change the numbers in the template if they differ, and if the steps are far from linear, note it here.
 
 ### Grey tank
 
@@ -218,7 +218,7 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 **Fresh tank (Garnet)**
 
 1. The BTP7's own screen and `sensor.inside_fresh_water_tank_sensor_fresh_tank` agree.
-2. Full tank reads 95 on the display and 100% on `sensor.casita_fresh_tank`; empty reads 0.
+2. Full tank reads 95 on the display and 100% on `sensor.casita_fresh_tank`; the pump running dry reads about 12 on the display and 0%.
 3. The reading survives a tow and a Pi restart (the `garnet` integration reconnects on its own).
 
 **Grey tank (Mopeka)**
@@ -238,7 +238,7 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 | Device | Symptom | Likely cause | Fix |
 | --- | --- | --- | --- |
 | Fresh | `sensor.inside_fresh_water_tank_sensor_fresh_tank` unavailable | The BTP7 is unpowered (its 12 V feed), or out of the Pi's Bluetooth reach, or the `garnet` integration is not loaded | Check the display is lit; **Settings > Devices & services > Garnet** |
-| Fresh | Reads 95 when the tank is not full, or never reaches 95 | The sender's pad count or position; or the template's 95 needs changing | Compare with a measured fill ([Calibrate](#fresh-tank)) |
+| Fresh | Reads 95 when the tank is not full, or never reaches 95; or the pump runs dry at a reading other than about 12 | The sender's pad count or position; or the template's 95 / 12 need changing | Compare with a measured fill and a run-dry ([Calibrate](#fresh-tank)) |
 | Grey | No Mopeka device discovered | Battery tab still in, flat cell, or the sensor out of Bluetooth reach of the Pi | Check the cell; bring the sensor inside to pair, then test reach at the tank (Step G2) |
 | Grey | Updates stop when the sensor is under the tank | Bluetooth reach through the floor | USB adapter nearer the floor, or an ESPHome Bluetooth proxy |
 | Grey | Level always 0 with water above it, low reading quality | No couplant, air gap, wrong medium setting, or the wall is beyond the sensor | Re-grease and press; set the medium to Waste Water; try another spot |
