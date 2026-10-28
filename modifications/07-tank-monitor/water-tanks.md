@@ -60,7 +60,7 @@ Both tanks now use finished products with their own radios, read by the Pi; noth
 
 ## Known Limitations
 
-- **The grey tank is shallow, and a bottom-mounted ultrasonic sensor cannot see the first few cm.** On a tank about 4 in (100 mm) tall outside, perhaps 90 mm inside, the usable range is roughly the top two thirds. Below that the Mopeka reports 0 and the percent shows 0%. That is fine for the question that matters (is it nearly full?) and useless for "is it completely empty?".
+- **The grey tank is shallow, and a bottom-mounted ultrasonic sensor struggles with it.** The tank is 3.75 in outside, about 85 mm inside (measured 2026-10-28). Below the sensor's dead zone the Mopeka reports no echo (0%); just above it, the sensor mostly reports multiples of the level (see [Grey tank (Mopeka)](#grey-tank-mopeka)), which the template folds down when they exceed the tank's height but cannot always tell apart from a nearly full tank. Expect a trustworthy reading only in roughly the top inch and a half.
 - **The tank wall and the Bluetooth reach are untested on this trailer.** Mopeka does not publish a wall-thickness limit for the Universal on plastic; one Casita owner's working install is the evidence. The sensor broadcasts from under the belly tank and the Pi is inside; Step G2 checks both before anything is stuck on. If the reach is marginal, a cheap ESPHome Bluetooth proxy near the floor fixes it.
 - **Sloshing and slope.** Both sensors read the water where they are. The Mopeka's reading-quality score drops while the trailer moves; trust readings when parked. If the trailer is not level, a wide, shallow grey tank reads quite differently at opposite ends. Park level before judging.
 - **The fresh reading is in Garnet's steps.** The display reports the sender's pads as a percentage: 95 full and 12 at the pump's limit on this tank, which the template maps to 100% and 0%; resolution is one pad, 1.33 in, about 3 gal on this tank.
@@ -134,7 +134,7 @@ The trailer's Home Assistant already has Bluetooth: the Pi 4's built-in radio an
 
 **As paired on 2026-10-28:** the sensor is **Pro Check Universal 5FA8** (Bluetooth `F2:FA:BD:30:5F:A8`), renamed **Grey Water Sensor** in the area *Outside*, medium **Waste Water**. Its entities are `sensor.outside_grey_water_sensor_tank_level` (shown in inches because the trailer's Home Assistant uses US units; the integration's native unit is mm), `..._reading_quality`, `..._temperature` and `..._battery`.
 
-**The readings need filtering.** Home Assistant's Mopeka integration publishes every Bluetooth broadcast as it comes; the Mopeka app smooths them, Home Assistant does not. On 2026-10-28 the raw level sat at 64-77 mm with quality 100%, then showed a burst of 137-166 mm (about twice the level: the surface-bottom-surface double-bounce echo, exactly what the propane L06 does on a shallow tank), then 283 mm with quality 0%, then settled again. So the percentage is built on a **Statistics helper** (Settings > Devices & services > Helpers > Statistics): **Grey Water Level (median)**, `sensor.casita_grey_level_median`, the **median** of the last **15** raw readings no older than **30 min**, keeping the last sample. A spike, or a short run of them, cannot move the median.
+**The readings need filtering, and most of them are multiples of the real level.** Home Assistant's Mopeka integration publishes every Bluetooth broadcast as it comes; the Mopeka app smooths them, Home Assistant does not. More importantly, on this tank (3.75 in outside, about 85 mm inside) the water surface sits barely above the sensor's dead zone, and the sensor mostly reports the echo that has bounced surface-bottom-surface two, three or four times. On 2026-10-28, with about 18-20 gal in the tank, the raw level read 43 mm once (the real surface), 64-77 mm (2x 32-38), 108-123 mm (3x), 137-166 mm (4x), rose steadily from 74 to 94 mm while water was added (2x 37 to 47 mm), and settled at 94-96 mm: 2x about 47 mm. A reading taller than the tank is impossible, which is how the multiples give themselves away. So the percentage is built on a **Statistics helper** (Settings > Devices & services > Helpers > Statistics): **Grey Water Level (median)**, `sensor.casita_grey_level_median`, the **median** of the last **15** raw readings no older than **30 min**, keeping the last sample. A spike, or a short run of them, cannot move the median.
 
 The percentage itself is a **template helper**, created 2026-10-28, attached to the Mopeka device and renamed to `sensor.casita_grey_tank` (name **Grey Tank**; a helper attached to a device otherwise gets the device name prefixed to its ID):
 
@@ -154,12 +154,18 @@ The percentage itself is a **template helper**, created 2026-10-28, attached to 
 {% else %}
 {% set u = state_attr(e, 'unit_of_measurement') %}
 {% set mm = s | float(0) * (25.4 if u == 'in' else 1) %}
-{{ ([0, (mm / 150 * 100) | round(0), 100] | sort)[1] | int }}{% endif %}
+{% set h = 85 %}
+{% if mm > h * 1.08 %}{% set mm = mm / 2 %}{% endif %}
+{% if mm > h * 1.08 %}{% set mm = mm / 2 %}{% endif %}
+{% if mm > h * 1.08 %}{% set mm = mm / 2 %}{% endif %}
+{{ ([0, (mm / h * 100) | round(0), 100] | sort)[1] | int }}{% endif %}
 ```
 
-So: the median level is converted from inches (the trailer's Home Assistant uses US units; the integration's native unit is mm) and divided by the full-tank height; a raw level of `unknown` (no echo: the dead zone, or an empty tank) shows **0%**; `unavailable` (out of Bluetooth reach, flat cell) makes the percent unavailable rather than 0.
+So: the median level is converted from inches (the trailer's Home Assistant uses US units; the integration's native unit is mm); anything taller than the tank (over 8% above the 85 mm inside height) is a multiple-bounce echo and is halved until it fits, up to three times; the result is divided by the inside height; a raw level of `unknown` (no echo: the dead zone, or an empty tank) shows **0%**; `unavailable` (out of Bluetooth reach, flat cell) makes the percent unavailable rather than 0. With the settled 94 mm reading of 2026-10-28 this gives 47 mm, **56%**, consistent with the owner's roughly 20 gal.
 
-**The full-tank height is a calibration estimate.** The first value, 90 mm, came from the "about 4 in tall" note on the tank, which had never been measured, and it made the gauge read 100% with the tank well under full. On 2026-10-28 the owner estimated about 20 gal in the tank while the settled reading was 95 mm, which gives 32 gal at about **150 mm**; that is the number in the template. **To confirm:** measure the tank's outside height (full is about that minus two wall thicknesses), or do the [measured fill](#grey-tank). `sensor.casita_grey_tank` is the ID in the README's [dashboard card and alerts](README.md#home-assistant-setup) and in mod 08.
+**The full-tank height is measured.** The owner measured the tank at **3.75 in outside** on 2026-10-28, so about 85 mm inside with two roughly 5 mm walls; that is the `h` in the template. (The template briefly used 90 mm, from an old "about 4 in" note, and then 150 mm, from mistaking a doubled echo for the real level; both read 100% on a half-full tank.)
+
+**What the sensor cannot do on this tank.** The fold-down only helps when the multiple is taller than the tank. A real level of 40 mm reported as its double, 80 mm, looks like a 94%-full tank and nothing in the reading says otherwise; readings between about 64 and 92 mm are therefore ambiguous (a nearly full tank, or a tank a third to half full whose first echo the sensor missed). On a tank this shallow a bottom-mounted ultrasonic sensor has perhaps 1.5 in of unambiguous range, which is why the project's first design said it would be "coarse near empty". Two ways to do better, not yet tried: move the Mopeka to the tank's lowest point (next to the drain, if the bottom slopes that way), where the water is deepest and the first echo clears the dead zone sooner; or add a capacitive point switch (XKC-Y25-NPN) on the tank's side at the "nearly full" height, wired to the main device's free D3, as a definite dump-soon signal. `sensor.casita_grey_tank` is the ID in the README's [dashboard card and alerts](README.md#home-assistant-setup) and in mod 08.
 
 ## Grey tank steps
 
@@ -215,7 +221,7 @@ After dumping, with the tank empty, the Mopeka's **Tank level** should read `unk
 
 `full level (mm) = 32 gal x (mm per gal)`, adjusted by the intercept if the line does not pass through zero (the first few gallons fill the tank's low spots).
 
-Put that number in place of the `150` in the template sensor. One point so far: about 20 gal read 95 mm settled on 2026-10-28, hence 150. Alternatively, keep filling while watching the shower drain, note **Tank level** the moment water appears in the shower pan, and use that; it defines 100% as "about to back up", which is the practical meaning. Dump afterwards.
+Put that number in place of the `85` in the template sensor if a measured fill disagrees with the measured height; so far the two agree (about 18-20 gal at a folded 47 mm on 2026-10-28). Alternatively, keep filling while watching the shower drain, note **Tank level** the moment water appears in the shower pan, and use that; it defines 100% as "about to back up", which is the practical meaning. Dump afterwards.
 
 Repeat the grey calibration once after the first trip, since a belly tank's shape under load can differ from the empty tank's.
 
@@ -249,7 +255,7 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 | Grey | Updates stop when the sensor is under the tank | Bluetooth reach through the floor | USB adapter nearer the floor, or an ESPHome Bluetooth proxy |
 | Grey | Level always 0 with water above it, low reading quality | No couplant, air gap, wrong medium setting, or the wall is beyond the sensor | Re-grease and press; set the medium to Waste Water; try another spot |
 | Grey | The raw **Tank level** jumps to about twice the level, or to hundreds of mm with quality 0%, while the gauge stays put | Double-bounce and junk readings; the median helper is doing its job | Nothing to fix. If the gauge itself jumps, check that `sensor.casita_grey_tank` is built on `sensor.casita_grey_level_median`, not the raw level |
-| Grey | Gauge reads 100% with the tank clearly not full, or never reaches 100% | The template's full-tank height is wrong | Measure the tank or do a measured fill ([Calibrate](#grey-tank)) and change the number |
+| Grey | Gauge reads 100% with the tank clearly not full | Either the inside height in the template is wrong, or the sensor is reporting the double of a level between about 32 and 46 mm (64-92 mm reads as nearly full) | Check the height (85 mm measured); if the tank is about a third to half full, expect this until the sensor is moved to a deeper spot or a point switch is added ([Grey tank (Mopeka)](#grey-tank-mopeka)) |
 | Grey | `sensor.casita_grey_tank` unknown | Wrong Tank level entity ID in the template | Fix the ID (Step G1) |
 | Grey | Level far off the ruler | Wrong full level in the template, or the tank is tilted | Recalibrate on level ground |
 
