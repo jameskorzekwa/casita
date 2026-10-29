@@ -163,13 +163,16 @@ Stage 3 (unit %, state class measurement; availability `{{ states('sensor.outsid
 ```jinja
 {% set m = states('sensor.casita_grey_level_min') %}
 {% set raw = states('sensor.outside_grey_water_sensor_tank_level') %}
-{% set age = (now() - states.sensor.casita_grey_level_folded.last_updated).total_seconds() if states.sensor.casita_grey_level_folded else 0 %}
-{% if raw == 'unknown' and age > 600 %}0
-{% elif not is_number(m) %}unknown
+{% set prev = (this.state if this is defined and this is not none else 'unknown') %}
+{% set age = ((now() - states.sensor.casita_grey_level_folded.last_updated).total_seconds() if states.sensor.casita_grey_level_folded else 9999) %}
+{% if raw == 'unknown' %}
+  {% if age > 180 or not is_number(prev) %}0{% else %}{{ prev }}{% endif %}
+{% elif not is_number(m) %}
+  {% if is_number(prev) %}{{ prev }}{% else %}unknown{% endif %}
 {% else %}{{ ([0, (m | float(0) / 85 * 100) | round(0), 100] | sort)[1] | int }}{% endif %}
 ```
 
-So: the raw level is converted from inches (the trailer's Home Assistant uses US units; the integration's native unit is mm) and folded; the lowest folded value of the last half hour is divided by the inside height; a raw level of `unknown` (no echo: the dead zone, or an empty tank) shows **0%** only once it has persisted for 10 minutes, so a single dropout does not flash the gauge to empty; `unavailable` (out of Bluetooth reach, flat cell) makes the percent unavailable rather than 0. With the settled 96 mm reading of 2026-10-28 this gives 48 mm, **56%**, consistent with the owner's roughly 20 gal. (An intermediate version used a plain median of the raw readings; it was replaced the same evening because a window full of multiples just returns the commonest multiple.)
+So: the raw level is converted from inches (the trailer's Home Assistant uses US units; the integration's native unit is mm) and folded; the lowest folded value of the last half hour is divided by the inside height. **What "no echo" looks like:** the Mopeka cannot see the first inch or so of water, so an empty tank gives it nothing to measure; the integration reports the raw level as `unknown` and reading quality as 0%, and the folded and min helpers go `unavailable` because they deliberately carry no number for it (a dropout must not drag the 30-minute minimum to zero). The percent handles that: during the first 3 minutes of no echo it holds its previous value (a single dropout does not flash the gauge), after 3 minutes it shows **0%**, and it never shows `unknown` while the sensor is reachable. `unavailable` on the raw level (out of Bluetooth reach, flat cell) makes the percent unavailable rather than 0. Seen 2026-10-29: the tank was dumped at 00:34, the raw readings fell from 3.9 to 2.4 in as it drained and then went to no echo; the gauge went to 0%. With the settled 96 mm reading of 2026-10-28 this gives 48 mm, **56%**, consistent with the owner's roughly 20 gal. (An intermediate version used a plain median of the raw readings; it was replaced the same evening because a window full of multiples just returns the commonest multiple.)
 
 **The full-tank height is measured.** The owner measured the tank at **3.75 in outside** on 2026-10-28, so about 85 mm inside with two roughly 5 mm walls; that is the `h` in the template. (The template briefly used 90 mm, from an old "about 4 in" note, and then 150 mm, from mistaking a doubled echo for the real level; both read 100% on a half-full tank.)
 
