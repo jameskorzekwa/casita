@@ -70,6 +70,12 @@ With nothing powered:
 2. Leave the battery **unplugged** for the bench test and the installed dashboard (see [Design choices](#design-choices)). If you do plug it in, red to `+`, black to `-`, and use the slide switch to turn it off when not needed.
 3. Plug a USB-C cable from a laptop into the board. Nothing shows yet; the panel keeps whatever image it shipped with.
 
+### Step 1b (optional): Bench test
+
+[`esphome/casita-dashboard-bench-test.yaml`](esphome/casita-dashboard-bench-test.yaml) is a stand-alone image with no Wi-Fi, Home Assistant or secrets. It uses the same pins as the dashboard and draws a border, corner marks, a checkerboard, diagonals, a redraw counter, the button states and the battery-sense voltage. **Button 1** redraws, **Button 2** inverts black and white, and **Button 3** writes a line to the log. Compile it anywhere ESPHome runs (`esphome compile casita-dashboard-bench-test.yaml`, then use `.esphome/build/casita-dashboard-bench/build/firmware.factory.bin`) and flash it at [web.esphome.io](https://web.esphome.io) as in Step 3. If it draws correctly, any later blank-panel problem is software, not the hardware or cable.
+
+Result on 2026-10-20: passed on the first try (panel drew correctly, all three buttons worked, logs clean; battery not fitted).
+
 ### Step 2: Add the device in the trailer's ESPHome Device Builder
 
 The trailer's Home Assistant runs the ESPHome Device Builder add-on (installed for [mod 04](../04-battery-monitor-esp32/README.md)). Builds there take a few minutes now that the first one is done.
@@ -205,6 +211,7 @@ Add photos to `photos/` as the build progresses:
 | 2026-10-13 | Project written: ESPHome design, layout, configuration validated and compiled (not run on hardware). Kit ordered |
 | 2026-10-14 | AC line added to both pages (voltage, panel watts, source) for mod 10; `--` until it is built |
 | 2026-10-19 | Added [components.md](components.md). Kit delivered; owner confirmed the 12 V to USB-C adapter, USB-C cable and mounting hardware on hand. Nothing left to buy. |
+| 2026-10-20 | Bench-test image ([casita-dashboard-bench-test.yaml](esphome/casita-dashboard-bench-test.yaml)) run on the board: panel, FPC cable, SPI/busy/reset pins and Button 1-3 (GPIO2, GPIO3, GPIO5) confirmed. File committed 2026-10-30, salvaged from a stale worktree |
 | 2026-10-27 | Propane and grey entity IDs changed to the combined [mod 07 tank monitor](../07-tank-monitor/README.md) device: `sensor.casita_tank_monitor_propane_1` / `_2` (and `_remaining`), `sensor.casita_tank_monitor_grey_tank`. Fresh and black unchanged. Configuration not yet flashed, so nothing on the trailer to update |
 | 2026-10-27 | Grey changed again, to `sensor.casita_grey_tank`: mod 07's grey sensor is now a Mopeka read by Home Assistant over Bluetooth, with a template sensor for the percentage |
 | 2026-10-28 | Fresh changed to `sensor.casita_fresh_tank`, the owner's template on the Garnet 709-BTP7 display's reading, which is what the trailer's HA actually has. `sensor.casita_grey_tank` now exists. The running dashboard still has the old IDs until it is re-installed |

@@ -1,0 +1,154 @@
+# Casita e-ink dashboard: bench test (TRMNL 7.5" OG DIY Kit)
+#
+# Stand-alone first-flash image: no Wi-Fi, no Home Assistant, no secrets.
+# It proves the XIAO ESP32-S3 Plus, the driver board pins, the FPC cable and
+# the 7.50inv2 panel work before the real casita-dashboard.yaml goes on.
+#
+# Uses the same SPI, display, button and battery-sense pins as
+# casita-dashboard.yaml. The panel shows a border, corner marks, a
+# checkerboard, a refresh counter, the button states and the battery-sense
+# voltage. Button 1 redraws now; Button 2 inverts the pattern and redraws.
+# Logs go to the USB port (web.esphome.io > Logs).
+
+esphome:
+  name: casita-dashboard-bench
+  friendly_name: Casita Dashboard Bench Test
+  on_boot:
+    priority: 600
+    then:
+      - output.turn_on: adc_enable
+      - delay: 200ms
+      - component.update: batt_v
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+  level: DEBUG
+
+spi:
+  clk_pin: GPIO7
+  mosi_pin: GPIO9
+
+font:
+  - file: "gfonts://Inter@400"
+    id: f_small
+    size: 18
+  - file: "gfonts://Inter@700"
+    id: f_value
+    size: 34
+  - file: "gfonts://Inter@800"
+    id: f_huge
+    size: 110
+
+globals:
+  - id: redraws
+    type: int
+    restore_value: false
+    initial_value: "0"
+  - id: inverted
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+output:
+  - platform: gpio
+    pin: GPIO6
+    id: adc_enable
+
+sensor:
+  - platform: adc
+    pin: GPIO1
+    id: batt_v
+    name: "Battery Sense"
+    unit_of_measurement: V
+    accuracy_decimals: 2
+    attenuation: 12db
+    update_interval: 30s
+    filters:
+      - multiply: 2.0
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO2
+      mode: INPUT_PULLUP
+      inverted: true
+    id: key1
+    name: "Button 1"
+    on_press:
+      - logger.log: "Button 1 pressed: redraw"
+      - component.update: epaper
+  - platform: gpio
+    pin:
+      number: GPIO3
+      mode: INPUT_PULLUP
+      inverted: true
+    id: key2
+    name: "Button 2"
+    on_press:
+      - logger.log: "Button 2 pressed: invert and redraw"
+      - lambda: id(inverted) = !id(inverted);
+      - component.update: epaper
+  - platform: gpio
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+      inverted: true
+    id: key3
+    name: "Button 3"
+    on_press:
+      - logger.log: "Button 3 pressed"
+
+display:
+  - platform: waveshare_epaper
+    id: epaper
+    model: 7.50inv2
+    cs_pin: GPIO44
+    dc_pin: GPIO10
+    reset_pin: GPIO38
+    busy_pin:
+      number: GPIO4
+      inverted: true
+    update_interval: 2min
+    lambda: |-
+      const int W = 800, H = 480;
+      id(redraws)++;
+      ESP_LOGI("bench", "Drawing frame %d (inverted=%d)", id(redraws), id(inverted));
+      Color fg = id(inverted) ? COLOR_OFF : COLOR_ON;
+      Color bg = id(inverted) ? COLOR_ON : COLOR_OFF;
+      it.fill(bg);
+
+      // Border, 4 px, and corner marks: shows the image fills the panel and
+      // is not shifted or mirrored.
+      for (int i = 0; i < 4; i++) it.rectangle(i, i, W - 2 * i, H - 2 * i, fg);
+      it.filled_rectangle(0, 0, 40, 40, fg);
+      it.print(48, 10, id(f_small), fg, "top-left");
+      it.filled_rectangle(W - 40, H - 40, 40, 40, fg);
+      it.print(W - 48, H - 10, id(f_small), fg, TextAlign::BOTTOM_RIGHT, "bottom-right");
+
+      // Title and counter.
+      it.print(W / 2, 30, id(f_value), fg, TextAlign::TOP_CENTER, "CASITA BENCH TEST");
+      it.printf(W / 2, 150, id(f_huge), fg, TextAlign::CENTER, "#%d", id(redraws));
+
+      // Checkerboard, 20 px squares: looks for missing lines or columns.
+      const int CX = 40, CY = 240, CS = 20, CN = 16, CR = 8;
+      for (int r = 0; r < CR; r++)
+        for (int c = 0; c < CN; c++)
+          if ((r + c) % 2 == 0) it.filled_rectangle(CX + c * CS, CY + r * CS, CS, CS, fg);
+      it.rectangle(CX, CY, CN * CS, CR * CS, fg);
+
+      // Diagonals across the right half.
+      it.line(420, 240, 760, 400, fg);
+      it.line(420, 400, 760, 240, fg);
+      it.rectangle(420, 240, 340, 160, fg);
+
+      // Status.
+      it.printf(40, 410, id(f_small), fg, "Battery sense %.2f V   Buttons %d %d %d   Uptime %us",
+                id(batt_v).state, id(key1).state, id(key2).state, id(key3).state,
+                (unsigned) (millis() / 1000));
+      it.print(40, 434, id(f_small), fg, "Button 1: redraw   Button 2: invert");
