@@ -266,7 +266,7 @@ The calibration buttons are left off the card on purpose. Pressing **Calibrate L
 - [ESPHome motion component (IMU)](https://esphome.io/components/motion/): pitch/roll, moving, calibrate_level, calibrate_heading, calibration persistence
 - [ESPHome LSM6DS platform](https://esphome.io/components/motion/lsm6ds/) and its source (`esphome/components/lsm6ds/lsm6ds.cpp`, release 2026.10.0, chip ID table)
 - [Adafruit LSM6DS3TR-C product page](https://www.adafruit.com/product/4503)
-- [Mod 07](../07-propane-tank-monitor/README.md) and [mod 09](../09-water-tank-monitor/README.md) for the shared 12 V / XIAO build pattern
+- [Mod 07](../07-tank-monitor/README.md) (tank monitor; absorbed the former mod 09) for the shared 12 V / XIAO build pattern
 
 ## Revisions
 
