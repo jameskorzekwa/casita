@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" width="900" height="430" font-family="Helvetica, Arial, sans-serif" font-size="14">
+  <title>Casita level sensor wiring</title>
+  <desc>Trailer 12 V positive runs through an inline 2 A fuse to the Pololu D24V5F5 VIN; 12 V negative to its GND. A 470 uF capacitor sits across VIN and GND at the regulator. Regulator VOUT goes to the XIAO ESP32-S3 5V pad and GND to XIAO GND. XIAO 3V3, GND, D4 (GPIO5, SDA) and D5 (GPIO6, SCL) go to the Adafruit 4503 LSM6DS3TR-C VIN, GND, SDA and SCL. The IMU is mounted with its X arrow to the front of the trailer and Y to the driver side.</desc>
+  <rect width="900" height="430" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="bold">Mod 13 level sensor: wiring (all inside one box except the 12 V feed)</text>
+
+  <!-- 12 V source -->
+  <rect x="20" y="110" width="130" height="110" rx="6" fill="#f3f3f3" stroke="#333"/>
+  <text x="85" y="140" text-anchor="middle" font-weight="bold">Trailer 12 V</text>
+  <text x="85" y="165" text-anchor="middle">circuit</text>
+  <text x="85" y="183" text-anchor="middle">to confirm</text>
+  <text x="140" y="130" text-anchor="end" fill="#c00">+</text>
+  <text x="140" y="212" text-anchor="end">-</text>
+
+  <!-- fuse -->
+  <rect x="185" y="112" width="70" height="26" rx="4" fill="#fff6d5" stroke="#333"/>
+  <text x="220" y="130" text-anchor="middle" font-size="12">2 A fuse</text>
+  <line x1="150" y1="125" x2="185" y2="125" stroke="#c00" stroke-width="3"/>
+  <line x1="255" y1="125" x2="300" y2="125" stroke="#c00" stroke-width="3"/>
+  <line x1="150" y1="207" x2="300" y2="207" stroke="#000" stroke-width="3"/>
+
+  <!-- regulator -->
+  <rect x="300" y="100" width="140" height="130" rx="6" fill="#e8f0ff" stroke="#333"/>
+  <text x="370" y="92" text-anchor="middle" font-weight="bold">Pololu D24V5F5</text>
+  <text x="310" y="130" font-size="12">VIN</text>
+  <text x="310" y="211" font-size="12">GND</text>
+  <text x="430" y="130" font-size="12" text-anchor="end">VOUT 5 V</text>
+  <text x="430" y="211" font-size="12" text-anchor="end">GND</text>
+  <!-- capacitor -->
+  <line x1="355" y1="140" x2="355" y2="160" stroke="#333" stroke-width="2"/>
+  <line x1="342" y1="160" x2="368" y2="160" stroke="#333" stroke-width="3"/>
+  <path d="M342 170 Q355 162 368 170" fill="none" stroke="#333" stroke-width="3"/>
+  <line x1="355" y1="168" x2="355" y2="195" stroke="#333" stroke-width="2"/>
+  <text x="372" y="160" font-size="11">470 uF</text>
+  <text x="372" y="174" font-size="11">stripe</text>
+  <text x="372" y="188" font-size="11">to GND</text>
+
+  <line x1="440" y1="125" x2="510" y2="125" stroke="#c00" stroke-width="3"/>
+  <line x1="440" y1="207" x2="510" y2="207" stroke="#000" stroke-width="3"/>
+
+  <!-- XIAO -->
+  <rect x="510" y="90" width="150" height="230" rx="8" fill="#e9f7e9" stroke="#333"/>
+  <text x="585" y="82" text-anchor="middle" font-weight="bold">XIAO ESP32-S3</text>
+  <text x="520" y="130" font-size="12">5V</text>
+  <text x="520" y="211" font-size="12">GND</text>
+  <text x="650" y="150" font-size="12" text-anchor="end">3V3</text>
+  <text x="650" y="190" font-size="12" text-anchor="end">GND</text>
+  <text x="650" y="230" font-size="12" text-anchor="end">D4 GPIO5</text>
+  <text x="650" y="270" font-size="12" text-anchor="end">D5 GPIO6</text>
+  <text x="585" y="305" text-anchor="middle" font-size="11" fill="#a00">No USB while on 12 V</text>
+
+  <!-- I2C lines -->
+  <line x1="660" y1="145" x2="730" y2="145" stroke="#c00" stroke-width="2.5"/>
+  <line x1="660" y1="185" x2="730" y2="185" stroke="#000" stroke-width="2.5"/>
+  <line x1="660" y1="225" x2="730" y2="225" stroke="#1f5fd0" stroke-width="2.5"/>
+  <line x1="660" y1="265" x2="730" y2="265" stroke="#d0a000" stroke-width="2.5"/>
+  <text x="695" y="220" text-anchor="middle" font-size="11">SDA</text>
+  <text x="695" y="260" text-anchor="middle" font-size="11">SCL</text>
+
+  <!-- IMU -->
+  <rect x="730" y="110" width="150" height="180" rx="6" fill="#f0e8ff" stroke="#333"/>
+  <text x="805" y="102" text-anchor="middle" font-weight="bold">Adafruit 4503</text>
+  <text x="805" y="305" text-anchor="middle" font-size="12">LSM6DS3TR-C, I2C 0x6A</text>
+  <text x="740" y="150" font-size="12">VIN</text>
+  <text x="740" y="190" font-size="12">GND</text>
+  <text x="740" y="230" font-size="12">SDA</text>
+  <text x="740" y="270" font-size="12">SCL</text>
+  <!-- axes -->
+  <line x1="830" y1="235" x2="830" y2="185" stroke="#333" stroke-width="2"/>
+  <polygon points="830,178 825,190 835,190" fill="#333"/>
+  <text x="822" y="172" font-size="12" text-anchor="end">X = front</text>
+  <line x1="830" y1="235" x2="790" y2="235" stroke="#333" stroke-width="2"/>
+  <polygon points="783,235 795,230 795,240" fill="#333"/>
+  <text x="790" y="255" font-size="12">Y = driver</text>
+
+  <text x="20" y="370" font-size="13">Mount the IMU on standoffs, flat, X arrow toward the tongue, Y toward the driver (left) side.</text>
+  <text x="20" y="392" font-size="13">ADDR, CS, INT1, INT2 unconnected. Box screwed to rigid structure; screws shorter than the floor.</text>
+  <text x="20" y="414" font-size="13">Status 2026-10-25: design only, not built.</text>
+</svg>

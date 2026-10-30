@@ -14,6 +14,7 @@ This repository is the maintained record for James's 2026 Casita Liberty 17 Delu
 | Battery monitor / ESPHome / Home Assistant | `modifications/04-battery-monitor-esp32/` |
 | Tank levels (propane L06 on ESPHome; fresh SeeLeveL via a Garnet 709-BTP7 Bluetooth display; grey Mopeka via Bluetooth) | `modifications/07-tank-monitor/` (propane device installed 2026-10-27; mod 09 merged into it) |
 | Xantrex Freedom X inverter, Bluetooth remote panel, `ha-xantrex-freedom` HA integration | `modifications/11-xantrex-freedom-x-inverter/README.md` |
+| Trailer level (side to side, front to back) / LSM6DS3TR-C / ESPHome | `modifications/13-rv-level-sensor/` (planned, not built) |
 | Overall plan, research and decisions | `docs/off-grid-upgrade-plan.md` |
 | Manuals | `manuals/README.md` (index). Every PDF has a same-name `.md` text version; search the `.md` files, then check the PDF for diagrams and safety-critical values |
 

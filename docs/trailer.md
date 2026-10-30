@@ -12,6 +12,7 @@ What is installed on the trailer, with the source of each fact. "To confirm" mea
 | Dry weight | About 2,480 lb (17' Deluxe) | Dealer listings; weigh the actual trailer |
 | Dry tongue weight | Not published; owners report 350-450 lb loaded | To measure |
 | Length / width | 204 in (17 ft) / 80 in | Dealer listings |
+| Track width / hitch to axle | Not measured (center of tire tread to center of tire tread; coupler center to axle center line) | To measure; needed by the level sensor, [mod 13](../modifications/13-rv-level-sensor/README.md#step-6-measure-the-trailer-geometry) |
 | Fresh water | 25 gal, tank 12 in tall (natural polyethylene, inside, rear passenger side bay) | Owner, 2026-10-28, confirming the owner's manual ("the Casitas come with a 16 gallon fresh water tank; only the 17' has the option of a 25 gallon tank"); this trailer has the 25 gal option. Supersedes the 23 gal recorded 2026-10-27 (an error) and matches the 25 gal recorded 2026-10-21. Height measured by owner 2026-10. Confirm capacity with a measured fill during the [mod 07](../modifications/07-tank-monitor/water-tanks.md#calibrate) calibration |
 | Grey water | 32 gal, belly tank under the floor, **3.75 in tall outside** (about 85 mm inside), black polyethylene, not enclosed or insulated | Owner, 2026-10-21, and Casita store (32 gal); height measured by the owner 2026-10-28. The only tank exposed to outside air; see [mod 12](../modifications/12-cold-weather/README.md) |
 | Black water | 15 gal, inside, under the toilet; 3 in ABS drain to the termination valve under the trailer | Owner manual; location confirmed by owner 2026-10-21 |
@@ -50,6 +51,7 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | Home Assistant monitor | `casita-battery-monitor`: Seeed XIAO ESP32-S3 in the RBM500 housing, with a GODIYMODULES INA228 module (B0GX5HM4X3) reading the RBM500 shunt | ESPHome device in the trailer's Home Assistant, running since 2026-10-13 with plausible readings; shunt calibration to confirm; see [mod 04](../modifications/04-battery-monitor-esp32/README.md) |
 | E-ink dashboard | Seeed/TRMNL 7.5" (OG) DIY Kit: XIAO ESP32-S3 Plus driver board, 800 x 480 e-paper | Ordered, not built; ESPHome device `casita-dashboard` on the trailer's Home Assistant; see [mod 08](../modifications/08-eink-dashboard/README.md) |
 | AC meter | Shelly EM Gen3 on the TS-30 PANEL output, second clamp on the shore cord | Planned, not purchased; see [mod 10](../modifications/10-ac-power-meter/README.md) |
+| Level sensor | Adafruit 4503 LSM6DS3TR-C accelerometer on a XIAO ESP32-S3, ESPHome device `casita-level` | Planned 2026-10-25, sensor board to buy; see [mod 13](../modifications/13-rv-level-sensor/README.md) |
 
 ## Heating, Cooling and Appliances
 
