@@ -1,0 +1,392 @@
+# Casita level sensor (LSM6DS3TR-C accelerometer)
+#
+# A Seeed Studio XIAO ESP32-S3 reads an Adafruit 4503 LSM6DS3TR-C 6-DoF IMU
+# over I2C and reports how far the trailer is out of level side to side and
+# front to back, plus how much to lift a wheel and move the tongue jack to
+# fix it. Powered from the trailer's 12 V system through a 5 V buck
+# regulator, like the propane and water monitors. See ../README.md before
+# flashing.
+#
+# Requires ESPHome 2026.10.0 or later (motion hub with calibrate_level and
+# calibrate_heading). ESPHome 2026.10.0 accepts LSM6DS3 (WHO_AM_I 0x69) and
+# LSM6DS3TR-C (0x6A) only; an LSM6DSO/LSM6DSOX board (0x6C) is rejected
+# with "Unknown WHO_AM_I" until a later release.
+#
+# Sign convention (after the two calibration steps in the README):
+#   Side to Side  > 0  = driver (left, road) side HIGH
+#   Front to Back > 0  = front (tongue) HIGH
+# Confirm both on the bench (README Step 3) and flip roll_sign / pitch_sign
+# here if either is reversed.
+
+substitutions:
+  name: casita-level
+  friendly_name: Casita Level
+
+  # +1 or -1. Defaults assume the board is mounted with its silkscreen X
+  # arrow pointing to the FRONT of the trailer and Y to the DRIVER side.
+  # TO CONFIRM on the bench before installing.
+  roll_sign: "1"
+  pitch_sign: "-1"
+
+  # Starting values for the geometry numbers. ASSUMED, TO MEASURE (README
+  # Step 6); edit the numbers in Home Assistant, they are stored in flash.
+  # Track width: centre of the left tyre tread to centre of the right one.
+  track_width_in: "70"
+  # Coupler (hitch ball centre) to the axle centre line, along the trailer.
+  hitch_to_axle_in: "130"
+  # Both readings within this many degrees counts as level.
+  level_tolerance_deg: "0.5"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  min_version: 2026.10.0
+
+esp32:
+  board: seeed_xiao_esp32s3
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+
+# Geometry numbers and the calibration matrix are saved to flash.
+preferences:
+  flash_write_interval: 1min
+
+logger:
+  level: INFO
+
+api:
+  encryption:
+    key: !secret level_api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+# Trailer Wi-Fi first, home Wi-Fi as a backup, so the board is reachable on
+# the bench at home. If neither is found the fallback hotspot appears.
+wifi:
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_password
+    - ssid: !secret wifi_backup_ssid
+      password: !secret wifi_backup_password
+  ap:
+    ssid: "Casita Level Fallback"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+# Local page so a phone on the trailer Wi-Fi can watch the level while
+# working at a wheel or the tongue jack, without Home Assistant.
+web_server:
+  port: 80
+  version: 3
+  auth:
+    type: digest
+    username: !secret web_username
+    password: !secret web_password
+
+# XIAO D4 = GPIO5 (SDA), D5 = GPIO6 (SCL), same pins as the battery monitor.
+# The Adafruit 4503 has its own 10 kohm pull-ups.
+i2c:
+  id: bus_a
+  sda: GPIO5
+  scl: GPIO6
+  scan: true
+  frequency: 400kHz
+
+motion:
+  - platform: lsm6ds
+    id: imu
+    i2c_id: bus_a
+    # Adafruit 4503 default; 0x6B if the ADDR jumper is bridged. The boot
+    # I2C scan shows which one answers.
+    address: 0x6A
+    # Smallest range = finest resolution; the trailer never sees > 2 g at rest.
+    accelerometer_range: 2G
+    accelerometer_odr: 52HZ
+    gyroscope_range: 250DPS
+    gyroscope_odr: 52HZ
+    # 100 ms keeps the "Moving" detector responsive (ESPHome warns above).
+    update_interval: 100ms
+
+sensor:
+  # Raw angles from the calibrated accelerometer, averaged over 5 s and
+  # published once a second. Internal: Home Assistant gets the signed,
+  # trailer-oriented values below.
+  - platform: motion
+    motion_id: imu
+    type: roll
+    id: raw_roll
+    internal: true
+    filters:
+      - sliding_window_moving_average:
+          window_size: 50
+          send_every: 10
+
+  - platform: motion
+    motion_id: imu
+    type: pitch
+    id: raw_pitch
+    internal: true
+    filters:
+      - sliding_window_moving_average:
+          window_size: 50
+          send_every: 10
+
+  - platform: template
+    id: side_to_side
+    name: "Side to Side"
+    icon: mdi:axis-x-rotate-counterclockwise
+    unit_of_measurement: "°"
+    accuracy_decimals: 1
+    state_class: measurement
+    update_interval: 1s
+    lambda: |-
+      return ${roll_sign} * id(raw_roll).state;
+    filters:
+      # Live while leveling, quiet in the database when parked.
+      - or:
+          - delta: 0.05
+          - throttle: 60s
+
+  - platform: template
+    id: front_to_back
+    name: "Front to Back"
+    icon: mdi:axis-y-rotate-counterclockwise
+    unit_of_measurement: "°"
+    accuracy_decimals: 1
+    state_class: measurement
+    update_interval: 1s
+    lambda: |-
+      return ${pitch_sign} * id(raw_pitch).state;
+    filters:
+      - or:
+          - delta: 0.05
+          - throttle: 60s
+
+  # Height to add under the LOW-side wheel: track width x tan(angle).
+  - platform: template
+    id: wheel_lift
+    name: "Wheel Lift Needed"
+    icon: mdi:arrow-up-bold-box-outline
+    unit_of_measurement: in
+    accuracy_decimals: 2
+    state_class: measurement
+    update_interval: 1s
+    lambda: |-
+      float s = id(side_to_side).state;
+      if (isnan(s)) return NAN;
+      return id(track_width).state * tanf(fabsf(s) * M_PI / 180.0f);
+    filters:
+      - or:
+          - delta: 0.05
+          - throttle: 60s
+
+  # Signed tongue jack move at the coupler: + = raise, - = lower.
+  # Hitch-to-axle distance x tan(angle); the axle is the pivot.
+  - platform: template
+    id: tongue_adjust
+    name: "Tongue Jack Adjustment"
+    icon: mdi:arrow-up-down-bold-outline
+    unit_of_measurement: in
+    accuracy_decimals: 2
+    state_class: measurement
+    update_interval: 1s
+    lambda: |-
+      float f = id(front_to_back).state;
+      if (isnan(f)) return NAN;
+      return -id(hitch_to_axle).state * tanf(f * M_PI / 180.0f);
+    filters:
+      - or:
+          - delta: 0.05
+          - throttle: 60s
+
+  - platform: lsm6ds
+    name: "IMU Temperature"
+    entity_category: diagnostic
+    accuracy_decimals: 1
+    filters:
+      - throttle_average: 60s
+
+  - platform: wifi_signal
+    name: "Wi-Fi Signal"
+    update_interval: 60s
+    entity_category: diagnostic
+
+  - platform: uptime
+    name: "Uptime"
+    update_interval: 60s
+    entity_category: diagnostic
+
+number:
+  - platform: template
+    id: track_width
+    name: "Track Width"
+    icon: mdi:arrow-expand-horizontal
+    unit_of_measurement: in
+    min_value: 40
+    max_value: 100
+    step: 0.5
+    initial_value: ${track_width_in}
+    optimistic: true
+    restore_value: true
+    mode: box
+    entity_category: config
+
+  - platform: template
+    id: hitch_to_axle
+    name: "Hitch to Axle"
+    icon: mdi:arrow-expand-horizontal
+    unit_of_measurement: in
+    min_value: 60
+    max_value: 240
+    step: 0.5
+    initial_value: ${hitch_to_axle_in}
+    optimistic: true
+    restore_value: true
+    mode: box
+    entity_category: config
+
+  - platform: template
+    id: level_tolerance
+    name: "Level Tolerance"
+    icon: mdi:angle-acute
+    unit_of_measurement: "°"
+    min_value: 0.1
+    max_value: 3
+    step: 0.1
+    initial_value: ${level_tolerance_deg}
+    optimistic: true
+    restore_value: true
+    mode: box
+    entity_category: config
+
+binary_sensor:
+  - platform: motion
+    motion_id: imu
+    type: moving
+    id: moving
+    name: "Moving"
+    icon: mdi:caravan
+
+  - platform: template
+    id: is_level
+    name: "Level"
+    icon: mdi:check-circle-outline
+    lambda: |-
+      float s = id(side_to_side).state;
+      float f = id(front_to_back).state;
+      if (isnan(s) || isnan(f)) return {};
+      float t = id(level_tolerance).state;
+      return fabsf(s) <= t && fabsf(f) <= t;
+
+text_sensor:
+  - platform: template
+    id: side_action
+    name: "Side to Side Action"
+    icon: mdi:car-tire-alert
+    update_interval: 2s
+    lambda: |-
+      float s = id(side_to_side).state;
+      if (isnan(s)) return {"--"};
+      if (id(moving).state) return {"Moving, wait"};
+      if (fabsf(s) <= id(level_tolerance).state) return {"Level"};
+      // Round to the nearest 1/4 inch.
+      float lift = roundf(id(wheel_lift).state * 4.0f) / 4.0f;
+      char buf[48];
+      snprintf(buf, sizeof(buf), "Raise %s wheel %.2f in",
+               s > 0 ? "passenger" : "driver", lift);
+      return {buf};
+
+  - platform: template
+    id: front_action
+    name: "Front to Back Action"
+    icon: mdi:caravan
+    update_interval: 2s
+    lambda: |-
+      float f = id(front_to_back).state;
+      if (isnan(f)) return {"--"};
+      if (id(moving).state) return {"Moving, wait"};
+      if (fabsf(f) <= id(level_tolerance).state) return {"Level"};
+      float t = roundf(id(tongue_adjust).state * 4.0f) / 4.0f;
+      char buf[48];
+      snprintf(buf, sizeof(buf), "%s tongue %.2f in",
+               t > 0 ? "Raise" : "Lower", fabsf(t));
+      return {buf};
+
+  - platform: template
+    id: calibration_status
+    name: "Calibration Status"
+    icon: mdi:tune-vertical
+    entity_category: diagnostic
+
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic
+
+button:
+  # Step 1 of calibration: with the TRAILER level (reference level on the
+  # floor), make the current reading zero in both directions.
+  - platform: template
+    name: "Calibrate Level"
+    icon: mdi:target
+    entity_category: config
+    on_press:
+      - if:
+          condition:
+            binary_sensor.is_on: moving
+          then:
+            - text_sensor.template.publish:
+                id: calibration_status
+                state: "Refused: trailer moving"
+          else:
+            - motion.calibrate_level:
+                id: imu
+                save: true
+                on_success:
+                  - text_sensor.template.publish:
+                      id: calibration_status
+                      state: "Level calibrated"
+                on_error:
+                  - text_sensor.template.publish:
+                      id: calibration_status
+                      state: "Level calibration failed"
+
+  # Step 2: after Calibrate Level, raise the tongue jack 3-4 inches (front to
+  # back tilt only) and press this. It turns the sensor axes to line up with
+  # the trailer, so side-to-side and front-to-back do not mix.
+  - platform: template
+    name: "Calibrate Heading"
+    icon: mdi:compass-outline
+    entity_category: config
+    on_press:
+      - motion.calibrate_heading:
+          id: imu
+          save: true
+          on_success:
+            - text_sensor.template.publish:
+                id: calibration_status
+                state: "Heading calibrated"
+          on_error:
+            - text_sensor.template.publish:
+                id: calibration_status
+                state: "Heading calibration failed (tilt more?)"
+
+  - platform: template
+    name: "Clear Calibration"
+    icon: mdi:restore
+    entity_category: config
+    on_press:
+      - motion.clear_calibration:
+          id: imu
+          save: true
+      - text_sensor.template.publish:
+          id: calibration_status
+          state: "Calibration cleared"
+
+  - platform: restart
+    name: "Restart"
+    entity_category: config
