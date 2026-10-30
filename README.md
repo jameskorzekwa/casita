@@ -11,7 +11,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | [`docs/trailer.md`](docs/trailer.md) | Specifications, factory equipment, model numbers, breakers, and weight limits |
 | [`docs/off-grid-upgrade-plan.md`](docs/off-grid-upgrade-plan.md) | The overall off-grid upgrade plan, including research and decisions |
 | [`docs/smart-dc-switch-research.md`](docs/smart-dc-switch-research.md) | Smart DC rocker research; BANDC rocker / Waveshare controller plan in mod 06, installed 2026-10-23 |
-| [`docs/ha-flic-sleep-wake.md`](docs/ha-flic-sleep-wake.md) | Flic-triggered sleep and wake scripts on the trailer Home Assistant; thermostat setpoint and fan behavior |
+| [`docs/ha-flic-sleep-wake.md`](docs/ha-flic-sleep-wake.md) | Flic-triggered sleep/wake and small-button light controls on the trailer Home Assistant |
 | [`modifications/`](modifications/) | One folder per modification, each with its own instructions, diagrams and status |
 | [`manuals/`](manuals/) | Equipment manuals and datasheets, organized by system |
 | [`photos/`](photos/) | General trailer photos (modification photos live in each modification's folder) |
