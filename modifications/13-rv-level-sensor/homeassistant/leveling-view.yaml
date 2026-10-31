@@ -164,6 +164,11 @@ sections:
               <circle cx="${x}" cy="${y}" r="14" fill="${dot}" stroke="white" stroke-width="2"/>
             </svg>`;
         ]]]
+    extra_styles: |
+      :host { display: block !important; width: 100% !important; }
+      ha-card { width: 100% !important; box-sizing: border-box; }
+      #container { width: 100%; justify-items: center; }
+      #bubble { width: 100%; display: flex; justify-content: center; }
     grid_options:
       columns: full
   - type: conditional
