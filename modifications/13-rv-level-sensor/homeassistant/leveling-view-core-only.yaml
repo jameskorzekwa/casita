@@ -1,6 +1,7 @@
 # Leveling view using only built-in Home Assistant cards (no HACS). Same
-# behaviour as leveling-view.yaml, but instead of the dot-in-a-circle it
-# shows two gauges. Use this if button-card is not installed.
+# idea as leveling-view.yaml, but with two gauges instead of the circle and
+# without the "starting" state. Kept as a fallback; button-card is installed
+# on the trailer HA, so leveling-view.yaml is the one in use.
 #
 # For the home Home Assistant, replace "casita_level_" with "rv_casita_level_".
 
@@ -21,9 +22,7 @@ cards:
       show_state: false
       tap_action:
         action: call-service
-        service: switch.turn_on
-        target:
-          entity_id: switch.casita_level_leveling_mode
+        service: script.casita_level_start_leveling
 
   - type: conditional
     conditions:
@@ -78,6 +77,4 @@ cards:
           show_state: false
           tap_action:
             action: call-service
-            service: switch.turn_off
-            target:
-              entity_id: switch.casita_level_leveling_mode
+            service: script.casita_level_stop_leveling

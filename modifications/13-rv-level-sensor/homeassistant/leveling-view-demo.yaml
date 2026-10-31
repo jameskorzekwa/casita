@@ -1,0 +1,163 @@
+# DEMO leveling view: the same screen as leveling-view.yaml, driven by
+# helpers instead of the sensor, so the UI can be tried before the device
+# exists. Two sliders at the bottom simulate the tilt; a toggle simulates
+# "moving". Created on the trailer HA on 2026-10-31 as the "Leveling"
+# sidebar dashboard, view "Demo".
+#
+# Helpers (all created through the UI/API, no YAML):
+#   input_boolean.casita_level_demo_leveling   stands in for switch.casita_level_leveling_mode
+#   input_boolean.casita_level_demo_moving     stands in for binary_sensor.casita_level_moving
+#   input_number.casita_level_demo_side        side to side, degrees (+ = driver high)
+#   input_number.casita_level_demo_front       front to back, degrees (+ = front high)
+#
+# The instruction text uses the firmware's math with the default geometry
+# (track width 70 in, hitch to axle 130 in, tolerance 0.5 deg).
+#
+# Delete this view and the four helpers once the real view is in use.
+
+title: Demo
+path: demo
+icon: mdi:test-tube
+cards:
+  - type: markdown
+    content: >
+      **Demo.** Nothing here comes from the trailer. Use the sliders at the
+      bottom to pretend the trailer is tilted.
+
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: input_boolean.casita_level_demo_leveling
+        state: "off"
+    card:
+      type: vertical-stack
+      cards:
+        - type: markdown
+          content: >
+            Sensor off (low power). Last check: side to side
+            **{{ states('input_number.casita_level_demo_side') | float(0) | round(1) }}°**,
+            front to back
+            **{{ states('input_number.casita_level_demo_front') | float(0) | round(1) }}°**.
+        - type: button
+          name: Start leveling
+          icon: mdi:spirit-level
+          icon_height: 80px
+          show_state: false
+          tap_action:
+            action: call-service
+            service: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.casita_level_demo_leveling
+
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: input_boolean.casita_level_demo_leveling
+        state: "on"
+    card:
+      type: vertical-stack
+      cards:
+        - type: markdown
+          content: >
+            {% set s = states('input_number.casita_level_demo_side') | float(0) %}
+            {% set f = states('input_number.casita_level_demo_front') | float(0) %}
+            {% set tol = 0.5 %}
+            {% set side_ok = s | abs <= tol %}
+            {% set front_ok = f | abs <= tol %}
+            {% set lift = ((70 * (s | abs * pi / 180) | tan) * 4) | round(0) / 4 %}
+            {% set tongue = ((-130 * (f * pi / 180) | tan) * 4) | round(0) / 4 %}
+            {% set side = 'Level' if side_ok else 'Raise the ' ~ ('passenger' if s > 0 else 'driver') ~ ' side ' ~ '%.2f' | format(lift) ~ ' in' %}
+            {% set front = 'Level' if front_ok else ('Raise' if tongue > 0 else 'Lower') ~ ' the front ' ~ '%.2f' | format(tongue | abs) ~ ' in' %}
+            {% if is_state('input_boolean.casita_level_demo_moving', 'on') %}
+            ## Hold still...
+            {% elif side_ok and front_ok %}
+            ## Level. Chock the wheels, then lower the stabilizers.
+            {% elif not side_ok %}
+            ## {{ side }}
+            {% if not front_ok %}
+            Then: {{ front | lower }}
+            {% endif %}
+            {% else %}
+            ## {{ front }}
+            {% endif %}
+
+        - type: custom:button-card
+          entity: input_boolean.casita_level_demo_leveling
+          show_name: false
+          show_icon: false
+          show_state: false
+          tap_action:
+            action: none
+          triggers_update:
+            - input_number.casita_level_demo_side
+            - input_number.casita_level_demo_front
+            - input_boolean.casita_level_demo_moving
+          styles:
+            card:
+              - padding: 8px
+              - box-shadow: none
+            custom_fields:
+              bubble:
+                - width: 100%
+                - display: flex
+                - justify-content: center
+          custom_fields:
+            bubble: |
+              [[[
+                const s = parseFloat(states['input_number.casita_level_demo_side'].state);
+                const f = parseFloat(states['input_number.casita_level_demo_front'].state);
+                const tol = 0.5;
+                const moving = states['input_boolean.casita_level_demo_moving'].state === 'on';
+                const range = 3.0;
+                const R = 120, C = 150;
+                const clamp = v => Math.max(-1, Math.min(1, v));
+                const ok = !isNaN(s) && !isNaN(f) && Math.abs(s) <= tol && Math.abs(f) <= tol;
+                const x = C + clamp((isNaN(s) ? 0 : s) / range) * R;
+                const y = C + clamp((isNaN(f) ? 0 : f) / range) * R;
+                const rTol = Math.max(8, tol / range * R);
+                const dot = moving ? '#9e9e9e' : (ok ? '#2e7d32' : '#ef6c00');
+                const txt = 'var(--primary-text-color)';
+                return `
+                  <svg viewBox="0 0 300 300" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${txt}" stroke-width="2" opacity="0.6"/>
+                    <circle cx="${C}" cy="${C}" r="${R * 2 / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+                    <circle cx="${C}" cy="${C}" r="${R / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+                    <circle cx="${C}" cy="${C}" r="${rTol}" fill="${ok ? '#2e7d32' : 'none'}" fill-opacity="0.15" stroke="#2e7d32" stroke-width="2"/>
+                    <line x1="${C - R}" y1="${C}" x2="${C + R}" y2="${C}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+                    <line x1="${C}" y1="${C - R}" x2="${C}" y2="${C + R}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+                    <text x="${C}" y="18" text-anchor="middle" font-size="13" fill="${txt}">FRONT</text>
+                    <text x="${C}" y="294" text-anchor="middle" font-size="13" fill="${txt}">REAR</text>
+                    <text x="14" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(-90 14 ${C})">DRIVER</text>
+                    <text x="286" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(90 286 ${C})">PASSENGER</text>
+                    <circle cx="${x}" cy="${y}" r="14" fill="${dot}" stroke="white" stroke-width="2"/>
+                  </svg>`;
+              ]]]
+
+        - type: glance
+          columns: 2
+          entities:
+            - entity: input_number.casita_level_demo_side
+              name: Side to side
+            - entity: input_number.casita_level_demo_front
+              name: Front to back
+
+        - type: button
+          name: Stop leveling
+          icon: mdi:stop-circle-outline
+          icon_height: 48px
+          show_state: false
+          tap_action:
+            action: call-service
+            service: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.casita_level_demo_leveling
+
+  - type: entities
+    title: Pretend the trailer is tilted
+    entities:
+      - entity: input_number.casita_level_demo_side
+        name: Side to side (+ = driver side high)
+      - entity: input_number.casita_level_demo_front
+        name: Front to back (+ = front high)
+      - entity: input_boolean.casita_level_demo_moving
+        name: Moving
