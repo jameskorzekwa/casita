@@ -1,0 +1,153 @@
+# Leveling view for the trailer's Home Assistant dashboard (mod 13).
+#
+# Add as a new view: open the dashboard, Edit, "+" (add view), three-dot
+# menu, "Edit in YAML", paste this whole file, Save.
+#
+# Needs the HACS frontend plugin "button-card" (custom:button-card) for the
+# bubble level. Everything else is built in. For a version without HACS see
+# leveling-view-core-only.yaml.
+#
+# Entity IDs are the trailer's. For the home Home Assistant, replace
+# "casita_level_" with "rv_casita_level_" throughout.
+#
+# How it behaves:
+#   Leveling Mode off: one big "Start leveling" button.
+#   Leveling Mode on:  instruction line at the top, bubble level (the dot
+#                      rolls toward the LOW side; the trailer is level when
+#                      it sits inside the inner ring), the two angles, and
+#                      "Stop leveling" at the bottom.
+
+title: Leveling
+path: leveling
+icon: mdi:spirit-level
+cards:
+  # ---------- Normal mode: just the start button ----------
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.casita_level_leveling_mode
+        state: "off"
+    card:
+      type: vertical-stack
+      cards:
+        - type: markdown
+          content: >
+            Last check: side to side **{{ states('sensor.casita_level_side_to_side') }}°**,
+            front to back **{{ states('sensor.casita_level_front_to_back') }}°**
+            ({{ 'level' if is_state('binary_sensor.casita_level_level', 'on') else 'not level' }}).
+            The sensor checks every few seconds and reports every 5 minutes.
+        - type: button
+          name: Start leveling
+          icon: mdi:spirit-level
+          icon_height: 80px
+          show_state: false
+          tap_action:
+            action: call-service
+            service: switch.turn_on
+            target:
+              entity_id: switch.casita_level_leveling_mode
+
+  # ---------- Leveling mode ----------
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.casita_level_leveling_mode
+        state: "on"
+    card:
+      type: vertical-stack
+      cards:
+        # Instruction line. Side to side first (do it hitched, with blocks),
+        # then front to back (tongue jack, unhitched).
+        - type: markdown
+          content: >
+            {% set side = states('sensor.casita_level_side_to_side_action') %}
+            {% set front = states('sensor.casita_level_front_to_back_action') %}
+            {% if is_state('binary_sensor.casita_level_moving', 'on') %}
+            ## Hold still...
+            {% elif side == 'Level' and front == 'Level' %}
+            ## Level. Chock the wheels, then lower the stabilizers.
+            {% elif side != 'Level' %}
+            ## {{ side }}
+            {% if front != 'Level' %}
+            Then: {{ front | lower }}
+            {% endif %}
+            {% else %}
+            ## {{ front }}
+            {% endif %}
+
+        # Bubble level. Screen top = front of the trailer, left = driver side.
+        - type: custom:button-card
+          entity: binary_sensor.casita_level_level
+          show_name: false
+          show_icon: false
+          show_state: false
+          tap_action:
+            action: none
+          triggers_update:
+            - sensor.casita_level_side_to_side
+            - sensor.casita_level_front_to_back
+            - number.casita_level_level_tolerance
+            - binary_sensor.casita_level_moving
+          styles:
+            card:
+              - padding: 8px
+              - box-shadow: none
+            custom_fields:
+              bubble:
+                - width: 100%
+                - display: flex
+                - justify-content: center
+          custom_fields:
+            bubble: |
+              [[[
+                const s = parseFloat(states['sensor.casita_level_side_to_side'].state);
+                const f = parseFloat(states['sensor.casita_level_front_to_back'].state);
+                const tol = parseFloat(states['number.casita_level_level_tolerance'].state) || 0.5;
+                const moving = states['binary_sensor.casita_level_moving'].state === 'on';
+                const range = 3.0;          // degrees at the outer ring
+                const R = 120, C = 150;     // ring radius, centre
+                const clamp = v => Math.max(-1, Math.min(1, v));
+                const ok = !isNaN(s) && !isNaN(f) && Math.abs(s) <= tol && Math.abs(f) <= tol;
+                // + side to side = driver side high -> dot rolls to the passenger (right).
+                // + front to back = front high -> dot rolls to the rear (down).
+                const x = C + clamp((isNaN(s) ? 0 : s) / range) * R;
+                const y = C + clamp((isNaN(f) ? 0 : f) / range) * R;
+                const rTol = Math.max(8, tol / range * R);
+                const dot = moving ? '#9e9e9e' : (ok ? '#2e7d32' : '#ef6c00');
+                const txt = 'var(--primary-text-color)';
+                return `
+                  <svg viewBox="0 0 300 300" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${txt}" stroke-width="2" opacity="0.6"/>
+                    <circle cx="${C}" cy="${C}" r="${R * 2 / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+                    <circle cx="${C}" cy="${C}" r="${R / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+                    <circle cx="${C}" cy="${C}" r="${rTol}" fill="${ok ? '#2e7d32' : 'none'}" fill-opacity="0.15" stroke="#2e7d32" stroke-width="2"/>
+                    <line x1="${C - R}" y1="${C}" x2="${C + R}" y2="${C}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+                    <line x1="${C}" y1="${C - R}" x2="${C}" y2="${C + R}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+                    <text x="${C}" y="18" text-anchor="middle" font-size="13" fill="${txt}">FRONT</text>
+                    <text x="${C}" y="294" text-anchor="middle" font-size="13" fill="${txt}">REAR</text>
+                    <text x="14" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(-90 14 ${C})">DRIVER</text>
+                    <text x="286" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(90 286 ${C})">PASSENGER</text>
+                    <circle cx="${x}" cy="${y}" r="14" fill="${dot}" stroke="white" stroke-width="2"/>
+                  </svg>`;
+              ]]]
+
+        - type: glance
+          columns: 2
+          show_name: true
+          show_state: true
+          entities:
+            - entity: sensor.casita_level_side_to_side
+              name: Side to side
+            - entity: sensor.casita_level_front_to_back
+              name: Front to back
+
+        - type: button
+          name: Stop leveling
+          icon: mdi:stop-circle-outline
+          icon_height: 48px
+          show_state: false
+          tap_action:
+            action: call-service
+            service: switch.turn_off
+            target:
+              entity_id: switch.casita_level_leveling_mode

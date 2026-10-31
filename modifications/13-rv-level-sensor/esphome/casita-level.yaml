@@ -1,11 +1,17 @@
-# Casita level sensor (LSM6DS3TR-C accelerometer)
+# Casita level sensor (LSM6DS3 / LSM6DS3TR-C accelerometer)
 #
-# A Seeed Studio XIAO ESP32-S3 reads an Adafruit 4503 LSM6DS3TR-C 6-DoF IMU
-# over I2C and reports how far the trailer is out of level side to side and
-# front to back, plus how much to lift a wheel and move the tongue jack to
-# fix it. Powered from the trailer's 12 V system through a 5 V buck
-# regulator, like the propane and water monitors. See ../README.md before
-# flashing.
+# A Seeed Studio XIAO ESP32-S3 reads an LSM6DS3-family 6-DoF IMU over I2C
+# and reports how far the trailer is out of level side to side and front to
+# back, plus how much to lift a wheel and move the tongue jack to fix it.
+# Powered from the trailer's 12 V system through a 5 V buck regulator, like
+# the tank monitor. See ../README.md before flashing.
+#
+# Two modes, chosen by the "Leveling Mode" switch (off at boot):
+#   Normal:   IMU read every ${normal_poll}; readings sent to Home Assistant
+#             when they change by ${normal_delta} degrees or at least every
+#             ${normal_report}.
+#   Leveling: IMU read every 100 ms, averaged over 1 s, sent 5 times a
+#             second. Turns itself off after ${leveling_timeout}.
 #
 # Requires ESPHome 2026.10.0 or later (motion hub with calibrate_level and
 # calibrate_heading). ESPHome 2026.10.0 accepts LSM6DS3 (WHO_AM_I 0x69) and
@@ -28,6 +34,17 @@ substitutions:
   roll_sign: "1"
   pitch_sign: "-1"
 
+  # Normal mode: how often the IMU is read (milliseconds), the change in
+  # degrees that triggers a report, and the longest gap between reports.
+  normal_poll_ms: "2000"
+  normal_poll: 2s
+  normal_delta: "0.2"
+  normal_report: 5min
+  normal_report_ms: "300000"
+
+  # Leveling mode switches itself off after this long.
+  leveling_timeout: 30min
+
   # Starting values for the geometry numbers. ASSUMED, TO MEASURE (README
   # Step 6); edit the numbers in Home Assistant, they are stored in flash.
   # Track width: centre of the left tyre tread to centre of the right one.
@@ -41,6 +58,14 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   min_version: 2026.10.0
+  on_boot:
+    priority: -100
+    then:
+      # Start in normal mode: slow polling.
+      - lambda: |-
+          id(imu).stop_poller();
+          id(imu).set_update_interval(${normal_poll_ms});
+          id(imu).start_poller();
 
 esp32:
   board: seeed_xiao_esp32s3
@@ -88,7 +113,7 @@ web_server:
     password: !secret web_password
 
 # XIAO D4 = GPIO5 (SDA), D5 = GPIO6 (SCL), same pins as the battery monitor.
-# The Adafruit 4503 has its own 10 kohm pull-ups.
+# Adafruit and most generic boards have their own I2C pull-ups.
 i2c:
   id: bus_a
   sda: GPIO5
@@ -100,20 +125,118 @@ motion:
   - platform: lsm6ds
     id: imu
     i2c_id: bus_a
-    # Adafruit 4503 default; 0x6B if the ADDR jumper is bridged. The boot
-    # I2C scan shows which one answers.
+    # Adafruit 4503 default. Generic LSM6DS3 boards often answer at 0x6B;
+    # the boot I2C scan shows which one.
     address: 0x6A
     # Smallest range = finest resolution; the trailer never sees > 2 g at rest.
     accelerometer_range: 2G
     accelerometer_odr: 52HZ
     gyroscope_range: 250DPS
     gyroscope_odr: 52HZ
-    # 100 ms keeps the "Moving" detector responsive (ESPHome warns above).
+    # Leveling-mode rate. on_boot drops it to ${normal_poll}; the Leveling
+    # Mode switch moves it between the two.
     update_interval: 100ms
 
+globals:
+  - id: last_report_ms
+    type: uint32_t
+    initial_value: "0"
+
+script:
+  # Takes the latest raw angles and decides whether to send them. Runs after
+  # every raw pitch update (pitch is published after roll in the same poll).
+  - id: publish_readings
+    mode: queued
+    max_runs: 2
+    then:
+      - lambda: |-
+          float s = ${roll_sign} * id(raw_roll).state;
+          float f = ${pitch_sign} * id(raw_pitch).state;
+          if (isnan(s) || isnan(f)) return;
+
+          bool leveling = id(leveling_mode).state;
+          uint32_t now = millis();
+          float ps = id(side_to_side).state, pf = id(front_to_back).state;
+          bool changed = isnan(ps) || isnan(pf)
+                         || fabsf(s - ps) >= ${normal_delta}f
+                         || fabsf(f - pf) >= ${normal_delta}f;
+          bool due = (now - id(last_report_ms)) >= ${normal_report_ms};
+          if (!leveling && !changed && !due) return;
+          id(last_report_ms) = now;
+
+          id(side_to_side).publish_state(s);
+          id(front_to_back).publish_state(f);
+
+          float tol = id(level_tolerance).state;
+          bool side_ok = fabsf(s) <= tol;
+          bool front_ok = fabsf(f) <= tol;
+          // Height to add under the LOW-side wheel: track width x tan(angle).
+          float lift = id(track_width).state * tanf(fabsf(s) * M_PI / 180.0f);
+          // Signed move at the coupler, + = raise. The axle is the pivot.
+          float tongue = -id(hitch_to_axle).state * tanf(f * M_PI / 180.0f);
+          id(wheel_lift).publish_state(lift);
+          id(tongue_adjust).publish_state(tongue);
+          id(is_level).publish_state(side_ok && front_ok);
+
+          char side_buf[48], front_buf[48];
+          if (id(moving).state) {
+            snprintf(side_buf, sizeof(side_buf), "Moving, wait");
+            snprintf(front_buf, sizeof(front_buf), "Moving, wait");
+          } else {
+            if (side_ok) {
+              snprintf(side_buf, sizeof(side_buf), "Level");
+            } else {
+              // Round to the nearest 1/4 inch.
+              float q = roundf(lift * 4.0f) / 4.0f;
+              snprintf(side_buf, sizeof(side_buf), "Raise the %s side %.2f in",
+                       s > 0 ? "passenger" : "driver", q);
+            }
+            if (front_ok) {
+              snprintf(front_buf, sizeof(front_buf), "Level");
+            } else {
+              float q = roundf(tongue * 4.0f) / 4.0f;
+              snprintf(front_buf, sizeof(front_buf), "%s the front %.2f in",
+                       q > 0 ? "Raise" : "Lower", fabsf(q));
+            }
+          }
+          if (id(side_action).state != side_buf)
+            id(side_action).publish_state(side_buf);
+          if (id(front_action).state != front_buf)
+            id(front_action).publish_state(front_buf);
+
+  # Leveling mode switches itself off so it is never left running.
+  - id: leveling_timeout
+    mode: restart
+    then:
+      - delay: ${leveling_timeout}
+      - switch.turn_off: leveling_mode
+
+switch:
+  - platform: template
+    id: leveling_mode
+    name: "Leveling Mode"
+    icon: mdi:spirit-level
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    turn_on_action:
+      - lambda: |-
+          id(imu).stop_poller();
+          id(imu).set_update_interval(100);
+          id(imu).start_poller();
+      - script.execute: leveling_timeout
+      - logger.log: "Leveling mode ON: polling every 100 ms"
+    turn_off_action:
+      - script.stop: leveling_timeout
+      - lambda: |-
+          id(imu).stop_poller();
+          id(imu).set_update_interval(${normal_poll_ms});
+          id(imu).start_poller();
+      - logger.log: "Leveling mode OFF: polling every ${normal_poll}"
+
 sensor:
-  # Raw angles from the calibrated accelerometer, averaged over 5 s and
-  # published once a second. Internal: Home Assistant gets the signed,
+  # Raw angles from the calibrated accelerometer. Averaged over the last 10
+  # reads (1 s in leveling mode, 20 s in normal mode) and handed to the
+  # publish script every 2 reads. Internal: Home Assistant gets the signed,
   # trailer-oriented values below.
   - platform: motion
     motion_id: imu
@@ -122,8 +245,9 @@ sensor:
     internal: true
     filters:
       - sliding_window_moving_average:
-          window_size: 50
-          send_every: 10
+          window_size: 10
+          send_every: 2
+          send_first_at: 2
 
   - platform: motion
     motion_id: imu
@@ -132,8 +256,11 @@ sensor:
     internal: true
     filters:
       - sliding_window_moving_average:
-          window_size: 50
-          send_every: 10
+          window_size: 10
+          send_every: 2
+          send_first_at: 2
+    on_value:
+      - script.execute: publish_readings
 
   - platform: template
     id: side_to_side
@@ -142,14 +269,7 @@ sensor:
     unit_of_measurement: "°"
     accuracy_decimals: 1
     state_class: measurement
-    update_interval: 1s
-    lambda: |-
-      return ${roll_sign} * id(raw_roll).state;
-    filters:
-      # Live while leveling, quiet in the database when parked.
-      - or:
-          - delta: 0.05
-          - throttle: 60s
+    update_interval: never
 
   - platform: template
     id: front_to_back
@@ -158,15 +278,8 @@ sensor:
     unit_of_measurement: "°"
     accuracy_decimals: 1
     state_class: measurement
-    update_interval: 1s
-    lambda: |-
-      return ${pitch_sign} * id(raw_pitch).state;
-    filters:
-      - or:
-          - delta: 0.05
-          - throttle: 60s
+    update_interval: never
 
-  # Height to add under the LOW-side wheel: track width x tan(angle).
   - platform: template
     id: wheel_lift
     name: "Wheel Lift Needed"
@@ -174,18 +287,8 @@ sensor:
     unit_of_measurement: in
     accuracy_decimals: 2
     state_class: measurement
-    update_interval: 1s
-    lambda: |-
-      float s = id(side_to_side).state;
-      if (isnan(s)) return NAN;
-      return id(track_width).state * tanf(fabsf(s) * M_PI / 180.0f);
-    filters:
-      - or:
-          - delta: 0.05
-          - throttle: 60s
+    update_interval: never
 
-  # Signed tongue jack move at the coupler: + = raise, - = lower.
-  # Hitch-to-axle distance x tan(angle); the axle is the pivot.
   - platform: template
     id: tongue_adjust
     name: "Tongue Jack Adjustment"
@@ -193,15 +296,7 @@ sensor:
     unit_of_measurement: in
     accuracy_decimals: 2
     state_class: measurement
-    update_interval: 1s
-    lambda: |-
-      float f = id(front_to_back).state;
-      if (isnan(f)) return NAN;
-      return -id(hitch_to_axle).state * tanf(f * M_PI / 180.0f);
-    filters:
-      - or:
-          - delta: 0.05
-          - throttle: 60s
+    update_interval: never
 
   - platform: lsm6ds
     name: "IMU Temperature"
@@ -275,52 +370,26 @@ binary_sensor:
     id: is_level
     name: "Level"
     icon: mdi:check-circle-outline
-    lambda: |-
-      float s = id(side_to_side).state;
-      float f = id(front_to_back).state;
-      if (isnan(s) || isnan(f)) return {};
-      float t = id(level_tolerance).state;
-      return fabsf(s) <= t && fabsf(f) <= t;
 
 text_sensor:
   - platform: template
     id: side_action
     name: "Side to Side Action"
     icon: mdi:car-tire-alert
-    update_interval: 2s
-    lambda: |-
-      float s = id(side_to_side).state;
-      if (isnan(s)) return {"--"};
-      if (id(moving).state) return {"Moving, wait"};
-      if (fabsf(s) <= id(level_tolerance).state) return {"Level"};
-      // Round to the nearest 1/4 inch.
-      float lift = roundf(id(wheel_lift).state * 4.0f) / 4.0f;
-      char buf[48];
-      snprintf(buf, sizeof(buf), "Raise %s wheel %.2f in",
-               s > 0 ? "passenger" : "driver", lift);
-      return {buf};
+    update_interval: never
 
   - platform: template
     id: front_action
     name: "Front to Back Action"
     icon: mdi:caravan
-    update_interval: 2s
-    lambda: |-
-      float f = id(front_to_back).state;
-      if (isnan(f)) return {"--"};
-      if (id(moving).state) return {"Moving, wait"};
-      if (fabsf(f) <= id(level_tolerance).state) return {"Level"};
-      float t = roundf(id(tongue_adjust).state * 4.0f) / 4.0f;
-      char buf[48];
-      snprintf(buf, sizeof(buf), "%s tongue %.2f in",
-               t > 0 ? "Raise" : "Lower", fabsf(t));
-      return {buf};
+    update_interval: never
 
   - platform: template
     id: calibration_status
     name: "Calibration Status"
     icon: mdi:tune-vertical
     entity_category: diagnostic
+    update_interval: never
 
   - platform: wifi_info
     ip_address:

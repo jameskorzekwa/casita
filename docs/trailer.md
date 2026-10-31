@@ -51,7 +51,7 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | Home Assistant monitor | `casita-battery-monitor`: Seeed XIAO ESP32-S3 in the RBM500 housing, with a GODIYMODULES INA228 module (B0GX5HM4X3) reading the RBM500 shunt | ESPHome device in the trailer's Home Assistant, running since 2026-10-13 with plausible readings; shunt calibration to confirm; see [mod 04](../modifications/04-battery-monitor-esp32/README.md) |
 | E-ink dashboard | Seeed/TRMNL 7.5" (OG) DIY Kit: XIAO ESP32-S3 Plus driver board, 800 x 480 e-paper | Ordered, not built; ESPHome device `casita-dashboard` on the trailer's Home Assistant; see [mod 08](../modifications/08-eink-dashboard/README.md) |
 | AC meter | Shelly EM Gen3 on the TS-30 PANEL output, second clamp on the shore cord | Planned, not purchased; see [mod 10](../modifications/10-ac-power-meter/README.md) |
-| Level sensor | Adafruit 4503 LSM6DS3TR-C accelerometer on a XIAO ESP32-S3, ESPHome device `casita-level` | Planned 2026-10-25, sensor board to buy; see [mod 13](../modifications/13-rv-level-sensor/README.md) |
+| Level sensor | LSM6DS3 accelerometer breakout (Amazon B0FKT9ZR2X) on a XIAO ESP32-S3, ESPHome device `casita-level` | Designed, parts on hand, not built; see [mod 13](../modifications/13-rv-level-sensor/README.md) |
 
 ## Heating, Cooling and Appliances
 
