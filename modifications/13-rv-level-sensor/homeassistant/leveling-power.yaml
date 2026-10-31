@@ -141,3 +141,31 @@ automation:
       - action: switch.turn_off
         target:
           entity_id: switch.casita_smart_dc_switches_load_3
+
+  # DEMO ONLY (delete with the Demo view): copies the demo sliders into the
+  # last-reading helpers so the demo view and the status cards share one
+  # data source. Installed 2026-10-31.
+  casita_level_demo_feed:
+    alias: "Casita Level DEMO: feed sliders into last reading"
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_number.casita_level_demo_side
+          - input_number.casita_level_demo_front
+    actions:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.casita_level_last_side
+        data:
+          value: "{{ states('input_number.casita_level_demo_side') | float(0) }}"
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.casita_level_last_front
+        data:
+          value: "{{ states('input_number.casita_level_demo_front') | float(0) }}"
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.casita_level_last_check
+        data:
+          datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
