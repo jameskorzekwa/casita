@@ -7,8 +7,9 @@
 # the gauges) and on the home HA "Casita RV" dashboard (after the gauges)
 # with the rv_ entity IDs and a Tailscale URL to the trailer's Leveling
 # dashboard instead of the in-app navigate. Needs button-card (installed on
-# both). The home version needs the three last-reading helpers in the
-# Remote Home-Assistant include list (added 2026-10-31).
+# both). The home version needs the three last-reading helpers mirrored:
+# give them the `shared` label on the trailer (done 2026-10-31); the bee2
+# sync service then adds them to the Remote Home-Assistant include list.
 #
 # Two documents below: the trailer card, then the home card.
 
@@ -90,7 +91,7 @@ cards:
           </svg>`;
       ]]]
   extra_styles: |
-    :host { display: block !important; width: 100% !important; }
+    :host { display: block !important; width: 100% !important; max-width: none !important; flex: 1 1 auto !important; }
     ha-card { width: 100% !important; box-sizing: border-box; }
     #container { width: 100%; justify-items: center; }
     #bubble { width: 100%; display: flex; justify-content: center; }
@@ -191,7 +192,7 @@ cards:
           </svg>`;
       ]]]
   extra_styles: |
-    :host { display: block !important; width: 100% !important; }
+    :host { display: block !important; width: 100% !important; max-width: none !important; flex: 1 1 auto !important; }
     ha-card { width: 100% !important; box-sizing: border-box; }
     #container { width: 100%; justify-items: center; }
     #bubble { width: 100%; display: flex; justify-content: center; }

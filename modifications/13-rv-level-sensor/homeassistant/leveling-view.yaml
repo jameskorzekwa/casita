@@ -165,7 +165,7 @@ sections:
             </svg>`;
         ]]]
     extra_styles: |
-      :host { display: block !important; width: 100% !important; }
+      :host { display: block !important; width: 100% !important; max-width: none !important; flex: 1 1 auto !important; }
       ha-card { width: 100% !important; box-sizing: border-box; }
       #container { width: 100%; justify-items: center; }
       #bubble { width: 100%; display: flex; justify-content: center; }
