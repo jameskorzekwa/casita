@@ -1,0 +1,44 @@
+{
+  "alias": "Casita TV - Thermostat Fan Volume",
+  "description": "Add 15 to current speaker volume when thermostat fan starts; subtract 15 from current volume when it stops. Manual adjustments are preserved. ADB readback required. Fan operation is inferred, not physically measured.",
+  "mode": "single",
+  "max_exceeded": "silent",
+  "triggers": [
+    {"trigger": "state", "entity_id": ["climate.inside_casita_thermostat", "media_player.casita_tv_adb"]},
+    {"trigger": "time_pattern", "seconds": "/30"},
+    {"trigger": "homeassistant", "event": "start"}
+  ],
+  "conditions": [],
+  "actions": [
+    {"variables": {
+      "tv": "media_player.casita_tv_adb",
+      "flag": "input_boolean.casita_tv_fan_boost_active",
+      "climate_state": "{{ states('climate.inside_casita_thermostat') }}",
+      "fan_mode": "{{ state_attr('climate.inside_casita_thermostat', 'fan_mode') }}",
+      "hvac_action": "{{ state_attr('climate.inside_casita_thermostat', 'hvac_action') }}"
+    }},
+    {"if": [{"condition": "template", "value_template": "{{ is_state(tv, 'off') }}"}],
+      "then": [
+        {"action": "input_boolean.turn_off", "target": {"entity_id": "input_boolean.casita_tv_fan_boost_active"}},
+        {"stop": "TV off: cancel outstanding boost without sending volume commands"}
+      ]
+    },
+    {"condition": "template", "value_template": "{{ states(tv) in ['on', 'idle', 'playing', 'paused'] and states(flag) in ['on', 'off'] and climate_state in ['off', 'heat', 'cool', 'auto', 'fan_only'] and fan_mode in ['low', 'high', 'auto'] and hvac_action in ['off', 'idle', 'heating', 'cooling', 'fan'] }}"},
+    {"variables": {
+      "fan_running": "{{ climate_state == 'fan_only' or hvac_action in ['heating', 'cooling', 'fan'] or (climate_state != 'off' and fan_mode in ['low', 'high']) }}"
+    }},
+    {"condition": "template", "value_template": "{{ (fan_running and is_state(flag, 'off')) or (not fan_running and is_state(flag, 'on')) }}"},
+    {"action": "androidtv.adb_command", "target": {"entity_id": "media_player.casita_tv_adb"}, "data": {"command": "media volume --stream 3 --get"}, "response_variable": "volume_read"},
+    {"variables": {"matches": "{{ (volume_read.get(tv, {}).get('adb_response', '') or '') | regex_findall('volume is ([0-9]+) in range \\[0\\.\\.100\\]') }}"}},
+    {"condition": "template", "value_template": "{{ matches | count == 1 and 0 <= (matches[0] | int) <= 100 }}"},
+    {"variables": {"target_volume": "{{ [[(matches[0] | int) + (15 if fan_running else -15), 0] | max, 100] | min }}"}},
+    {"if": [{"condition": "template", "value_template": "{{ fan_running }}"}],
+      "then": [{"action": "input_boolean.turn_on", "target": {"entity_id": "input_boolean.casita_tv_fan_boost_active"}}],
+      "else": [{"action": "input_boolean.turn_off", "target": {"entity_id": "input_boolean.casita_tv_fan_boost_active"}}]
+    },
+    {"action": "androidtv.adb_command", "target": {"entity_id": "media_player.casita_tv_adb"}, "data": {"command": "media volume --stream 3 --set {{ target_volume }} --get"}, "response_variable": "volume_write"},
+    {"if": [{"condition": "template", "value_template": "{{ ('volume is ' ~ target_volume ~ ' in range [0..100]') not in (volume_write.get(tv, {}).get('adb_response', '') or '') }}"}],
+      "then": [{"action": "persistent_notification.create", "data": {"notification_id": "casita_tv_volume_failure", "title": "Casita TV volume adjustment needs checking", "message": "ADB did not confirm the requested volume. Automatic repeated adjustment was suppressed. Check the TV and the Fan Boost Active helper before the next fan transition."}}]
+    }
+  ]
+}
