@@ -1,0 +1,80 @@
+# Leveling view using only built-in Home Assistant cards (no HACS). Same
+# idea as leveling-view.yaml, but with two gauges instead of the circle and
+# without the "starting" state. Kept as a fallback; button-card is installed
+# on the trailer HA, so leveling-view.yaml is the one in use.
+#
+# For the home Home Assistant, replace "casita_level_" with "rv_casita_level_".
+
+title: Leveling
+path: leveling
+icon: mdi:spirit-level
+cards:
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.casita_level_leveling_mode
+        state: "off"
+    card:
+      type: button
+      name: Start leveling
+      icon: mdi:spirit-level
+      icon_height: 80px
+      show_state: false
+      tap_action:
+        action: call-service
+        service: script.casita_level_start_leveling
+
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: switch.casita_level_leveling_mode
+        state: "on"
+    card:
+      type: vertical-stack
+      cards:
+        - type: markdown
+          content: >
+            {% set side = states('sensor.casita_level_side_to_side_action') %}
+            {% set front = states('sensor.casita_level_front_to_back_action') %}
+            {% if is_state('binary_sensor.casita_level_moving', 'on') %}
+            ## Hold still...
+            {% elif side == 'Level' and front == 'Level' %}
+            ## Level. Chock the wheels, then lower the stabilizers.
+            {% elif side != 'Level' %}
+            ## {{ side }}
+            {% if front != 'Level' %}
+            Then: {{ front | lower }}
+            {% endif %}
+            {% else %}
+            ## {{ front }}
+            {% endif %}
+        - type: horizontal-stack
+          cards:
+            - type: gauge
+              entity: sensor.casita_level_side_to_side
+              name: Side to side (+ = driver high)
+              min: -3
+              max: 3
+              needle: true
+              severity:
+                green: -0.5
+                yellow: 0.5
+                red: 1.5
+            - type: gauge
+              entity: sensor.casita_level_front_to_back
+              name: Front to back (+ = front high)
+              min: -3
+              max: 3
+              needle: true
+              severity:
+                green: -0.5
+                yellow: 0.5
+                red: 1.5
+        - type: button
+          name: Stop leveling
+          icon: mdi:stop-circle-outline
+          icon_height: 48px
+          show_state: false
+          tap_action:
+            action: call-service
+            service: script.casita_level_stop_leveling

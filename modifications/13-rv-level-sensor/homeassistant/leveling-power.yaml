@@ -1,0 +1,171 @@
+# Low-power control for the level sensor (mod 13): the sensor's 12 V feed
+# goes through relay CH3 of the smart DC switch board (mod 06,
+# switch.casita_smart_dc_switches_load_3), so the sensor is OFF except
+# while leveling and for a short check every 6 hours.
+#
+# Installed on the trailer HA on 2026-10-31 through the config API (scripts
+# and automations are editable in the UI). Record of what was created; not a
+# file HA reads.
+#
+# Helpers (created the same day): input_number.casita_level_last_side,
+# input_number.casita_level_last_front (-90..90 deg, box) and
+# input_datetime.casita_level_last_check hold the last reading taken before
+# the sensor was powered down, for the "Sensor off" line in the view.
+
+script:
+  casita_level_start_leveling:
+    alias: "Casita Level: start leveling"
+    icon: mdi:spirit-level
+    mode: single
+    sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.casita_smart_dc_switches_load_3
+      # Boot + Wi-Fi + HA reconnect. The switch entity leaves 'unavailable'
+      # when the device is back.
+      - wait_template: >-
+          {{ states('switch.casita_level_leveling_mode') in ['on', 'off'] }}
+        timeout: "00:01:30"
+        continue_on_timeout: true
+      - if:
+          - condition: template
+            value_template: "{{ wait.completed }}"
+        then:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.casita_level_leveling_mode
+        else:
+          - action: switch.turn_off
+            target:
+              entity_id: switch.casita_smart_dc_switches_load_3
+          - action: persistent_notification.create
+            data:
+              title: Level sensor
+              message: >-
+                The level sensor did not come online within 90 s of powering
+                relay CH3. Check the fuse, the relay wiring and the Wi-Fi.
+                CH3 was turned off again.
+
+  casita_level_stop_leveling:
+    alias: "Casita Level: stop leveling"
+    icon: mdi:stop-circle-outline
+    mode: single
+    sequence:
+      - if:
+          - condition: state
+            entity_id: switch.casita_level_leveling_mode
+            state: "on"
+        then:
+          # The auto power-off automation records the reading and cuts CH3.
+          - action: switch.turn_off
+            target:
+              entity_id: switch.casita_level_leveling_mode
+        else:
+          - action: switch.turn_off
+            target:
+              entity_id: switch.casita_smart_dc_switches_load_3
+
+  casita_level_record_reading:
+    alias: "Casita Level: record last reading"
+    icon: mdi:content-save-outline
+    mode: single
+    sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.casita_level_last_side
+        data:
+          value: "{{ states('sensor.casita_level_side_to_side') | float(0) | round(1) }}"
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.casita_level_last_front
+        data:
+          value: "{{ states('sensor.casita_level_front_to_back') | float(0) | round(1) }}"
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.casita_level_last_check
+        data:
+          datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+
+automation:
+  casita_level_auto_power_off:
+    alias: "Casita Level: power off after leveling"
+    description: >-
+      When Leveling Mode goes off (Stop button, or the firmware's 30-minute
+      timeout), save the last reading and cut the sensor's 12 V (relay CH3).
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: switch.casita_level_leveling_mode
+        from: "on"
+        to: "off"
+        for: "00:00:03"
+    actions:
+      - action: script.casita_level_record_reading
+      - action: switch.turn_off
+        target:
+          entity_id: switch.casita_smart_dc_switches_load_3
+
+  casita_level_periodic_check:
+    alias: "Casita Level: check level every 6 hours"
+    description: >-
+      Powers the sensor for about a minute at 00:00, 06:00, 12:00 and 18:00,
+      saves the reading, and powers it off. Skipped while leveling and until
+      the device has been added to Home Assistant.
+    mode: single
+    triggers:
+      - trigger: time_pattern
+        hours: "/6"
+        minutes: "0"
+    conditions:
+      - condition: state
+        entity_id: switch.casita_smart_dc_switches_load_3
+        state: "off"
+      # 'unknown' means the entity does not exist yet (device not adopted).
+      - condition: template
+        value_template: "{{ states('switch.casita_level_leveling_mode') != 'unknown' }}"
+    actions:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.casita_smart_dc_switches_load_3
+      - wait_template: >-
+          {{ is_number(states('sensor.casita_level_side_to_side')) }}
+        timeout: "00:01:30"
+        continue_on_timeout: true
+      - if:
+          - condition: template
+            value_template: "{{ wait.completed }}"
+        then:
+          # Let the 20 s normal-mode average settle, then save.
+          - delay: "00:00:30"
+          - action: script.casita_level_record_reading
+      - action: switch.turn_off
+        target:
+          entity_id: switch.casita_smart_dc_switches_load_3
+
+  # DEMO ONLY (delete with the Demo view): copies the demo sliders into the
+  # last-reading helpers so the demo view and the status cards share one
+  # data source. Installed 2026-10-31.
+  casita_level_demo_feed:
+    alias: "Casita Level DEMO: feed sliders into last reading"
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_number.casita_level_demo_side
+          - input_number.casita_level_demo_front
+    actions:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.casita_level_last_side
+        data:
+          value: "{{ states('input_number.casita_level_demo_side') | float(0) }}"
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.casita_level_last_front
+        data:
+          value: "{{ states('input_number.casita_level_demo_front') | float(0) }}"
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.casita_level_last_check
+        data:
+          datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"

@@ -110,7 +110,7 @@ Complete this worksheet before selecting power components or installing:
 | --- | --- | --- | --- | --- | --- |
 | 1 | LED lights A, switched positive (grey wire from an old switch load tab) | Panel feed fuse (WFCO); rating and grey wire gauge to record | Not measured; LED lighting, expected well under 2 A | Onboard relay CH1 direct (≤10 A / 30 V DC), COM ← feed, NO → light; no suppression | `ALWAYS_OFF` — lights off after a power loss is acceptable |
 | 2 | LED lights B, switched positive (grey wire from the other old switch load tab) | Same | Same | Onboard relay CH2 direct, COM ← feed, NO → light | `ALWAYS_OFF` — acceptable |
-| 3 | Nothing (spare) | — | n/a | CH3 empty | `ALWAYS_OFF` (no load) |
+| 3 | Planned: 12 V feed for the level sensor ([mod 13](../13-rv-level-sensor/README.md)), switched by Home Assistant for low power | Same red feed chain, 2 A inline fuse at CH3 COM | About 60-100 mA (XIAO + IMU) | Onboard relay CH3 direct, COM ← fused feed, NO → sensor box | `ALWAYS_OFF` — sensor off after a power loss is the intended state |
 | 4 | Nothing (spare) | — | n/a | CH4 empty | `ALWAYS_OFF` (no load) |
 
 Load identities were given by the owner and confirmed by the 2026-10-23 panel photos (two empty load tabs, two grey load wires). The panel rear has one red +12 V daisy chain and one black lamp-ground daisy chain, both spliced to two grey harness wires and shared with the panel voltmeter. **The WFCO fuse rating and the grey wire gauge still need recording.** Why the old panel had no local fuses: nothing after the WFCO fuse was thinner than the wire it protects. The same holds for the new wiring if every extension matches that gauge; the only reason to add a fuse at the panel is a thinner extension wire, and the 2 A controller fuse is device protection, not wire protection.
@@ -131,7 +131,7 @@ No fuse amperage or wire gauge is selected here. Fuses protect conductors; choos
 | 6 | Grey light wire, lights B | **CH2 NO** | Same |
 | 7 | Red/black chain stubs at the four switch positions | removed and capped | BANDC rockers have no lamp |
 | 8 | Rockers 1–4 | `DGND` / `DI1`–`DI8` | Exactly the bench wiring |
-| — | CH3, CH4, CH1 NC, CH2 NC, input `COM` | empty | Spares |
+| — | CH4, CH1 NC, CH2 NC, input `COM` | empty | Spares. CH3 is reserved for the level sensor feed (mod 13, not yet wired) |
 
 As built (owner photos, 2026-10-23): board screwed to the cabinet wall with its labels facing down (so the relay row is at the top and `CH8 … CH1` read right-to-left); feed, negative and rocker commons joined with WAGO 221 lever connectors; rocker runs in 22/4 alarm cable; no inline fuses fitted (owner's decision; the WFCO branch fuse remains the only protection, see the fuse note above); panel voltmeter alive on its original chains (13.8 V shown). The original cabinet cover no longer fits over the board; a 3D-printed cover is planned. The diagram above was drawn before installation with the lights on CH3/CH4; the installed channels are CH1/CH2 as in the table.
 

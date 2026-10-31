@@ -1,0 +1,216 @@
+# Trailer-level card for the status dashboards (mod 13): the circle, the
+# last saved reading and when it was taken, and a button to the Leveling
+# dashboard. Read-only; it shows the live reading while the sensor is on
+# and the last saved reading otherwise.
+#
+# Installed 2026-10-31 on the trailer HA "Casita Status" dashboard (after
+# the gauges) and on the home HA "Casita RV" dashboard (after the gauges)
+# with the rv_ entity IDs and a Tailscale URL to the trailer's Leveling
+# dashboard instead of the in-app navigate. Needs button-card (installed on
+# both). The home version needs the three last-reading helpers mirrored:
+# give them the `shared` label on the trailer (done 2026-10-31); the bee2
+# sync service then adds them to the Remote Home-Assistant include list.
+#
+# Two documents below: the trailer card, then the home card.
+
+type: vertical-stack
+cards:
+- type: custom:button-card
+  entity: input_number.casita_level_last_side
+  show_name: true
+  show_icon: false
+  show_state: false
+  tap_action:
+    action: none
+  triggers_update:
+  - sensor.casita_level_side_to_side
+  - sensor.casita_level_front_to_back
+  - input_number.casita_level_last_side
+  - input_number.casita_level_last_front
+  - number.casita_level_level_tolerance
+  - binary_sensor.casita_level_moving
+  styles:
+    grid:
+    - grid-template-areas: '"n" "bubble"'
+    - grid-template-columns: 1fr
+    - grid-template-rows: auto 1fr
+    card:
+    - padding: 8px
+    - box-shadow: none
+    - width: 100%
+    custom_fields:
+      bubble:
+      - justify-self: center
+      - align-self: center
+      - width: 100%
+      - display: flex
+      - justify-content: center
+    name:
+    - font-size: 1.1em
+    - font-weight: '500'
+    - padding-bottom: 4px
+  custom_fields:
+    bubble: |
+      [[[
+        // Live reading while the sensor is on, else the last saved reading.
+        const pick = (liveId, lastId) => {
+          const l = states[liveId];
+          const v = l ? parseFloat(l.state) : NaN;
+          return isFinite(v) ? v : parseFloat(states[lastId] ? states[lastId].state : 'NaN');
+        };
+        const s = pick('sensor.casita_level_side_to_side', 'input_number.casita_level_last_side');
+        const f = pick('sensor.casita_level_front_to_back', 'input_number.casita_level_last_front');
+        const tolE = states['number.casita_level_level_tolerance'];
+        const tol = tolE && isFinite(parseFloat(tolE.state)) ? parseFloat(tolE.state) : 0.5;
+        const mvE = states['binary_sensor.casita_level_moving'];
+        const moving = mvE ? mvE.state === 'on' : false;
+        const range = 3.0;          // degrees at the outer ring
+        const R = 120, C = 150;     // ring radius, centre
+        const clamp = v => Math.max(-1, Math.min(1, v));
+        const ok = isFinite(s) && isFinite(f) && Math.abs(s) <= tol && Math.abs(f) <= tol;
+        // + side to side = driver side high -> dot rolls to the passenger (right).
+        // + front to back = front high -> dot rolls to the rear (down).
+        const x = C + clamp((isFinite(s) ? s : 0) / range) * R;
+        const y = C + clamp((isFinite(f) ? f : 0) / range) * R;
+        const rTol = Math.max(8, tol / range * R);
+        const dot = moving ? '#9e9e9e' : (ok ? '#2e7d32' : '#ef6c00');
+        const txt = 'var(--primary-text-color)';
+        return `
+          <svg viewBox="0 0 300 300" width="100%" style="max-width:300px;height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${txt}" stroke-width="2" opacity="0.6"/>
+            <circle cx="${C}" cy="${C}" r="${R * 2 / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+            <circle cx="${C}" cy="${C}" r="${R / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+            <circle cx="${C}" cy="${C}" r="${rTol}" fill="${ok ? '#2e7d32' : 'none'}" fill-opacity="0.15" stroke="#2e7d32" stroke-width="2"/>
+            <line x1="${C - R}" y1="${C}" x2="${C + R}" y2="${C}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+            <line x1="${C}" y1="${C - R}" x2="${C}" y2="${C + R}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+            <text x="${C}" y="18" text-anchor="middle" font-size="13" fill="${txt}">FRONT</text>
+            <text x="${C}" y="294" text-anchor="middle" font-size="13" fill="${txt}">REAR</text>
+            <text x="14" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(-90 14 ${C})">DRIVER</text>
+            <text x="286" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(90 286 ${C})">PASSENGER</text>
+            <circle cx="${x}" cy="${y}" r="14" fill="${dot}" stroke="white" stroke-width="2"/>
+          </svg>`;
+      ]]]
+  extra_styles: |
+    :host { display: block !important; width: 100% !important; max-width: none !important; flex: 1 1 auto !important; }
+    ha-card { width: 100% !important; box-sizing: border-box; }
+    #container { width: 100%; justify-items: center; }
+    #bubble { width: 100%; display: flex; justify-content: center; }
+  name: Trailer level
+- type: glance
+  columns: 3
+  entities:
+  - entity: input_number.casita_level_last_side
+    name: Side to side
+  - entity: input_number.casita_level_last_front
+    name: Front to back
+  - entity: input_datetime.casita_level_last_check
+    name: Last check
+- type: button
+  name: Leveling
+  icon: mdi:spirit-level
+  icon_height: 32px
+  show_state: false
+  tap_action:
+    action: navigate
+    navigation_path: /casita-leveling
+---
+type: vertical-stack
+cards:
+- type: custom:button-card
+  entity: input_number.rv_casita_level_last_side
+  show_name: true
+  show_icon: false
+  show_state: false
+  tap_action:
+    action: none
+  triggers_update:
+  - sensor.rv_casita_level_side_to_side
+  - sensor.rv_casita_level_front_to_back
+  - input_number.rv_casita_level_last_side
+  - input_number.rv_casita_level_last_front
+  - number.rv_casita_level_level_tolerance
+  - binary_sensor.rv_casita_level_moving
+  styles:
+    grid:
+    - grid-template-areas: '"n" "bubble"'
+    - grid-template-columns: 1fr
+    - grid-template-rows: auto 1fr
+    card:
+    - padding: 8px
+    - box-shadow: none
+    - width: 100%
+    custom_fields:
+      bubble:
+      - justify-self: center
+      - align-self: center
+      - width: 100%
+      - display: flex
+      - justify-content: center
+    name:
+    - font-size: 1.1em
+    - font-weight: '500'
+    - padding-bottom: 4px
+  custom_fields:
+    bubble: |
+      [[[
+        // Live reading while the sensor is on, else the last saved reading.
+        const pick = (liveId, lastId) => {
+          const l = states[liveId];
+          const v = l ? parseFloat(l.state) : NaN;
+          return isFinite(v) ? v : parseFloat(states[lastId] ? states[lastId].state : 'NaN');
+        };
+        const s = pick('sensor.rv_casita_level_side_to_side', 'input_number.rv_casita_level_last_side');
+        const f = pick('sensor.rv_casita_level_front_to_back', 'input_number.rv_casita_level_last_front');
+        const tolE = states['number.rv_casita_level_level_tolerance'];
+        const tol = tolE && isFinite(parseFloat(tolE.state)) ? parseFloat(tolE.state) : 0.5;
+        const mvE = states['binary_sensor.rv_casita_level_moving'];
+        const moving = mvE ? mvE.state === 'on' : false;
+        const range = 3.0;          // degrees at the outer ring
+        const R = 120, C = 150;     // ring radius, centre
+        const clamp = v => Math.max(-1, Math.min(1, v));
+        const ok = isFinite(s) && isFinite(f) && Math.abs(s) <= tol && Math.abs(f) <= tol;
+        // + side to side = driver side high -> dot rolls to the passenger (right).
+        // + front to back = front high -> dot rolls to the rear (down).
+        const x = C + clamp((isFinite(s) ? s : 0) / range) * R;
+        const y = C + clamp((isFinite(f) ? f : 0) / range) * R;
+        const rTol = Math.max(8, tol / range * R);
+        const dot = moving ? '#9e9e9e' : (ok ? '#2e7d32' : '#ef6c00');
+        const txt = 'var(--primary-text-color)';
+        return `
+          <svg viewBox="0 0 300 300" width="100%" style="max-width:300px;height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${txt}" stroke-width="2" opacity="0.6"/>
+            <circle cx="${C}" cy="${C}" r="${R * 2 / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+            <circle cx="${C}" cy="${C}" r="${R / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+            <circle cx="${C}" cy="${C}" r="${rTol}" fill="${ok ? '#2e7d32' : 'none'}" fill-opacity="0.15" stroke="#2e7d32" stroke-width="2"/>
+            <line x1="${C - R}" y1="${C}" x2="${C + R}" y2="${C}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+            <line x1="${C}" y1="${C - R}" x2="${C}" y2="${C + R}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+            <text x="${C}" y="18" text-anchor="middle" font-size="13" fill="${txt}">FRONT</text>
+            <text x="${C}" y="294" text-anchor="middle" font-size="13" fill="${txt}">REAR</text>
+            <text x="14" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(-90 14 ${C})">DRIVER</text>
+            <text x="286" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(90 286 ${C})">PASSENGER</text>
+            <circle cx="${x}" cy="${y}" r="14" fill="${dot}" stroke="white" stroke-width="2"/>
+          </svg>`;
+      ]]]
+  extra_styles: |
+    :host { display: block !important; width: 100% !important; max-width: none !important; flex: 1 1 auto !important; }
+    ha-card { width: 100% !important; box-sizing: border-box; }
+    #container { width: 100%; justify-items: center; }
+    #bubble { width: 100%; display: flex; justify-content: center; }
+  name: Trailer level
+- type: glance
+  columns: 3
+  entities:
+  - entity: input_number.rv_casita_level_last_side
+    name: Side to side
+  - entity: input_number.rv_casita_level_last_front
+    name: Front to back
+  - entity: input_datetime.rv_casita_level_last_check
+    name: Last check
+- type: button
+  name: Leveling
+  icon: mdi:spirit-level
+  icon_height: 32px
+  show_state: false
+  tap_action:
+    action: url
+    url_path: http://casita-ha.tail386ec.ts.net/casita-leveling
