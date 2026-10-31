@@ -123,11 +123,18 @@ cards:
             - number.casita_level_level_tolerance
             - binary_sensor.casita_level_moving
           styles:
+            grid:
+              - grid-template-areas: '"bubble"'
+              - grid-template-columns: 1fr
+              - grid-template-rows: 1fr
             card:
               - padding: 8px
               - box-shadow: none
+              - width: 100%
             custom_fields:
               bubble:
+                - justify-self: center
+                - align-self: center
                 - width: 100%
                 - display: flex
                 - justify-content: center
@@ -150,7 +157,7 @@ cards:
                 const dot = moving ? '#9e9e9e' : (ok ? '#2e7d32' : '#ef6c00');
                 const txt = 'var(--primary-text-color)';
                 return `
-                  <svg viewBox="0 0 300 300" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+                  <svg viewBox="0 0 300 300" width="100%" style="max-width:300px;height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${txt}" stroke-width="2" opacity="0.6"/>
                     <circle cx="${C}" cy="${C}" r="${R * 2 / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
                     <circle cx="${C}" cy="${C}" r="${R / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
