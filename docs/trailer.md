@@ -60,7 +60,7 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | Air conditioner | Coleman-Mach Mach 8 Plus Cub, 37200 series (R-32), 9,200 BTU | Likely 37201-076. Wiring sticker 1976-764 (PP 03-20): compressor Run = white, Common = black, Start = red. About 9.3-9.9 A cooling. SpartanStart soft start installed; factory start capacitor and PTCR removed ([mod 02](../modifications/02-ac-soft-start/README.md)) |
 | Thermostat | Airxcel | [Manual](../manuals/air-conditioning/airxcel-thermostat-manual.pdf) |
 | Refrigerator | 12 V only (compressor) | Model to record |
-| Water heater | Gas/electric | Electric element now on the shore-only box (works only on shore power). Model to record. Casita lists both a direct-vent gas manual and a Dometic 6-gal gas/electric manual |
+| Water heater | Gas/electric; expected 6 US gal (22.7 L), label to confirm | Electric element now on the shore-only box (works only on shore power). Model, capacity and element rating to confirm from the installed label; see [capacity and electric heat-up](#water-heater-capacity-and-electric-heat-up) |
 | Furnace | Propane | Model to record; [manual from Casita](../manuals/appliances/furnace-manual.pdf) |
 | Range/cooktop | Suburban SRNA3 (per Casita's manual list) | To confirm |
 | Water pump | Shurflo/Flojet (per Casita's manual list) | To confirm |
@@ -71,6 +71,30 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | LP/CO detector | Safe-T-Alert 30 series (per Casita's manual list) | To confirm |
 
 Items marked "per Casita's manual list" come from the manuals Casita publishes for its trailers, not from this trailer's labels.
+
+## Water Heater Capacity and Electric Heat-Up
+
+Researched 2026-10-31: **expected tank capacity is 6 US gallons (22.7 L)**, separate from the 25 gal fresh-water tank. This is not yet confirmed from this trailer's equipment label. [Casita's manual index](https://casitatraveltrailers.com/user-manuals/) links a [Dometic 6-gallon gas/electric manual](https://epi.dometic.com/externalassets/dometic-water-heater-6-gallon-gas-electric_9600024379_81175.pdf), as well as the [Suburban direct-vent manual](../manuals/appliances/direct-vent-gas-water-heater-manual.md). A generic manual listing does not establish which model is installed; record the heater's model, capacity and element wattage when its label is checked.
+
+**Electric-only planning estimate: about 50-60 minutes from 60 F to 140 F**, assuming a full 6 US gal tank, a roughly 1.4 kW element at its rated supply voltage, no hot-water draw and no propane heating. Starting at 40 F takes over an hour to reach 140 F. The archived Suburban manual's searchable text specifies a 1,440 W, 120 V element (Figure 6); that rating is a reference for the estimate, **not a confirmed rating of this trailer's heater**.
+
+| Starting water temperature | Target water temperature | Ideal heat-up at 1,440 W |
+| --- | --- | --- |
+| 60 F | 120 F | 37 minutes |
+| 60 F | 140 F | 49 minutes |
+| 40 F | 140 F | 61 minutes |
+
+Calculated using `time = mass × specific heat × temperature rise / power`, with 22.7 kg of water and specific heat 4.186 kJ/(kg·C). These are ideal water-only estimates, not measured recovery times: heating the tank itself, heat loss, lower supply voltage and water use increase the time. Targets are calculation examples, not confirmed thermostat settings or recommended tap temperatures; 140 F water can scald. Confirm the installed heater's rating and thermostat specification, then time an actual cold-start cycle to refine the estimate.
+
+The electric element is on the **shore-only breaker box**, so it does not heat from the batteries/inverter in the current wiring. Always fill and purge air from the water heater before energizing the element; never run it dry.
+
+### Propane and Combined Heating from 40 F
+
+For a **6 gal Suburban-style gas/electric heater**, budget roughly **40-45 minutes on propane alone** or **25-30 minutes on propane plus electric** to heat water from **40 F to 140 F**, with no water draw. These are conditional planning estimates, not measurements of the installed heater.
+
+[Suburban's 6 gal product specifications](https://suburbanrv.com/water-heating/tank-water-heaters/advantage-water-heaters/6-gallon-tank/) list a 12,000 BTU/h burner, 1,440 W optional element, and recovery rates of 10.1 gal/h gas and 6.1 gal/h electric. Assuming those recovery rates use a 90 F temperature rise (the webpage does not state the rating's temperature rise), scaling to a 100 F rise gives `6 / 10.1 × 60 × 100 / 90 = 39.6 minutes` on gas and `6 / (10.1 + 6.1) × 60 × 100 / 90 = 24.7 minutes` combined. Confirm the rating basis and installed model before treating these as model-specific performance figures.
+
+**Simultaneous operation:** [Suburban's FAQ](https://suburbanrv.com/service-support/faqs/) explicitly permits operating its gas/electric water heater's burner and factory electric element together for faster recovery. Confirm this trailer's model and its instructions before applying that guidance to the installed unit. Both modes require a full water heater; combined operation also requires shore power in this trailer. At the reference rating, the element alone draws 12 A at 120 V, so account for other loads on the 30 A shore supply. The 140 F calculation target is not a safe bathing temperature; mix with cold water to avoid scalding.
 
 ## Battery Bank Energy
 

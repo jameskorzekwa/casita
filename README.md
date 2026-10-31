@@ -57,7 +57,7 @@ Open safety follow-ups:
 | Power center | WFCO WF-8900-AD series (auto-detect) |
 | A/C | Coleman-Mach Mach 8 Plus Cub, 37200 series (R-32), 9,200 BTU |
 | Refrigerator | 12 V only |
-| Water heater | Gas/electric |
+| Water heater | Gas/electric; expected 6 US gal (22.7 L), installed label to confirm. [Capacity and electric heat-up estimates](docs/trailer.md#water-heater-capacity-and-electric-heat-up) |
 
 Full details are in [`docs/trailer.md`](docs/trailer.md).
 
