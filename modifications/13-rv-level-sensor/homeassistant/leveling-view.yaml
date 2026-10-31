@@ -22,197 +22,238 @@
 #                          dot rolls toward the LOW side; level when it sits
 #                          inside the green ring), the angles, "Stop leveling".
 #
+# Layout: a "sections" view limited to one column, so on a wide screen the
+# strip is centred instead of being spread across masonry columns.
+#
 # Entity IDs are the trailer's. The home Home Assistant gets the read-only
 # level-card.yaml instead (the scripts are not mirrored).
 
 title: Leveling
 path: leveling
 icon: mdi:spirit-level
-cards:
-- type: conditional
-  conditions:
-  - condition: state
-    entity: switch.casita_smart_dc_switches_load_3
-    state: 'off'
-  card:
-    type: markdown
-    content: 'Sensor off (low power). Last check {{ relative_time(states.input_datetime.casita_level_last_check.last_changed) }} ago: side to side **{{ states(''input_number.casita_level_last_side'') }}°**, front to back **{{ states(''input_number.casita_level_last_front'') }}°**. The sensor also wakes for a minute every 6 hours.'
-- type: conditional
-  conditions:
-  - condition: state
-    entity: switch.casita_smart_dc_switches_load_3
-    state: 'on'
-  - &id001
-    condition: state
-    entity: switch.casita_level_leveling_mode
-    state_not: 'on'
-  card:
-    type: markdown
-    content: |-
-      ## Starting the sensor...
-
-      Power is on; waiting for it to connect (up to 90 s).
-- type: conditional
-  conditions:
-  - condition: state
-    entity: switch.casita_level_leveling_mode
-    state: 'on'
-  card:
-    type: markdown
-    content: |
-      {% set side = states('sensor.casita_level_side_to_side_action') %}
-      {% set front = states('sensor.casita_level_front_to_back_action') %}
-      {% if is_state('binary_sensor.casita_level_moving', 'on') %}
-      ## Hold still...
-      {% elif side == 'Level' and front == 'Level' %}
-      ## Level. Chock the wheels, then lower the stabilizers.
-      {% elif side != 'Level' %}
-      ## {{ side }}
-      {% if front != 'Level' %}
-      Then: {{ front | lower }}
-      {% endif %}
-      {% else %}
-      ## {{ front }}
-      {% endif %}
-- type: custom:button-card
-  entity: input_number.casita_level_last_side
-  show_name: false
-  show_icon: false
-  show_state: false
-  tap_action:
-    action: none
-  triggers_update:
-  - sensor.casita_level_side_to_side
-  - sensor.casita_level_front_to_back
-  - input_number.casita_level_last_side
-  - input_number.casita_level_last_front
-  - number.casita_level_level_tolerance
-  - binary_sensor.casita_level_moving
-  styles:
-    grid:
-    - grid-template-areas: '"bubble"'
-    - grid-template-columns: 1fr
-    - grid-template-rows: 1fr
+type: sections
+max_columns: 1
+sections:
+- type: grid
+  cards:
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: switch.casita_smart_dc_switches_load_3
+      state: 'off'
     card:
-    - padding: 8px
-    - box-shadow: none
-    - width: 100%
-    custom_fields:
-      bubble:
-      - justify-self: center
-      - align-self: center
+      type: markdown
+      content: 'Sensor off (low power). Last check {{ relative_time(states.input_datetime.casita_level_last_check.last_changed) }} ago: side to side **{{ states(''input_number.casita_level_last_side'') }}°**, front to back **{{ states(''input_number.casita_level_last_front'') }}°**. The sensor also wakes for a minute every 6 hours.'
+      grid_options:
+        columns: full
+    grid_options:
+      columns: full
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: switch.casita_smart_dc_switches_load_3
+      state: 'on'
+    - &id001
+      condition: state
+      entity: switch.casita_level_leveling_mode
+      state_not: 'on'
+    card:
+      type: markdown
+      content: |-
+        ## Starting the sensor...
+
+        Power is on; waiting for it to connect (up to 90 s).
+      grid_options:
+        columns: full
+    grid_options:
+      columns: full
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: switch.casita_level_leveling_mode
+      state: 'on'
+    card:
+      type: markdown
+      content: |
+        {% set side = states('sensor.casita_level_side_to_side_action') %}
+        {% set front = states('sensor.casita_level_front_to_back_action') %}
+        {% if is_state('binary_sensor.casita_level_moving', 'on') %}
+        ## Hold still...
+        {% elif side == 'Level' and front == 'Level' %}
+        ## Level. Chock the wheels, then lower the stabilizers.
+        {% elif side != 'Level' %}
+        ## {{ side }}
+        {% if front != 'Level' %}
+        Then: {{ front | lower }}
+        {% endif %}
+        {% else %}
+        ## {{ front }}
+        {% endif %}
+      grid_options:
+        columns: full
+    grid_options:
+      columns: full
+  - type: custom:button-card
+    entity: input_number.casita_level_last_side
+    show_name: false
+    show_icon: false
+    show_state: false
+    tap_action:
+      action: none
+    triggers_update:
+    - sensor.casita_level_side_to_side
+    - sensor.casita_level_front_to_back
+    - input_number.casita_level_last_side
+    - input_number.casita_level_last_front
+    - number.casita_level_level_tolerance
+    - binary_sensor.casita_level_moving
+    styles:
+      grid:
+      - grid-template-areas: '"bubble"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      card:
+      - padding: 8px
+      - box-shadow: none
       - width: 100%
-      - display: flex
-      - justify-content: center
-  custom_fields:
-    bubble: |
-      [[[
-        // Live reading while the sensor is on, else the last saved reading.
-        const pick = (liveId, lastId) => {
-          const l = states[liveId];
-          const v = l ? parseFloat(l.state) : NaN;
-          return isFinite(v) ? v : parseFloat(states[lastId] ? states[lastId].state : 'NaN');
-        };
-        const s = pick('sensor.casita_level_side_to_side', 'input_number.casita_level_last_side');
-        const f = pick('sensor.casita_level_front_to_back', 'input_number.casita_level_last_front');
-        const tolE = states['number.casita_level_level_tolerance'];
-        const tol = tolE && isFinite(parseFloat(tolE.state)) ? parseFloat(tolE.state) : 0.5;
-        const mvE = states['binary_sensor.casita_level_moving'];
-        const moving = mvE ? mvE.state === 'on' : false;
-        const range = 3.0;          // degrees at the outer ring
-        const R = 120, C = 150;     // ring radius, centre
-        const clamp = v => Math.max(-1, Math.min(1, v));
-        const ok = isFinite(s) && isFinite(f) && Math.abs(s) <= tol && Math.abs(f) <= tol;
-        // + side to side = driver side high -> dot rolls to the passenger (right).
-        // + front to back = front high -> dot rolls to the rear (down).
-        const x = C + clamp((isFinite(s) ? s : 0) / range) * R;
-        const y = C + clamp((isFinite(f) ? f : 0) / range) * R;
-        const rTol = Math.max(8, tol / range * R);
-        const dot = moving ? '#9e9e9e' : (ok ? '#2e7d32' : '#ef6c00');
-        const txt = 'var(--primary-text-color)';
-        return `
-          <svg viewBox="0 0 300 300" width="100%" style="max-width:300px;height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${txt}" stroke-width="2" opacity="0.6"/>
-            <circle cx="${C}" cy="${C}" r="${R * 2 / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
-            <circle cx="${C}" cy="${C}" r="${R / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
-            <circle cx="${C}" cy="${C}" r="${rTol}" fill="${ok ? '#2e7d32' : 'none'}" fill-opacity="0.15" stroke="#2e7d32" stroke-width="2"/>
-            <line x1="${C - R}" y1="${C}" x2="${C + R}" y2="${C}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
-            <line x1="${C}" y1="${C - R}" x2="${C}" y2="${C + R}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
-            <text x="${C}" y="18" text-anchor="middle" font-size="13" fill="${txt}">FRONT</text>
-            <text x="${C}" y="294" text-anchor="middle" font-size="13" fill="${txt}">REAR</text>
-            <text x="14" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(-90 14 ${C})">DRIVER</text>
-            <text x="286" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(90 286 ${C})">PASSENGER</text>
-            <circle cx="${x}" cy="${y}" r="14" fill="${dot}" stroke="white" stroke-width="2"/>
-          </svg>`;
-      ]]]
-- type: conditional
-  conditions:
-  - condition: state
-    entity: switch.casita_level_leveling_mode
-    state: 'on'
-  card:
-    type: glance
-    columns: 2
-    entities:
-    - entity: sensor.casita_level_side_to_side
-      name: Side to side
-    - entity: sensor.casita_level_front_to_back
-      name: Front to back
-- type: conditional
-  conditions:
-  - condition: state
-    entity: switch.casita_level_leveling_mode
-    state_not: 'on'
-  card:
-    type: glance
-    columns: 3
-    entities:
-    - entity: input_number.casita_level_last_side
-      name: Side to side
-    - entity: input_number.casita_level_last_front
-      name: Front to back
-    - entity: input_datetime.casita_level_last_check
-      name: Last check
-- type: conditional
-  conditions:
-  - condition: state
-    entity: switch.casita_smart_dc_switches_load_3
-    state: 'off'
-  card:
-    type: button
-    name: Start leveling
-    icon: mdi:spirit-level
-    icon_height: 80px
-    show_state: false
-    tap_action:
-      action: call-service
-      service: script.casita_level_start_leveling
-- type: conditional
-  conditions:
-  - condition: state
-    entity: switch.casita_smart_dc_switches_load_3
-    state: 'on'
-  - *id001
-  card:
-    type: button
-    name: Cancel
-    icon: mdi:stop-circle-outline
-    icon_height: 48px
-    show_state: false
-    tap_action:
-      action: call-service
-      service: script.casita_level_stop_leveling
-- type: conditional
-  conditions:
-  - condition: state
-    entity: switch.casita_level_leveling_mode
-    state: 'on'
-  card:
-    type: button
-    name: Stop leveling
-    icon: mdi:stop-circle-outline
-    icon_height: 48px
-    show_state: false
-    tap_action:
-      action: call-service
-      service: script.casita_level_stop_leveling
+      custom_fields:
+        bubble:
+        - justify-self: center
+        - align-self: center
+        - width: 100%
+        - display: flex
+        - justify-content: center
+    custom_fields:
+      bubble: |
+        [[[
+          // Live reading while the sensor is on, else the last saved reading.
+          const pick = (liveId, lastId) => {
+            const l = states[liveId];
+            const v = l ? parseFloat(l.state) : NaN;
+            return isFinite(v) ? v : parseFloat(states[lastId] ? states[lastId].state : 'NaN');
+          };
+          const s = pick('sensor.casita_level_side_to_side', 'input_number.casita_level_last_side');
+          const f = pick('sensor.casita_level_front_to_back', 'input_number.casita_level_last_front');
+          const tolE = states['number.casita_level_level_tolerance'];
+          const tol = tolE && isFinite(parseFloat(tolE.state)) ? parseFloat(tolE.state) : 0.5;
+          const mvE = states['binary_sensor.casita_level_moving'];
+          const moving = mvE ? mvE.state === 'on' : false;
+          const range = 3.0;          // degrees at the outer ring
+          const R = 120, C = 150;     // ring radius, centre
+          const clamp = v => Math.max(-1, Math.min(1, v));
+          const ok = isFinite(s) && isFinite(f) && Math.abs(s) <= tol && Math.abs(f) <= tol;
+          // + side to side = driver side high -> dot rolls to the passenger (right).
+          // + front to back = front high -> dot rolls to the rear (down).
+          const x = C + clamp((isFinite(s) ? s : 0) / range) * R;
+          const y = C + clamp((isFinite(f) ? f : 0) / range) * R;
+          const rTol = Math.max(8, tol / range * R);
+          const dot = moving ? '#9e9e9e' : (ok ? '#2e7d32' : '#ef6c00');
+          const txt = 'var(--primary-text-color)';
+          return `
+            <svg viewBox="0 0 300 300" width="100%" style="max-width:300px;height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${txt}" stroke-width="2" opacity="0.6"/>
+              <circle cx="${C}" cy="${C}" r="${R * 2 / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+              <circle cx="${C}" cy="${C}" r="${R / 3}" fill="none" stroke="${txt}" stroke-width="1" opacity="0.25"/>
+              <circle cx="${C}" cy="${C}" r="${rTol}" fill="${ok ? '#2e7d32' : 'none'}" fill-opacity="0.15" stroke="#2e7d32" stroke-width="2"/>
+              <line x1="${C - R}" y1="${C}" x2="${C + R}" y2="${C}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+              <line x1="${C}" y1="${C - R}" x2="${C}" y2="${C + R}" stroke="${txt}" stroke-width="1" opacity="0.3"/>
+              <text x="${C}" y="18" text-anchor="middle" font-size="13" fill="${txt}">FRONT</text>
+              <text x="${C}" y="294" text-anchor="middle" font-size="13" fill="${txt}">REAR</text>
+              <text x="14" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(-90 14 ${C})">DRIVER</text>
+              <text x="286" y="${C + 4}" text-anchor="middle" font-size="13" fill="${txt}" transform="rotate(90 286 ${C})">PASSENGER</text>
+              <circle cx="${x}" cy="${y}" r="14" fill="${dot}" stroke="white" stroke-width="2"/>
+            </svg>`;
+        ]]]
+    grid_options:
+      columns: full
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: switch.casita_level_leveling_mode
+      state: 'on'
+    card:
+      type: glance
+      columns: 2
+      entities:
+      - entity: sensor.casita_level_side_to_side
+        name: Side to side
+      - entity: sensor.casita_level_front_to_back
+        name: Front to back
+      grid_options:
+        columns: full
+    grid_options:
+      columns: full
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: switch.casita_level_leveling_mode
+      state_not: 'on'
+    card:
+      type: glance
+      columns: 3
+      entities:
+      - entity: input_number.casita_level_last_side
+        name: Side to side
+      - entity: input_number.casita_level_last_front
+        name: Front to back
+      - entity: input_datetime.casita_level_last_check
+        name: Last check
+      grid_options:
+        columns: full
+    grid_options:
+      columns: full
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: switch.casita_smart_dc_switches_load_3
+      state: 'off'
+    card:
+      type: button
+      name: Start leveling
+      icon: mdi:spirit-level
+      icon_height: 80px
+      show_state: false
+      tap_action:
+        action: call-service
+        service: script.casita_level_start_leveling
+      grid_options:
+        columns: full
+    grid_options:
+      columns: full
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: switch.casita_smart_dc_switches_load_3
+      state: 'on'
+    - *id001
+    card:
+      type: button
+      name: Cancel
+      icon: mdi:stop-circle-outline
+      icon_height: 48px
+      show_state: false
+      tap_action:
+        action: call-service
+        service: script.casita_level_stop_leveling
+      grid_options:
+        columns: full
+    grid_options:
+      columns: full
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: switch.casita_level_leveling_mode
+      state: 'on'
+    card:
+      type: button
+      name: Stop leveling
+      icon: mdi:stop-circle-outline
+      icon_height: 48px
+      show_state: false
+      tap_action:
+        action: call-service
+        service: script.casita_level_stop_leveling
+      grid_options:
+        columns: full
+    grid_options:
+      columns: full
