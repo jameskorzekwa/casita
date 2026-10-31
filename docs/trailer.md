@@ -65,7 +65,7 @@ Keep loaded tongue weight at 10-15% of the actual trailer weight (about 300-450 
 | Range/cooktop | Suburban SRNA3 (per Casita's manual list) | To confirm |
 | Water pump | Shurflo/Flojet (per Casita's manual list) | To confirm |
 | Roof vent fan | MaxxAir MaxxFan Deluxe (per Casita's manual list) | To confirm |
-| TV | NTD-2256 (per Casita's manual list) | To confirm |
+| TV | Insignia Fire TV; exact model to confirm | Owner confirmed 2026-10-31; supersedes the NTD-2256 assumption from Casita's manual list. ADB volume read/set verified; [fan-volume automation](ha-tv-fan-volume.md) installed |
 | Awning | Fiamma F45s (per Casita's manual list) | To confirm |
 | Axle | Dexter (per Casita's manual list) | To confirm |
 | LP/CO detector | Safe-T-Alert 30 series (per Casita's manual list) | To confirm |
