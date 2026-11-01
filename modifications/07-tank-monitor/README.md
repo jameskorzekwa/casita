@@ -217,7 +217,7 @@ The propane device is an ESPHome device in the trailer's Home Assistant, like th
 
 | Entity name | Entity ID | Unit / notes |
 | --- | --- | --- |
-| Grey Tank | `sensor.casita_grey_tank` | %. Template on the filtered helper divided by **Grey tank full level** (`input_number.casita_grey_full_mm`, 76 mm, set with **Mark grey tank full** on a full tank), capped at 100%; **used by mod 08**. Errs toward full (a full tank always reads full; a third-to-half-full tank may read high). Holds its value through a brief dropout, 0% after 3 min of no echo, unavailable when the Mopeka is out of reach |
+| Grey Tank | `sensor.casita_grey_tank` | %. **0% means below the sensor, not empty**: the Mopeka is at the inlet (high) end of a wide, shallow tank, so it sees only the last slice of the fill; 100% is full everywhere. Template on the filtered helper divided by **Grey tank full level** (`input_number.casita_grey_full_mm`, 76 mm, set with **Mark grey tank full** on a full tank), capped at 100%; **used by mod 08**. Errs toward full (a full tank always reads full; a third-to-half-full tank may read high). Holds its value through a brief dropout, 0% after 3 min of no echo, unavailable when the Mopeka is out of reach |
 | Grey Water Level (folded) | `sensor.casita_grey_level_folded` | mm. Each raw reading, halved while over 110 mm (multiple-bounce echoes); unavailable for quality-0 readings |
 | Grey Water Level (filtered) | `sensor.casita_grey_level_min` | mm. The median folded reading of the last 30 min; what the percent is built on |
 | Grey tank full level, Mark grey tank full | `input_number.casita_grey_full_mm`, `script.casita_grey_mark_full` | The calibration number and the button that sets it from the current filtered level |
@@ -305,8 +305,10 @@ alias: Casita grey tank nearly full
 triggers:
   - trigger: numeric_state
     entity_id: sensor.casita_grey_tank
-    above: 80
-    for: "00:02:00"
+    # The sensor sees only the last slice of the tank (see water-tanks.md), so
+    # 60% at the sensor is already close to full; 80% leaves almost no notice.
+    above: 60
+    for: "00:05:00"
 actions:
   - action: notify.mobile_app_your_phone
     data:
@@ -424,3 +426,4 @@ Add photos to `photos/` as the build progresses. Main device: `main-enclosure-sp
 | 2026-10-29 | Grey gauge behaviour on an empty tank: the Mopeka reports no echo as `unknown` (its dead zone) and the folded/min helpers go `unavailable` by design; the percent template now holds its last value for 3 min of no echo, then shows 0%, and never `unknown` while the sensor is reachable (it had shown `unknown` for 10 min after the owner dumped the tank). The Casita Status dashboard's water card labels the raw row "unknown = no echo / empty" and shows the filtered level |
 | 2026-11-01 | **Grey gauge now errs toward full.** Home Assistant said 55% while the Mopeka app said 100%; the fresh-water history (about 20 gal used since the 10-29 dump) showed the tank was indeed near full, and the fold rule had been halving a full tank's 94-98 mm reading as if it were a doubled 47 mm. Readings up to 110 mm are now believed (capped at 100%), only taller ones are halved, and the 30 min filter is a median rather than the minimum. Reads 81% and settling. A third-to-half-full tank can now read high; documented, with the point switch as the definite fix |
 | 2026-11-01 | **Grey full level calibrated on a full tank** (water backing up into the sink): raw readings 75-82 mm and their doubles, filtered 76 mm. Added `input_number.casita_grey_full_mm` and `script.casita_grey_mark_full` (on the Casita Status dashboard), the percent template divides by the number, and Mark grey tank full set it to 76. Gauge reads 100% |
+| 2026-11-01 | Recorded the Mopeka's placement near the inlet (high) end of the wide, shallow tank (owner): 0% means below the sensor, not empty; 100% is full everywhere. Both dashboards' grey gauges relabeled "0% = below sensor"; the sample dump-soon alert lowered to 60% for 5 min (no such automation exists on the trailer yet) |
