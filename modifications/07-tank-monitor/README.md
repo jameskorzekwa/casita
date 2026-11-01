@@ -220,7 +220,8 @@ The propane device is an ESPHome device in the trailer's Home Assistant, like th
 | Grey Tank | `sensor.casita_grey_tank` | %. **0% means below the sensor, not empty**: the Mopeka is at the inlet (high) end of a wide, shallow tank and cannot see less than about 40 mm there, so the gauge reads 0% until about 53% and then climbs to 100%, which is full everywhere. Template on the smoothed helper divided by **Grey tank full level** (`input_number.casita_grey_full_mm`, 76 mm, set with **Mark grey tank full** on a full tank), capped at 100%; **used by mod 08**. Errs toward full (a full tank always reads full; a third-to-half-full tank may read high). Holds its value through a brief dropout, 0% after 3 min of no echo, unavailable when the Mopeka is out of reach |
 | Grey Water Level (folded) | `sensor.casita_grey_level_folded` | mm. Each raw reading resolved to the multiple (1x, 1/2, 1/3, 1/4) nearest the previous value, so echo switches are undone by continuity; unavailable for quality-0 readings |
 | Grey Water Level (smoothed) | `sensor.casita_grey_level_min` | mm. The median of the last 5 folded readings (no age limit); what the percent is built on |
-| Grey tank full level, Mark grey tank full | `input_number.casita_grey_full_mm`, `script.casita_grey_mark_full` | The calibration number and the button that sets it from the current filtered level |
+| Grey tank full level, Mark grey tank full | `input_number.casita_grey_full_mm`, `script.casita_grey_mark_full` | The calibration number and the button that sets it from the current smoothed level |
+| Grey tank nearly-full alert | `input_number.casita_grey_alert_pct` | The dump-soon alert's threshold, 55-95%, set from the Casita Status dashboard |
 | Grey Water Sensor Tank Level | `sensor.outside_grey_water_sensor_tank_level` | in (the integration's mm, converted by HA's US unit setting) |
 | Grey Water Sensor Reading quality | `sensor.outside_grey_water_sensor_reading_quality` | %; 0 = no echo |
 | Grey Water Sensor Temperature, Battery | `sensor.outside_grey_water_sensor_temperature`, `..._battery` | degF, % |
@@ -300,7 +301,7 @@ actions:
 mode: queued
 ```
 
-**Live on the trailer's Home Assistant since 2026-11-01** as `automation.casita_grey_tank_nearly_full` (created through the automation editor API; shown on the Casita Status dashboard's Water card). Two levels, both to the owner's iPhone registered with the trailer's Home Assistant; the notification `tag` makes a newer alert replace the older one on the phone.
+**Live on the trailer's Home Assistant since 2026-11-01** as `automation.casita_grey_tank_nearly_full` (created through the automation editor API; shown on the Casita Status dashboard's Water card). Two levels, both to the owner's iPhone registered with the trailer's Home Assistant; the notification `tag` makes a newer alert replace the older one on the phone. The nearly-full threshold is the number helper **Grey tank nearly-full alert** (`input_number.casita_grey_alert_pct`, 55-95% in steps of 5, **60%** to start): change it on the **Casita Status** dashboard's Water card (the slider "Nearly-full alert threshold"), or under **Settings > Devices & services > Helpers**. The sensor cannot see below about 53%, so the lowest useful setting is 55-60%, which fires soon after the water becomes visible at the inlet end; 70-80% means a bit past that. The 95% "full" level is fixed.
 
 ```yaml
 alias: Casita grey tank nearly full
@@ -312,7 +313,7 @@ mode: single
 triggers:
   - trigger: numeric_state
     entity_id: sensor.casita_grey_tank
-    above: 60
+    above: input_number.casita_grey_alert_pct
     for: "00:05:00"
     id: nearly
   - trigger: numeric_state
@@ -327,7 +328,8 @@ actions:
       message: >-
         {{ 'Grey tank at ' ~ states('sensor.casita_grey_tank') ~ '%: water will back up into the sink. Dump it.'
            if trigger.id == 'full' else
-           'Grey tank at ' ~ states('sensor.casita_grey_tank') ~ '% at the sensor (inlet end). Dump soon.' }}
+           'Grey tank at ' ~ states('sensor.casita_grey_tank') ~ '% at the sensor (inlet end), past your '
+           ~ states('input_number.casita_grey_alert_pct') | int ~ '% threshold. Dump soon.' }}
       data:
         tag: casita-grey-tank
         push:
@@ -451,3 +453,4 @@ Add photos to `photos/` as the build progresses. Main device: `main-enclosure-sp
 | 2026-11-01 | Grey fold rule changed to **continuity**: a drain from 54 mm had the sensor switch to the doubled echo (80 mm, below the 95 mm fold threshold) and the gauge rose from 72 to 81% while water was leaving. The folded helper now picks the multiple of the raw reading nearest its previous value; seeded at 40 mm for the current state; filtered helper reloaded; gauge 72% and settling toward about 53% |
 | 2026-11-01 | **Grey pipeline settled**: continuity fold (nearest multiple of the raw reading to the previous level) > median of the last 5 readings, no age limit > percent of the calibrated 76 mm. The 20-reading window was dropped because a steady sensor produces no new readings and the gauge sat at 72% with the level at 40 mm; re-seeded, the gauge reads 53%. The guide now carries the final design, the rule's known weakness and a record of the five rules that failed before it |
 | 2026-11-01 | Grey sensor floor measured in use: the echo is lost at about 40 mm at the sensor (53% of the calibrated full) and returns when a little water is added. The gauge is therefore a top-end gauge, 0% then 53-100%; documented on the gauge labels and in the guide |
+| 2026-11-01 | Nearly-full alert threshold made configurable: `input_number.casita_grey_alert_pct` (60% to start) on the Casita Status dashboard's Water card; the automation triggers above it for 5 min. The 95% full alert is fixed |
