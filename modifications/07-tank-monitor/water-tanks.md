@@ -138,8 +138,8 @@ The trailer's Home Assistant already has Bluetooth: the Pi 4's built-in radio an
 
 | Stage | Helper | ID | What it does |
 | --- | --- | --- | --- |
-| 1 | Template sensor **Grey Water Level (folded)** | `sensor.casita_grey_level_folded` | Each raw reading in mm; anything over 8% above the 85 mm inside height is halved until it fits (up to three times). **Unavailable** while the raw level is not a number or the Mopeka's reading quality is below 33% (that drops the quality-0 junk such as the 283 mm reading) |
-| 2 | Statistics helper **Grey Water Level (min)** | `sensor.casita_grey_level_min` | The **lowest** folded reading of the last 30 (no older than 30 min), keeping the last sample. Any real echo in the window wins; a tripled echo folded to 1.5x at least beats a doubled one. A fill therefore shows with up to 30 min of lag |
+| 1 | Template sensor **Grey Water Level (folded)** | `sensor.casita_grey_level_folded` | Each raw reading in mm; anything over **110 mm** is halved until it fits (up to three times). A genuinely full tank reads about 94-98 mm, because the sensor measures from its own face through the 5 mm wall, so readings up to 110 mm are taken at face value and the percent caps them at 100%. **Unavailable** while the raw level is not a number or the Mopeka's reading quality is below 33% (that drops the quality-0 junk such as the 283 mm reading) |
+| 2 | Statistics helper **Grey Water Level (filtered)** | `sensor.casita_grey_level_min` (ID kept from its first version) | The **median** of the last 30 folded readings (no older than 30 min), keeping the last sample. Spikes and a few folded triple echoes cannot move it; a fill shows with up to about 15 min of lag |
 | 3 | Template sensor **Casita Grey Tank** | `sensor.casita_grey_tank` (name **Grey Tank**) | The percent the dashboards and alerts use, below. **Used by mod 08** |
 
 Stage 1 state template and availability:
@@ -147,10 +147,10 @@ Stage 1 state template and availability:
 ```jinja
 {% set r = states('sensor.outside_grey_water_sensor_tank_level') %}
 {% set u = state_attr('sensor.outside_grey_water_sensor_tank_level', 'unit_of_measurement') %}
-{% set mm = r | float(0) * (25.4 if u == 'in' else 1) %}{% set h = 85 %}
-{% if mm > h * 1.08 %}{% set mm = mm / 2 %}{% endif %}
-{% if mm > h * 1.08 %}{% set mm = mm / 2 %}{% endif %}
-{% if mm > h * 1.08 %}{% set mm = mm / 2 %}{% endif %}
+{% set mm = r | float(0) * (25.4 if u == 'in' else 1) %}
+{% if mm > 110 %}{% set mm = mm / 2 %}{% endif %}
+{% if mm > 110 %}{% set mm = mm / 2 %}{% endif %}
+{% if mm > 110 %}{% set mm = mm / 2 %}{% endif %}
 {{ mm | round(1) }}
 ```
 
@@ -172,11 +172,11 @@ Stage 3 (unit %, state class measurement; availability `{{ states('sensor.outsid
 {% else %}{{ ([0, (m | float(0) / 85 * 100) | round(0), 100] | sort)[1] | int }}{% endif %}
 ```
 
-So: the raw level is converted from inches (the trailer's Home Assistant uses US units; the integration's native unit is mm) and folded; the lowest folded value of the last half hour is divided by the inside height. **What "no echo" looks like:** the Mopeka cannot see the first inch or so of water, so an empty tank gives it nothing to measure; the integration reports the raw level as `unknown` and reading quality as 0%, and the folded and min helpers go `unavailable` because they deliberately carry no number for it (a dropout must not drag the 30-minute minimum to zero). The percent handles that: during the first 3 minutes of no echo it holds its previous value (a single dropout does not flash the gauge), after 3 minutes it shows **0%**, and it never shows `unknown` while the sensor is reachable. `unavailable` on the raw level (out of Bluetooth reach, flat cell) makes the percent unavailable rather than 0. Seen 2026-10-29: the tank was dumped at 00:34, the raw readings fell from 3.9 to 2.4 in as it drained and then went to no echo; the gauge went to 0%. With the settled 96 mm reading of 2026-10-28 this gives 48 mm, **56%**, consistent with the owner's roughly 20 gal. (An intermediate version used a plain median of the raw readings; it was replaced the same evening because a window full of multiples just returns the commonest multiple.)
+So: the raw level is converted from inches (the trailer's Home Assistant uses US units; the integration's native unit is mm) and folded; the median folded value of the last half hour is divided by the inside height and capped at 100%. **What "no echo" looks like:** the Mopeka cannot see the first inch or so of water, so an empty tank gives it nothing to measure; the integration reports the raw level as `unknown` and reading quality as 0%, and the folded and min helpers go `unavailable` because they deliberately carry no number for it (a dropout must not drag the 30-minute minimum to zero). The percent handles that: during the first 3 minutes of no echo it holds its previous value (a single dropout does not flash the gauge), after 3 minutes it shows **0%**, and it never shows `unknown` while the sensor is reachable. `unavailable` on the raw level (out of Bluetooth reach, flat cell) makes the percent unavailable rather than 0. Seen 2026-10-29: the tank was dumped at 00:34, the raw readings fell from 3.9 to 2.4 in as it drained and then went to no echo; the gauge went to 0%. With the settled 96 mm reading of 2026-10-28 this gives 48 mm, **56%**, consistent with the owner's roughly 20 gal. (An intermediate version used a plain median of the raw readings; it was replaced the same evening because a window full of multiples just returns the commonest multiple.)
 
 **The full-tank height is measured.** The owner measured the tank at **3.75 in outside** on 2026-10-28, so about 85 mm inside with two roughly 5 mm walls; that is the `h` in the template. (The template briefly used 90 mm, from an old "about 4 in" note, and then 150 mm, from mistaking a doubled echo for the real level; both read 100% on a half-full tank.)
 
-**What the sensor cannot do on this tank.** The fold-down only helps when the multiple is taller than the tank. A real level of 40 mm reported as its double, 80 mm, looks like a 94%-full tank and nothing in the reading says otherwise; readings between about 64 and 92 mm are therefore ambiguous (a nearly full tank, or a tank a third to half full whose first echo the sensor missed). On a tank this shallow a bottom-mounted ultrasonic sensor has perhaps 1.5 in of unambiguous range, which is why the project's first design said it would be "coarse near empty". Two ways to do better, not yet tried: move the Mopeka to the tank's lowest point (next to the drain, if the bottom slopes that way), where the water is deepest and the first echo clears the dead zone sooner; or add a capacitive point switch (XKC-Y25-NPN) on the tank's side at the "nearly full" height, wired to the main device's free D3, as a definite dump-soon signal. `sensor.casita_grey_tank` is the ID in the README's [dashboard card and alerts](README.md#home-assistant-setup) and in mod 08.
+**What the sensor cannot do on this tank, and which way the gauge errs.** A reading of 94 mm is either a full tank (85 mm of water plus the wall and the sensor's offset) or the doubled echo of a 47 mm level, and nothing in the reading says which. The first version of the fold rule (2026-10-28) halved everything above 92 mm and so called a full tank 55%; on 2026-11-01 the Mopeka app said 100% while Home Assistant said 55%, and the fresh-water history (about 20 gal used since the last dump, most of it down the drains) showed the app was right. The rule now errs the other way, which is the safe way for a grey tank: readings up to 110 mm are believed, so a **full tank always reads full**, and the price is that a tank between about a third and a half full, whose first echo the sensor misses, can read 70-100%. The dump-soon alert may therefore fire early; it should never fire late. The Mopeka app applies the same logic with the tank height set in the app, so set that to 3.75 in and the two agree. On a tank this shallow a bottom-mounted ultrasonic sensor has perhaps 1.5 in of unambiguous range, which is why the project's first design said it would be "coarse near empty". Two ways to do better, not yet tried: move the Mopeka to the tank's lowest point (next to the drain, if the bottom slopes that way), where the water is deepest and the first echo clears the dead zone sooner; or add a capacitive point switch (XKC-Y25-NPN) on the tank's side at the "nearly full" height, wired to the main device's free D3, as a definite dump-soon signal. `sensor.casita_grey_tank` is the ID in the README's [dashboard card and alerts](README.md#home-assistant-setup) and in mod 08.
 
 ## Grey tank steps
 
@@ -228,7 +228,7 @@ The BTP7 does its own level estimation; what is calibrated is the template, whos
 
 ### Grey tank
 
-After dumping, with the tank empty, the Mopeka's **Tank level** should read `unknown` (below its dead zone). Then add water through the sink in 5 gal steps, wait for the water to settle, and record **Grey Water Level (folded)** each time (the min helper lags; the folded value is immediate). From two points above the dead zone, compute millimeters per gallon; then:
+After dumping, with the tank empty, the Mopeka's **Tank level** should read `unknown` (below its dead zone). Then add water through the sink in 5 gal steps, wait for the water to settle, and record **Grey Water Level (folded)** each time (the filtered helper lags; the folded value is immediate). From two points above the dead zone, compute millimeters per gallon; then:
 
 `full level (mm) = 32 gal x (mm per gal)`, adjusted by the intercept if the line does not pass through zero (the first few gallons fill the tank's low spots).
 
@@ -266,8 +266,9 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 | Grey | Updates stop when the sensor is under the tank | Bluetooth reach through the floor | USB adapter nearer the floor, or an ESPHome Bluetooth proxy |
 | Grey | Level always 0 with water above it, low reading quality | No couplant, air gap, wrong medium setting, or the wall is beyond the sensor | Re-grease and press; set the medium to Waste Water; try another spot |
 | Grey | The raw **Tank level** jumps to about twice the level, or to hundreds of mm with quality 0%, while the gauge stays put | Multiple-bounce and junk readings; the folded and min helpers are doing their job | Nothing to fix. If the gauge itself jumps, check the chain raw > `sensor.casita_grey_level_folded` > `sensor.casita_grey_level_min` > `sensor.casita_grey_tank` |
-| Grey | Gauge lags a fill by up to half an hour | The min helper's 30 min window | Expected; shorten `max_age` on **Grey Water Level (min)** if it matters |
-| Grey | Gauge reads 100% with the tank clearly not full | Either the inside height in the template is wrong, or the sensor is reporting the double of a level between about 32 and 46 mm (64-92 mm reads as nearly full) | Check the height (85 mm measured); if the tank is about a third to half full, expect this until the sensor is moved to a deeper spot or a point switch is added ([Grey tank (Mopeka)](#grey-tank-mopeka)) |
+| Grey | Gauge lags a fill by up to a quarter hour | The filtered helper's 30 min median | Expected; shorten `max_age` on **Grey Water Level (filtered)** if it matters |
+| Grey | Home Assistant and the Mopeka app disagree | Different tank heights, or an older fold rule | Set the app's tank height to 3.75 in; both then cap at 100% on readings of about 95 mm and up |
+| Grey | Gauge reads 100% with the tank clearly not full | The sensor is reporting the double of a level between about 32 and 55 mm, which the gauge deliberately believes (see above) | Expect it between a third and a half full; a capacitive point switch at the nearly-full height would make the alert definite ([Grey tank (Mopeka)](#grey-tank-mopeka)) |
 | Grey | `sensor.casita_grey_tank` unknown | Wrong Tank level entity ID in the template | Fix the ID (Step G1) |
 | Grey | Level far off the ruler | Wrong full level in the template, or the tank is tilted | Recalibrate on level ground |
 
