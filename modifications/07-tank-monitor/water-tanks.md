@@ -60,7 +60,7 @@ Both tanks now use finished products with their own radios, read by the Pi; noth
 
 ## Known Limitations
 
-- **The grey tank is shallow, and a bottom-mounted ultrasonic sensor struggles with it.** The tank is 3.75 in outside, about 85 mm inside (measured 2026-10-28). Below the sensor's dead zone the Mopeka reports no echo (0%); just above it, the sensor mostly reports multiples of the level (see [Grey tank (Mopeka)](#grey-tank-mopeka)), which the template folds down when they exceed the tank's height but cannot always tell apart from a nearly full tank. Expect a trustworthy reading only in roughly the top inch and a half.
+- **The grey tank is shallow, and a bottom-mounted ultrasonic sensor struggles with it.** The tank is 3.75 in outside, about 85 mm inside (measured 2026-10-28). Below about 40 mm of water (53% of the calibrated full) the Mopeka reports no echo (0%); above it, the sensor mostly reports multiples of the level, which the folding helper resolves by continuity (see [Grey tank (Mopeka)](#grey-tank-mopeka)). The measured reading covers only the top half; below that the combined gauge shows an estimate from fresh-water use, which is bookkeeping and must be told about dumps the sensor did not see. The definite fix for the lower half is a sender on the tank's side wall: a Garnet 710-AR2 cut to three 1 in pads fits the 3.75 in wall and the BTP7 display has two unused grey channels, or two capacitive point switches on the propane device's free pins.
 - **The tank wall and the Bluetooth reach are untested on this trailer.** Mopeka does not publish a wall-thickness limit for the Universal on plastic; one Casita owner's working install is the evidence. The sensor broadcasts from under the belly tank and the Pi is inside; Step G2 checks both before anything is stuck on. If the reach is marginal, a cheap ESPHome Bluetooth proxy near the floor fixes it.
 - **Sloshing and slope.** Both sensors read the water where they are. The Mopeka's reading-quality score drops while the trailer moves; trust readings when parked. If the trailer is not level, a wide, shallow grey tank reads quite differently at opposite ends. Park level before judging.
 - **The fresh reading is in Garnet's steps.** The display reports the sender's pads as a percentage: 95 full and 12 at the pump's limit on this tank, which the template maps to 100% and 0%; resolution is one pad, 1.33 in, about 3 gal on this tank.
@@ -191,7 +191,30 @@ Stage 3 (unit %, state class measurement; availability `{{ states('sensor.outsid
 
 - **100%** (76 mm of water at the sensor) means the tank is full everywhere: confirmed 2026-11-01, when 100% coincided with water backing up into the sink.
 - **0%** means the water at the sensor is below what it can see, which is about **40 mm (53%)**: on 2026-11-01 the echo was lost at a steady 40 mm and came back at 53% when a little water was added. So the gauge reads 0% for most of the fill and then jumps to about 53% and climbs to 100%; it is a top-end gauge. 0% does **not** mean empty; there can be a lot of water at the outlet end, and because the sensor is at the high end, water reaching it at all already means most of the tank is full. The dashboards label the gauge "0% = below sensor" for this reason.
-- The usable 53-100% range covers only the last slice of the tank's volume, so the "nearly full" alert at 60% fires soon after the water becomes visible at the sensor; the 95% "full" alert is the one that means water is about to back up. This placement also explains the echo multiples seen in the first days: when water first reaches the sensor it is only an inch or so deep, at the edge of what the sensor can resolve.
+- The usable 53-100% range covers only the last slice of the tank's volume, so the "nearly full" alert (60% to start, adjustable) fires soon after the water becomes visible at the sensor; the 95% "full" alert is the one that means water is about to back up. This placement also explains the echo multiples seen in the first days: when water first reaches the sensor it is only an inch or so deep, at the edge of what the sensor can resolve.
+- The 40 mm floor is the sensor's dead zone on this wall, so moving the Mopeka or adding a second one would not help: wherever it sits, it is blind until there are about 40 mm of water above it, which on an 85 mm tank is about half. For the range below that, see the next section.
+
+**Below the sensor floor: the estimate from fresh-water use.** Nearly all the water that leaves the fresh tank through the sink and shower ends up in the grey tank, and the fresh tank has a gauge that works over its whole range. So since 2026-11-01 Home Assistant also keeps a **guess** at the grey tank's contents, and a combined gauge shows the Mopeka's reading where it has one and the guess where it does not. It is bookkeeping, not measurement: it drifts by whatever goes elsewhere (toilet flushes go to the black tank, the outside tap goes on the ground) and it has to be told about dumps it cannot see. The pieces, all helpers on the trailer's Home Assistant:
+
+| Helper | ID | What it does |
+| --- | --- | --- |
+| Number **Grey tank estimate (gallons since dump)** | `input_number.casita_grey_est_gal` | The running guess, 0-32 gal. Editable by hand if you know better |
+| Number **Fresh tank low-water mark** | `input_number.casita_fresh_low` | Bookkeeping: the lowest fresh reading seen since the last refill |
+| Automation **Casita grey tank estimate** | `automation.casita_grey_estimate` | Keeps the two numbers (rules below) |
+| Template sensor **Casita Grey Tank (estimated)** | `sensor.casita_grey_estimate` | The guess as a percent of 32 gal |
+| Template sensor **Casita Grey Tank (best)** | `sensor.casita_grey_tank_combined` | **The gauge to look at.** The Mopeka's percent whenever it is above 0 (water visible at the sensor, 53-100%); otherwise the estimate, held to at most 50% because the sensor says there is less than that at the inlet end. Shared to the home Home Assistant |
+| Script **Mark grey tank dumped** | `script.casita_grey_mark_dumped` | Sets the estimate to 0. On the Casita Status dashboard's Water card |
+
+The automation's rules:
+
+1. **Use.** The fresh gauge flickers one Garnet step up and down for minutes at a time (65, 70, 65, 70 in the history) and blips 15-20 points for a few seconds, so drops are not summed as they happen. Instead the automation keeps a **low-water mark**: when the fresh reading has stayed **below** the mark for 3 minutes, the difference (in points of 25 gal) is added to the grey estimate and the mark moves down to the reading. Flicker above the mark adds nothing; a momentary dip does not last the 3 minutes; a real draw-down is counted exactly once, as the sum of the mark's steps. Capped at 32 gal.
+2. **Refill.** When the fresh reading has stayed **10 points or more above** the mark for 10 minutes, the mark moves up to the reading and nothing is added (the water came from a hose, not the tank). A one-step upward settle never qualifies; the usual 5-point flicker never lasts.
+3. **Anchor.** Whenever the Mopeka reports a level above 0, the estimate is set to its reading (percent x 0.32 gal). The two gauges therefore agree whenever the sensor can see, and the guess picks up from a measured value when the sensor goes blind again.
+4. **Dumped.** When the Mopeka's percent falls from a reading **to 0**, the water went below the floor in minutes with the trailer parked, which is a dump: the estimate resets to 0. (While towing the sensor may lose its echo and do the same; the anchor rule repairs it once parked and the water is visible again.) A dump made while the sensor was already blind, say at 40%, is invisible to it: **press Mark grey tank dumped**, or the estimate stays where it was.
+
+Resolution is one Garnet step, about 1.2 gal or 4 points of the grey tank. The estimate was started at the Mopeka's 53% (17 gal) with the fresh tank at 0%, so the first refill moves the mark to the top and use counts from there. Judge it against the Mopeka at the next crossing of 53%: if the estimate is already past 50 when the sensor wakes, something is going elsewhere; if it is far short, something else is draining into the tank.
+
+The e-ink dashboard (mod 08) still reads `sensor.casita_grey_tank`, the measured value; switching it to the combined gauge is a one-line change in its ESPHome configuration and a reflash, not yet done.
 
 **The full level is calibrated, not computed from the height.** On 2026-11-01 the tank was full (water backing up into the sink) and the raw readings over 90 minutes clustered at 75-82 mm (the real echo) and 150-165 mm (its double), with the filtered value at 76 mm; **Mark grey tank full** set **Grey tank full level** to 76. That is less than the 85 mm expected from the 3.75 in outside height (measured 2026-10-28), presumably the sensor's offset and the wall; it is the number that matters. Earlier values were 90 mm (an old "about 4 in" note), 150 mm (mistaking a doubled echo for the level) and 85 mm (from the measured height); the first two read 100% on a half-full tank, the last read 89% on a full one.
 
@@ -231,7 +254,8 @@ Both tanks are read by integrations on the trailer's Home Assistant, not by ESPH
 | Entity | Built on | Notes |
 | --- | --- | --- |
 | `sensor.casita_fresh_tank` | the BTP7's fresh channel | 12 to 95 on the display mapped to 0 to 100%; see [Fresh tank (Garnet)](#fresh-tank-garnet) |
-| `sensor.casita_grey_tank` | the Mopeka's tank level | inches to mm, 90 mm assumed full; see [Grey tank (Mopeka)](#grey-tank-mopeka) |
+| `sensor.casita_grey_tank` | the Mopeka's tank level | the folded and smoothed level over the calibrated 76 mm; 0% below the sensor's floor (about 53%); see [Grey tank (Mopeka)](#grey-tank-mopeka) |
+| `sensor.casita_grey_tank_combined` | the above, or the fresh-use estimate when the Mopeka sees nothing | the gauge for the dashboards; see [below the sensor floor](#grey-tank-mopeka) |
 
 The dashboard card, the fresh-low and grey-full alerts, and mirroring to the home Home Assistant are in the README's [Home Assistant setup](README.md#home-assistant-setup).
 
@@ -289,6 +313,8 @@ Repeat the grey calibration once after the first trip, since a belly tank's shap
 | Grey | Gauge under-reads a full tank | **Grey tank full level** is too high | Press **Mark grey tank full** with the tank full and settled |
 | Grey | Gauge reads 100% with the tank clearly not full | The continuity rule locked onto the wrong multiple after a restart or a no-echo spell; or **Grey tank full level** was set with the tank not full | Expect it between a third and a half full; a capacitive point switch at the nearly-full height would make the alert definite ([Grey tank (Mopeka)](#grey-tank-mopeka)) |
 | Grey | `sensor.casita_grey_tank` unknown | Wrong Tank level entity ID in the template | Fix the ID (Step G1) |
+| Grey | Combined gauge shows a level after a dump | The dump happened while the Mopeka was blind, so nothing saw it | Press **Mark grey tank dumped** on the Casita Status dashboard's Water card |
+| Grey | Estimate climbs with no water used | The fresh gauge dipped and stayed down for 3 min (sloshing while towing, or a Garnet dropout read as a low value) | Edit **Grey tank estimate (gallons since dump)** by hand; the next Mopeka reading corrects it anyway |
 | Grey | Level far off the ruler | Wrong full level in the template, or the tank is tilted | Recalibrate on level ground |
 
 ## Safety Notes

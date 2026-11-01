@@ -222,6 +222,8 @@ The propane device is an ESPHome device in the trailer's Home Assistant, like th
 | Grey Water Level (smoothed) | `sensor.casita_grey_level_min` | mm. The median of the last 5 folded readings (no age limit); what the percent is built on |
 | Grey tank full level, Mark grey tank full | `input_number.casita_grey_full_mm`, `script.casita_grey_mark_full` | The calibration number and the button that sets it from the current smoothed level |
 | Grey tank nearly-full alert | `input_number.casita_grey_alert_pct` | The dump-soon alert's threshold, 55-95%, set from the Casita Status dashboard |
+| Casita Grey Tank (best) | `sensor.casita_grey_tank_combined` | %. **The gauge for the dashboards:** the measured value above (53-100%) when the Mopeka sees water, else the estimate below, held to at most 50%. Shared to the home Home Assistant as `sensor.rv_casita_grey_tank_combined` |
+| Casita Grey Tank (estimated) | `sensor.casita_grey_estimate` | %. `input_number.casita_grey_est_gal` (gallons since the last dump) over 32 gal. Kept by `automation.casita_grey_estimate` from sustained drops of the fresh gauge, anchored to the Mopeka when it reads, reset when its reading falls to 0 or by `script.casita_grey_mark_dumped` (**Mark grey tank dumped**, on the Water card). `input_number.casita_fresh_low` is its bookkeeping. Rules in [water-tanks.md](water-tanks.md#grey-tank-mopeka) |
 | Grey Water Sensor Tank Level | `sensor.outside_grey_water_sensor_tank_level` | in (the integration's mm, converted by HA's US unit setting) |
 | Grey Water Sensor Reading quality | `sensor.outside_grey_water_sensor_reading_quality` | %; 0 = no echo |
 | Grey Water Sensor Temperature, Battery | `sensor.outside_grey_water_sensor_temperature`, `..._battery` | degF, % |
@@ -265,8 +267,8 @@ cards:
           yellow: 25
           green: 50
       - type: gauge
-        entity: sensor.casita_grey_tank
-        name: Grey
+        entity: sensor.casita_grey_tank_combined
+        name: Grey (estimated below 53%)
         min: 0
         max: 100
         severity:
@@ -358,14 +360,14 @@ mode: single
 
 The Remote Home Assistant link to the home Home Assistant mirrors whichever Casita entities carry the **`shared`** label (a service on bee2 keeps the link's include list and the **Casita RV** area in step with the label; see the agent-config `home-assistant/casita.md`). Mirrors arrive as `sensor.rv_casita_tank_monitor_propane_1`, `sensor.rv_casita_fresh_tank`, `sensor.rv_casita_grey_tank` and so on, with friendly names starting `RV `.
 
-Labeled `shared` on 2026-10-28 for this project: the two propane percentages and pounds remaining, the two **Coupling OK** sensors, `sensor.casita_fresh_tank` (already shared by the owner), `sensor.casita_grey_tank`, the Mopeka's reading quality and battery, and `sensor.casita_ac_source`. On the home side, display precision was set (percent 0, pounds 1) because ESPHome's `accuracy_decimals` does not cross the link, and the **Casita RV** dashboard gained fresh and grey gauges, propane gauges, a **Tanks** card and the AC source and shore rows.
+Labeled `shared` on 2026-10-28 for this project: the two propane percentages and pounds remaining, the two **Coupling OK** sensors, `sensor.casita_fresh_tank` (already shared by the owner), `sensor.casita_grey_tank`, the Mopeka's reading quality and battery, and `sensor.casita_ac_source`; on 2026-11-01, `sensor.casita_grey_tank_combined` and `sensor.casita_grey_estimate`. On the home side, display precision was set (percent 0, pounds 1) because ESPHome's `accuracy_decimals` does not cross the link, and the **Casita RV** dashboard gained fresh and grey gauges, propane gauges, a **Tanks** card and the AC source and shore rows.
 
 ### Dashboards
 
 | Where | Dashboard | What it shows |
 | --- | --- | --- |
-| Trailer Home Assistant | **Casita Status** (`/casita-status/status`, in the sidebar; created 2026-10-28) | Everything on the trailer in one page: battery, fresh and grey gauges; propane gauges; battery, solar, propane (with echo strength, coupling, Mark Full and full-level numbers), water (with the raw Garnet and Mopeka readings and their batteries), AC power (meter and source), the inverter (switch, status, settings) and a 24 h graph; lights and switches; the thermostat; and a **Devices** card with each ESPHome device's Wi-Fi and uptime |
-| Home Home Assistant | **Casita RV** (`/casita-rv/casita`) | The `shared` mirrors: battery, fresh and grey, propane, tanks, solar, AC power, inverter, thermostat, Casita updates |
+| Trailer Home Assistant | **Casita Status** (`/casita-status/status`, in the sidebar; created 2026-10-28) | Everything on the trailer in one page: battery, fresh and grey gauges; propane gauges; battery, solar, propane (with echo strength, coupling, Mark Full and full-level numbers), water (the combined grey gauge, the measured and estimated values with their helpers and the Mark full and Mark dumped buttons, the raw Garnet and Mopeka readings and their batteries, the alert threshold), AC power (meter and source), the inverter (switch, status, settings) and a 24 h graph; lights and switches; the thermostat; and a **Devices** card with each ESPHome device's Wi-Fi and uptime |
+| Home Home Assistant | **Casita RV** (`/casita-rv/casita`) | The `shared` mirrors: battery, fresh and grey (the combined gauge; measured and estimated in the Tanks card), propane, tanks, solar, AC power, inverter, thermostat, Casita updates |
 | E-ink panel in the trailer | [mod 08](../08-eink-dashboard/README.md) | Overview, details and power pages |
 
 ### Local web page
@@ -454,3 +456,4 @@ Add photos to `photos/` as the build progresses. Main device: `main-enclosure-sp
 | 2026-11-01 | **Grey pipeline settled**: continuity fold (nearest multiple of the raw reading to the previous level) > median of the last 5 readings, no age limit > percent of the calibrated 76 mm. The 20-reading window was dropped because a steady sensor produces no new readings and the gauge sat at 72% with the level at 40 mm; re-seeded, the gauge reads 53%. The guide now carries the final design, the rule's known weakness and a record of the five rules that failed before it |
 | 2026-11-01 | Grey sensor floor measured in use: the echo is lost at about 40 mm at the sensor (53% of the calibrated full) and returns when a little water is added. The gauge is therefore a top-end gauge, 0% then 53-100%; documented on the gauge labels and in the guide |
 | 2026-11-01 | Nearly-full alert threshold made configurable: `input_number.casita_grey_alert_pct` (60% to start) on the Casita Status dashboard's Water card; the automation triggers above it for 5 min. The 95% full alert is fixed |
+| 2026-11-01 | **Grey estimate below the sensor floor.** The Mopeka cannot see the lower half of the tank wherever it sits, so Home Assistant now keeps `input_number.casita_grey_est_gal` (gallons since dump) from sustained drops of the fresh gauge (low-water-mark rule, 3 min; refills detected by a 10-point rise for 10 min), anchored to the Mopeka when it reads and reset when its reading falls to 0 or by **Mark grey tank dumped**. `sensor.casita_grey_tank_combined` shows the measured value above 53% and the estimate (at most 50%) below; both dashboards use it, the e-ink still shows the measured value. Started at 17 gal (53%). Use rule verified with a 20-point test (added 5.0 gal). Hardware fixes for the lower half recorded: a Garnet 710-AR2 cut to three pads on the side wall into the BTP7's spare grey channel, or point switches |
