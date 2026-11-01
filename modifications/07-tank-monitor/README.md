@@ -300,23 +300,41 @@ actions:
 mode: queued
 ```
 
+**Live on the trailer's Home Assistant since 2026-11-01** as `automation.casita_grey_tank_nearly_full` (created through the automation editor API; shown on the Casita Status dashboard's Water card). Two levels, both to the owner's iPhone registered with the trailer's Home Assistant; the notification `tag` makes a newer alert replace the older one on the phone.
+
 ```yaml
 alias: Casita grey tank nearly full
+description: >-
+  The Mopeka sits at the inlet (high) end of the wide, shallow grey tank, so the
+  gauge only covers the last slice of the fill: 60% at the sensor is already
+  close to full, and 95% means water is about to back up into the sink.
+mode: single
 triggers:
   - trigger: numeric_state
     entity_id: sensor.casita_grey_tank
-    # The sensor sees only the last slice of the tank (see water-tanks.md), so
-    # 60% at the sensor is already close to full; 80% leaves almost no notice.
     above: 60
     for: "00:05:00"
+    id: nearly
+  - trigger: numeric_state
+    entity_id: sensor.casita_grey_tank
+    above: 95
+    for: "00:02:00"
+    id: full
 actions:
-  - action: notify.mobile_app_your_phone
+  - action: notify.mobile_app_j2k_iphone
     data:
-      title: Casita grey tank
+      title: "{{ 'Casita grey tank FULL' if trigger.id == 'full' else 'Casita grey tank nearly full' }}"
       message: >-
-        Grey tank at {{ states('sensor.casita_grey_tank') }}%. Dump soon.
-mode: single
+        {{ 'Grey tank at ' ~ states('sensor.casita_grey_tank') ~ '%: water will back up into the sink. Dump it.'
+           if trigger.id == 'full' else
+           'Grey tank at ' ~ states('sensor.casita_grey_tank') ~ '% at the sensor (inlet end). Dump soon.' }}
+      data:
+        tag: casita-grey-tank
+        push:
+          interruption-level: "{{ 'time-sensitive' if trigger.id == 'full' else 'active' }}"
 ```
+
+A numeric-state trigger fires when the level crosses the threshold, so with the tank already at 100% when the automation was created it was fired by hand once (19:54 UTC) to check the push.
 
 ```yaml
 alias: Casita fresh water low
@@ -427,3 +445,4 @@ Add photos to `photos/` as the build progresses. Main device: `main-enclosure-sp
 | 2026-11-01 | **Grey gauge now errs toward full.** Home Assistant said 55% while the Mopeka app said 100%; the fresh-water history (about 20 gal used since the 10-29 dump) showed the tank was indeed near full, and the fold rule had been halving a full tank's 94-98 mm reading as if it were a doubled 47 mm. Readings up to 110 mm are now believed (capped at 100%), only taller ones are halved, and the 30 min filter is a median rather than the minimum. Reads 81% and settling. A third-to-half-full tank can now read high; documented, with the point switch as the definite fix |
 | 2026-11-01 | **Grey full level calibrated on a full tank** (water backing up into the sink): raw readings 75-82 mm and their doubles, filtered 76 mm. Added `input_number.casita_grey_full_mm` and `script.casita_grey_mark_full` (on the Casita Status dashboard), the percent template divides by the number, and Mark grey tank full set it to 76. Gauge reads 100% |
 | 2026-11-01 | Recorded the Mopeka's placement near the inlet (high) end of the wide, shallow tank (owner): 0% means below the sensor, not empty; 100% is full everywhere. Both dashboards' grey gauges relabeled "0% = below sensor"; the sample dump-soon alert lowered to 60% for 5 min (no such automation exists on the trailer yet) |
+| 2026-11-01 | **Dump-soon alert live** on the trailer's Home Assistant: `automation.casita_grey_tank_nearly_full`, 60% for 5 min (nearly full) and 95% for 2 min (full, time-sensitive push) to the owner's iPhone; test push sent. Listed on the Casita Status dashboard |
