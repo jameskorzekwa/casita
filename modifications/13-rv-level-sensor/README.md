@@ -71,7 +71,7 @@ Prices come from an anonymous Amazon search and Adafruit's product page on 2026-
 
 ## Wiring
 
-![Wiring: 12 V through a 2 A fuse to the Pololu regulator, 5 V to the XIAO, XIAO 3V3, GND, D4 and D5 to the IMU](images/wiring-schematic.svg)
+![Wiring: 12 V through a 2 A fuse and mod 06 relay CH3 to the Pololu regulator, 5 V to the XIAO, XIAO 3V3, GND, D4 and D5 to the IMU](images/wiring-schematic.svg)
 
 | From | To | Notes |
 | --- | --- | --- |
