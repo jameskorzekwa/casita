@@ -5,7 +5,7 @@ A Shelly EM Gen3 energy meter on the output of the TS-30 transfer switch, so the
 ![Where the clamps and the voltage tap go](images/wiring.svg)
 
 > [!IMPORTANT]
-> **Status: meter and panel clamp reporting since 2026-10-28; shore clamp installed per owner and positive shore readings observed 2026-11-01.** The Shelly EM Gen3 was observed on the trailer's Home Assistant on 2026-10-28; its physical installation has not yet been documented. Owner reported installing the second CT on 2026-11-01. At 22:16 UTC its shore watts were negative (-693.5 W); at 22:23 UTC, after owner follow-up, live HA reported 526.8 W, 6.629 A, 121.0 V panel voltage and `Casita AC Source: shore`. Shore polarity and source now pass a shore-powered snapshot, but inverter-only/transfer behavior, energy accumulation and physical installation remain unverified ([components.md](components.md)).
+> **Status: meter and both clamps reporting; shore, inverter and no-AC states exercised 2026-11-01.** The Shelly EM Gen3 was observed on the trailer's Home Assistant on 2026-10-28; its physical installation has not yet been documented. Owner reported installing the second CT on 2026-11-01. An initial negative shore reading was corrected during the live test. Shore and panel load response, source transfers, no-AC detection, energy accumulation and home mirror were observed; see [live acceptance record](#live-acceptance-record-2026-11-01). Physical placement, exact accuracy, water-heater heating and an intermittent meter dropout remain unverified.
 
 **Contents:** [Why here](#why-the-ts-30-output) · [What you get](#what-you-get) · [Parts](#parts) · [Wiring](#wiring) · [Steps](#steps) · [Home Assistant setup](#home-assistant-setup) · [Dashboard](#e-ink-dashboard) · [Testing](#testing-checklist) · [Troubleshooting](#troubleshooting) · [Safety](#safety-notes)
 
@@ -191,6 +191,23 @@ The Shelly reads 0 below about 30 VA per channel, so the `shore > 20` test is sa
 8. The home Home Assistant shows the `rv_` copies and the Casita RV page updates.
 9. After a day, the Shelly's internal temperature stays well under its 40 C ambient limit in the compartment.
 
+### Live acceptance record (2026-11-01)
+
+Read-only API observations from the **trailer** HA with the owner operating the cord, inverter, water-heater switch and a heat gun. Times below are UTC; only physical actions explicitly reported by the owner are treated as confirmed. Home HA was read separately for the final mirror check.
+
+| Test | Observation | Result |
+| --- | --- | --- |
+| Shore, heat gun at regular outlet | Before: shore 551 W, panel 96 W; running: shore 1,486 W, panel 1,065 W, 119.3 V; off: shore 488 W, panel 85 W | Both channels respond positively to a panel load; close wattage deltas, not a calibrated accuracy test |
+| Shore to inverter, shore unplugged after inverter on | Shore 0 W / 0 A, panel 87 W, 119.3 V, source `inverter`; Shelly stayed online | Passed |
+| Inverter-only load | Heat gun running: panel 609 W, shore 0 W, 119.1 V, source `inverter`; panel returned to about 86 W when off | Passed |
+| Inverter to shore, cord reconnected | Shore 705 W, panel 87 W, 120.5 V, source `shore`; inverter subsequently turned off with shore readings continuing | Passed |
+| No AC | Owner reported regular outlet had no power with inverter off and shore unplugged. Shelly entities became `unavailable`, source became `none` at 22:40:05; HA first held stale shore readings for over a minute | Passed with detection delay; `none` is not instantaneous |
+| Restore shore, inverter off | At 22:41:53: shore 493.3 W, panel 82.6 W, 121.1 V, source `shore` | Passed |
+| Shore energy and home mirror | Shore energy rose from 0.01247 to 0.07729 kWh during tests; final home `rv_` meter power, voltage, energy and source matched trailer HA | Passed for accumulation and entity mirror; dashboard appearance not inspected |
+| Water-heater electric switch | With shore plugged in, switching off coincided with shore power dropping from 657.5 to 551.3 W while panel stayed ~96 W | Inconclusive for element heating: ~106 W change is far below the manual's unconfirmed ~1,440 W reference; thermostat/converter variation possible |
+
+**Open follow-ups:** The Shelly became unavailable at 22:26 while the owner later confirmed a regular outlet still had power; it returned by 22:31 without a documented cause. This is not the intentional no-AC test and warrants attention if it recurs. `sensor.freedom_x_2000_mode` and `binary_sensor.freedom_x_2000_inverting` were unavailable during the earlier source check; the shore CT alone did correctly identify shore/inverter while loads were present. The meter's enclosure, clamp placement, fuse, ambient temperature over a hot day, and calibrated voltage/power accuracy have not been independently checked. Do not infer that the water-heater tank was full or its element was heating from these readings.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
@@ -239,3 +256,4 @@ Add photos to `photos/` as the build progresses:
 | 2026-11-01 | Owner confirms the second current transformer is on hand; shore-clamp installation and test have not been reported. Updated status and components record; physical installation of the meter still needs documentation |
 | 2026-11-01 | Owner subsequently reported installing the second CT. Live read-only check at 22:16 UTC: trailer HA shore current 9.224 A, shore power -693.5 W, panel power 2.0 W, voltage 120.9 V, `sensor.casita_ac_source` unknown; home HA mirror showed the same shore reading and connected link. CT channel reports but sign is wrong (orientation/polarity to verify and retest safely); Xantrex inverter mode and inverting entities were unavailable, so source helper cannot fall back to them. Physical installation not independently inspected |
 | 2026-11-01 | Follow-up live trailer HA check at 22:23 UTC: shore power **526.8 W**, current **6.629 A**, panel power 2.2 W, voltage 121.0 V, AC source **shore**. Polarity and source are now correct for this snapshot; shore energy still 0.0 kWh. Inverter-only, source transfer, energy accumulation and physical placement not verified; Xantrex state entities remained unavailable |
+| 2026-11-01 | Completed shore/inverter/no-AC and return-to-shore live checks with owner; see [live acceptance record](#live-acceptance-record-2026-11-01). Shore energy accumulated and home mirror matched. Water-heater element heating, physical install and earlier Shelly dropout remain unresolved |
