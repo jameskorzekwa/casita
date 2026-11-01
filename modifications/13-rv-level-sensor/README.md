@@ -40,11 +40,7 @@ Prices come from an anonymous Amazon search and Adafruit's product page on 2026-
    - **Normal** (switch off, the state after every boot): the IMU is read every 2 s, averaged over 20 s, and sent to Home Assistant only when a reading changes by 0.2° or more, or every 5 minutes. This is the "parked" state: almost no Wi-Fi traffic and little database growth.
    - **Leveling** (switch on): the IMU is read every 100 ms, averaged over 1 s, and every reading is sent, five times a second. The mode turns itself off after 30 minutes so it cannot be left running.
 
-   On its own, the firmware's normal mode saves little power: the IMU draws under 1 mA in either mode, and the XIAO with Wi-Fi draws about 40-80 mA (0.5-1 W) regardless. So the sensor's 12 V feed goes through **relay CH3 of the smart DC switch board** ([mod 06](../06-smart-dc-switches/README.md), `switch.casita_smart_dc_switches_load_3`, an empty spare), and Home Assistant keeps the sensor **off** except:
-   - while leveling: **Start leveling** powers CH3, waits for the sensor to connect (up to 90 s), then turns Leveling Mode on; **Stop leveling** (or the firmware's 30-minute timeout) turns Leveling Mode off, and an automation saves the last reading and cuts CH3 three seconds later;
-   - every 6 hours (00:00, 06:00, 12:00, 18:00): an automation powers CH3 for about a minute, saves the reading into `input_number.casita_level_last_side` / `_last_front` and `input_datetime.casita_level_last_check`, and powers off. It does nothing until the device has been added to Home Assistant, and skips if CH3 is already on.
-
-   Rocker 3 on the Nilight panel drives CH3 too, so the sensor can also be powered by hand. The scripts and automations are in [`homeassistant/leveling-power.yaml`](homeassistant/leveling-power.yaml) and were installed on the trailer HA on 2026-10-31. The firmware's normal mode still matters for the minute the sensor is awake and for bench work.
+   The sensor is **always powered** (owner decision 2026-10-31; a relay in the feed was considered and rejected). Normal mode is about Wi-Fi traffic and database growth, not watts: the IMU draws under 1 mA in either mode and the XIAO with Wi-Fi about 40-80 mA (0.5-1 W) regardless, roughly 1-2 Ah a day from the 600 Ah bank. Home Assistant's part, in [`homeassistant/leveling-power.yaml`](homeassistant/leveling-power.yaml) (installed on the trailer HA 2026-10-31): **Start leveling** / **Stop leveling** scripts that switch Leveling Mode, and two automations that copy the reading into `input_number.casita_level_last_side` / `_last_front` and `input_datetime.casita_level_last_check` when leveling ends and once an hour. Those helpers are what the home dashboard mirrors.
 3. **Wheel Lift Needed** = track width x tan(side-to-side angle). That is the height to put under the low-side wheel.
 4. **Tongue Jack Adjustment** = -(hitch-to-axle distance) x tan(front-to-back angle). This is the signed move at the coupler: positive means raise it, negative means lower it. The axle is the pivot.
 5. **Side to Side Action** and **Front to Back Action** spell out the fix, rounded to 1/4 in, for example `Raise the passenger side 1.25 in` or `Lower the front 2.00 in`. When the trailer is within **Level Tolerance** (default 0.5°) they read `Level`, and while the trailer is moving they read `Moving, wait`.
@@ -71,21 +67,21 @@ Prices come from an anonymous Amazon search and Adafruit's product page on 2026-
 
 ## Wiring
 
-![Wiring: 12 V through a 2 A fuse and mod 06 relay CH3 to the Pololu regulator, 5 V to the XIAO, XIAO 3V3, GND, D4 and D5 to the IMU](images/wiring-schematic.svg)
+![Wiring: 12 V through a 2 A fuse to the Pololu regulator, 5 V to the XIAO, XIAO 3V3, GND, D4 and D5 to the IMU](images/wiring-schematic.svg)
 
 | From | To | Notes |
 | --- | --- | --- |
-| Trailer 12 V + (same fused feed as mod 06, red chain) | Inline 2 A fuse, then **CH3 COM**; **CH3 NO** to Pololu `VIN` | CH3 is open when the relay is off, so the sensor is unpowered. Find NO with a meter: the board is mounted labels-down, so the terminal order is reversed (mod 06) |
+| Trailer 12 V + | Inline 2 A fuse, then Pololu `VIN` | Any fused 12 V circuit near the box, chosen on site; fuse as close to the source as possible |
 | Trailer 12 V - | Pololu `GND` | |
 | 470 uF capacitor | Across Pololu `VIN` / `GND` | Stripe (negative) to `GND`, right at the regulator |
 | Pololu `VOUT` | XIAO `5V` | |
 | Pololu `GND` | XIAO `GND` | |
-| XIAO `3V3` | IMU `VIN` (STEMMA red) | The Adafruit board accepts 3-5 V and regulates to 3.3 V |
-| XIAO `GND` | IMU `GND` (STEMMA black) | |
-| XIAO `D4` (GPIO5) | IMU `SDA` (STEMMA blue) | Same pins as the battery monitor |
-| XIAO `D5` (GPIO6) | IMU `SCL` (STEMMA yellow) | |
+| XIAO `3V3` | IMU `VCC` | The generic LSM6DS3 board is marked 1.71-5 V; 3.3 V keeps its I2C lines at the XIAO's level |
+| XIAO `GND` | IMU `GND` | |
+| XIAO `D4` (GPIO5) | IMU `SDA` | Same pins as the battery monitor |
+| XIAO `D5` (GPIO6) | IMU `SCL` | |
 
-Leave the IMU's `ADDR`/`DO`, `CS`, `INT1` and `INT2` unconnected; the Adafruit board pulls them to the right state for I2C at address `0x6A`. On a generic board, check that `CS` is pulled high (I2C mode) and `SDO/SA0` is tied one way. The boot log's I2C scan shows the address.
+Leave the IMU's `SDO`/`SA0`, `CS`, `INT1` and `INT2` unconnected. Generic boards pull `CS` high (I2C mode) and tie `SA0` one way, which sets the address to `0x6A` or `0x6B`; the boot log's I2C scan shows which, and the YAML `address:` must match.
 
 **Do not plug USB into the XIAO while it is powered from the 12 V regulator.** The XIAO's `5V` pad is joined to the USB 5 V, so both supplies would be connected together. Disconnect the 12 V feed, or pull the fuse, before connecting USB. After the first flash, updates are wireless.
 
@@ -135,8 +131,8 @@ Order one board from [What to order](#what-to-order). When it arrives, read the 
 ### Step 5: Install in the trailer
 
 1. Choose the spot using [Where to mount it](#where-to-mount-it). Screw the box down by its ears, with **FRONT** toward the tongue and the box as square to the trailer as you can judge.
-2. 12 V feed through the mod 06 relay: pull the WFCO fuse that feeds the Nilight panel (voltmeter goes dark), then take positive from the red feed chain in the mod 06 cabinet through the inline holder with a **2 A** fuse to **CH3 COM**, and from **CH3 NO** to the sensor box; negative to the black chain. Identify NO with a meter (COM-NO open with the relay off). Refit the fuse. Turn `switch.casita_smart_dc_switches_load_3` on from Home Assistant (or press rocker 3 up) and check 5 V at the XIAO; turn it off and check 0 V. Close the lid. If the box is far from that cabinet, run the feed from CH3 to the box; the relay only switches 60-100 mA.
-3. With CH3 on, in Home Assistant **Settings, Devices and services**: the ESPHome integration offers **Casita Level**. **Configure**, then paste `level_api_encryption_key`. From then on the periodic-check automation runs, and the Start/Stop scripts work.
+2. 12 V feed: positive through the inline holder with a **2 A** fuse, from the nearest fused 12 V circuit (chosen on site; the mod 06 cabinet's red feed chain and the water pump circuit are both candidates), negative to the trailer 12 V negative. Check 5 V at the XIAO before closing the lid.
+3. In Home Assistant **Settings, Devices and services**: the ESPHome integration offers **Casita Level**. **Configure**, then paste `level_api_encryption_key`. From then on the Start/Stop scripts and the record-reading automations work.
 
 ### Step 6: Measure the trailer geometry
 
@@ -222,13 +218,12 @@ The trailer HA has a **Leveling** sidebar dashboard (`/casita-leveling`, created
 | [`leveling-view.yaml`](homeassistant/leveling-view.yaml) | button-card, the device, the scripts | The real view. Add it when the device is adopted, then delete the Demo view, the four `casita_level_demo_*` helpers and the DEMO automation |
 | [`level-card.yaml`](homeassistant/level-card.yaml) | button-card | **Trailer level** card for the status dashboards: the circle, the last reading and when it was taken, and a Leveling button. Installed 2026-10-31 on the trailer's **Casita Status** dashboard (after the gauges) and on the home **Casita RV** dashboard (after the gauges, `rv_` entities, button opens the trailer's Leveling dashboard over Tailscale). Works now from the demo sliders and later from the sensor with no change |
 | [`leveling-view-core-only.yaml`](homeassistant/leveling-view-core-only.yaml) | Nothing extra | Fallback with two gauges instead of the circle |
-| [`leveling-power.yaml`](homeassistant/leveling-power.yaml) | mod 06 CH3 | Record of the three scripts and two automations installed on the trailer HA on 2026-10-31 (power on, start; stop; record reading; auto power-off; 6-hour check) |
+| [`leveling-power.yaml`](homeassistant/leveling-power.yaml) | | Record of the three scripts and three automations installed on the trailer HA on 2026-10-31 (start; stop; record reading; record after leveling; record hourly; DEMO slider feed) |
 
-Each view file is a whole dashboard **view**. To add one: open the Leveling dashboard, **Edit**, **+** to add a view, three-dot menu, **Edit in YAML**, paste the file, **Save**. The circle is always on screen. Its data source is the live sensor while the sensor is on, otherwise the saved last reading (`input_number.casita_level_last_side` / `_last_front`), so the dashboards show how level the trailer is between leveling sessions too. The real view has three states:
+Each view file is a whole dashboard **view**. To add one: open the Leveling dashboard, **Edit**, **+** to add a view, three-dot menu, **Edit in YAML**, paste the file, **Save**. The circle is always on screen, from the live sensor (the status cards fall back to the saved last reading if the sensor entities are missing, which is how the home card works). The real view has two states:
 
-- **Sensor off** (CH3 off): "Sensor off" with the time of the last reading, the circle, the last angles, and one big **Start leveling** button, which runs `script.casita_level_start_leveling`.
-- **Starting** (CH3 on, Leveling Mode not yet on): "Starting the sensor...", the circle, and a Cancel button.
-- **Leveling Mode on:** the instruction line at the top (side to side first, then front to back, `Hold still...` while moving, and `Level. Chock the wheels, then lower the stabilizers.` when done), the circle live, the angles, and **Stop leveling** at the bottom, which runs `script.casita_level_stop_leveling`. The firmware also ends leveling by itself after 30 minutes; either way the sensor is powered off three seconds later.
+- **Leveling Mode off:** an idle line with the current reading, the circle, the angles, and one big **Start leveling** button, which runs `script.casita_level_start_leveling`.
+- **Leveling Mode on:** the instruction line at the top (side to side first, then front to back, `Hold still...` while moving, and `Level. Chock the wheels, then lower the stabilizers.` when done), the circle live, the angles, and **Stop leveling** at the bottom, which runs `script.casita_level_stop_leveling`. The firmware also ends leveling by itself after 30 minutes.
 
 The view and card YAML are generated by a small Python script kept in the 2026-10-31 session (one bubble template, three outputs); the committed YAML is the source of truth and can be edited directly. One button-card quirk is handled in the card's `extra_styles`: when `styles.card` sets a width, button-card puts an inline `max-width: fit-content` on its host, which shrink-wraps the card to the 300 px drawing and leaves it at the left of the column; the override forces the host to full width. Verified in a headless browser on both HAs on 2026-10-31.
 
@@ -243,7 +238,7 @@ The calibration buttons are left off the view on purpose. Pressing **Calibrate L
 1. Open the **Leveling** view and press **Start leveling**.
 2. **Hitched, side to side first.** The instruction line says, for example, `Raise the passenger side 1.25 in`. Put that much block in front of that wheel, round to your block size, then pull onto it and chock. The dot moves toward the middle.
 3. **Unhitch, then front to back.** Follow the instruction (`Raise the front ...` / `Lower the front ...`) with the tongue jack until the dot is inside the green ring and the line reads `Level`.
-4. Press **Stop leveling** (or let it time out after 30 minutes). The sensor powers off.
+4. Press **Stop leveling** (or let it time out after 30 minutes).
 5. **Then lower the stabilizer jacks.** They steady the trailer and are not for lifting it. Lowering them can move the reading a little; if it changes by more than the tolerance, raise them and adjust.
 6. The 12 V compressor fridge does not need the trailer level to run. Leveling is for comfort, doors, and draining the shower and sinks.
 
@@ -258,7 +253,7 @@ The calibration buttons are left off the view on purpose. Pressing **Calibrate L
 7. Power cycle (pull the fuse): calibration and the geometry numbers survive.
 8. Temperature: over a few days, check the reading against the reference level on a cold morning and a hot afternoon. Note IMU Temperature and the error. More than 0.5° drift means temperature compensation is worth adding (see Revisions for follow-ups).
 9. Leveling Mode: turning it on makes the angles update several times a second in Home Assistant; turning it off, they stop updating until a 0.2° change or 5 minutes. The log shows the polling change. Left on, it turns itself off after 30 minutes.
-10. Power control: **Start leveling** turns CH3 on and, within 90 s, Leveling Mode on; **Stop leveling** turns Leveling Mode off and CH3 off 3 s later, and the last-reading helpers update. Rocker 3 up powers the sensor too. At the next 6-hour mark with CH3 off, CH3 goes on for about a minute, the helpers update, and it goes off.
+10. Scripts: **Start leveling** turns Leveling Mode on; **Stop leveling** turns it off and the last-reading helpers update. At the top of the next hour the helpers update again.
 11. The Leveling view: Start shows the leveling screen, the dot moves the right way when the trailer is tilted (toward the low side), Stop returns to the single button.
 12. Entities appear at home as `rv_casita_level_*`.
 
@@ -274,8 +269,7 @@ The calibration buttons are left off the view on purpose. Pressing **Calibrate L
 | `Level calibration failed` | Sensor read failure, or moving during calibration | Keep still for 10 s and retry; check the logs |
 | Readings jump when people move inside | Normal; the trailer rocks | Wait for `Moving` to clear; level with nobody inside |
 | Inches look wrong but degrees are right | Track Width or Hitch to Axle not measured | Step 6 |
-| Readings do not change in Home Assistant | Sensor powered off (CH3 off), or normal mode only reports on a 0.2° change or every 5 min | Press Start leveling, or turn on Leveling Mode |
-| Start leveling ends with a notification "did not come online" | CH3 wiring, fuse, Wi-Fi, or the device takes over 90 s to reconnect | Check 5 V at the XIAO with CH3 on; check the ESPHome logs |
+| Readings do not change in Home Assistant | Normal mode only reports on a 0.2° change or every 5 min | Press Start leveling, or turn on Leveling Mode |
 | Leveling view shows a blank card where the circle should be | button-card not installed, or the browser cache | Install button-card through HACS and reload; or use the core-only view |
 
 ## Safety notes
@@ -300,3 +294,4 @@ The calibration buttons are left off the view on purpose. Pressing **Calibrate L
 | 2026-10-25 | Planned. Sensor chosen: LSM6DS3TR-C (Adafruit 4503), after finding that ESPHome 2026.10.0's `lsm6ds` driver rejects LSM6DSO/DSOX. All other parts confirmed in owner stock. Mount location to be chosen on site. ESPHome configuration written. `esphome config` passed on bee2 with ESPHome 2026.10.0 using synthetic secrets. A local `esphome compile` could not run (bee2's Python cannot create the ESP-IDF virtual environment), so the first compile will be in the trailer's Device Builder (Step 3). Not run on hardware. Possible follow-ups: temperature compensation if Testing item 8 shows drift; a level line on the mod 08 e-ink dashboard |
 | 2026-10-31 | LSM6DS3 boards delivered 2026-10-29 (Amazon B0FKT9ZR2X), so everything is on hand. Added **Leveling Mode**: a switch that moves the IMU between 2 s polling with reports on a 0.2° change or every 5 min (normal) and 100 ms polling with reports five times a second (leveling), with a 30-minute auto-off; all publishing moved into one `publish_readings` script; action texts reworded (`Raise the passenger side 1.25 in`, `Lower the front 2.00 in`). Added the Home Assistant **Leveling view** (Start button; instruction line, dot-in-a-circle bubble level with button-card, Stop button) and a core-only variant with gauges. Firmware compiled on bee2 with ESPHome 2026.10.0 (RAM 30.0%, flash 48.9%) using a Python 3.12 environment; still not run on hardware |
 | 2026-10-31 | Circle always shown (live when the sensor is on, else the saved last reading); **Trailer level** card added to the trailer's Casita Status dashboard and the home Casita RV dashboard; the three last-reading helpers given the `shared` label so the sync service mirrors them home; demo sliders now feed the last-reading helpers through a DEMO automation. Low power: the sensor's 12 V now goes through mod 06 relay **CH3**; Home Assistant powers it only while leveling and for a minute every 6 hours (scripts and automations in `homeassistant/leveling-power.yaml`, installed on the trailer HA; helpers `input_number.casita_level_last_side` / `_last_front`, `input_datetime.casita_level_last_check`). **button-card v7.0.1** installed through HACS on the trailer HA. **Leveling** sidebar dashboard created with the **Demo** view and four `casita_level_demo_*` helpers so the UI can be tried before the sensor exists. The real view gained a "Starting" state and calls the scripts instead of the switch |
+| 2026-10-31 (later) | **CH3 relay feed dropped** (owner): the sensor is always powered from a fused 12 V circuit chosen on site. Scripts now only switch Leveling Mode; the power-off and 6-hour automations were removed from the trailer HA and replaced by record-after-leveling and hourly-record automations. Leveling view has two states (no "Starting"); wiring diagram and tables back to the direct feed, generic LSM6DS3 pin names. Sensor boards on hand |

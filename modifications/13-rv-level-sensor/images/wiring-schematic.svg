@@ -1,33 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" width="900" height="430" font-family="Helvetica, Arial, sans-serif" font-size="14">
   <title>Casita level sensor wiring</title>
-  <desc>Trailer 12 V positive (the mod 06 red feed chain) runs through an inline 2 A fuse to relay CH3 COM on the smart DC switch board; CH3 NO goes to the Pololu D24V5F5 VIN, so the sensor is unpowered unless Home Assistant or rocker 3 closes the relay; 12 V negative to its GND. A 470 uF capacitor sits across VIN and GND at the regulator. Regulator VOUT goes to the XIAO ESP32-S3 5V pad and GND to XIAO GND. XIAO 3V3, GND, D4 (GPIO5, SDA) and D5 (GPIO6, SCL) go to the Adafruit 4503 LSM6DS3TR-C VIN, GND, SDA and SCL. The IMU is mounted with its X arrow to the front of the trailer and Y to the driver side.</desc>
+  <desc>Trailer 12 V positive runs through an inline 2 A fuse to the Pololu D24V5F5 VIN; 12 V negative to its GND. A 470 uF capacitor sits across VIN and GND at the regulator. Regulator VOUT goes to the XIAO ESP32-S3 5V pad and GND to XIAO GND. XIAO 3V3, GND, D4 (GPIO5, SDA) and D5 (GPIO6, SCL) go to the Adafruit 4503 LSM6DS3TR-C VIN, GND, SDA and SCL. The IMU is mounted with its X arrow to the front of the trailer and Y to the driver side.</desc>
   <rect width="900" height="430" fill="#ffffff"/>
-  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="bold">Mod 13 level sensor: wiring (12 V through mod 06 relay CH3)</text>
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="bold">Mod 13 level sensor: wiring (all inside one box except the 12 V feed)</text>
 
   <!-- 12 V source -->
   <rect x="20" y="110" width="130" height="110" rx="6" fill="#f3f3f3" stroke="#333"/>
   <text x="85" y="140" text-anchor="middle" font-weight="bold">Trailer 12 V</text>
-  <text x="85" y="165" text-anchor="middle" font-size="12">mod 06 cabinet</text>
-  <text x="85" y="183" text-anchor="middle" font-size="12">red / black chains</text>
+  <text x="85" y="165" text-anchor="middle" font-size="12">fused circuit,</text>
+  <text x="85" y="183" text-anchor="middle" font-size="12">chosen on site</text>
   <text x="140" y="130" text-anchor="end" fill="#c00">+</text>
   <text x="140" y="212" text-anchor="end">-</text>
 
   <!-- fuse -->
-  <rect x="160" y="112" width="56" height="26" rx="4" fill="#fff6d5" stroke="#333"/>
-  <text x="188" y="130" text-anchor="middle" font-size="11">2 A fuse</text>
-  <line x1="150" y1="125" x2="160" y2="125" stroke="#c00" stroke-width="3"/>
-  <line x1="216" y1="125" x2="226" y2="125" stroke="#c00" stroke-width="3"/>
-  <rect x="226" y="40" width="66" height="105" rx="4" fill="#ffe9e9" stroke="#333"/>
-  <text x="259" y="56" text-anchor="middle" font-size="11" font-weight="bold">Mod 06</text>
-  <text x="259" y="69" text-anchor="middle" font-size="11">relay CH3</text>
-  <text x="229" y="117" font-size="11">COM</text>
-  <text x="289" y="117" font-size="11" text-anchor="end">NO</text>
-  <line x1="246" y1="125" x2="264" y2="113" stroke="#333" stroke-width="2"/>
-  <circle cx="246" cy="125" r="2.5" fill="#333"/>
-  <circle cx="272" cy="125" r="2.5" fill="#333"/>
-  <text x="259" y="96" text-anchor="middle" font-size="10">open when</text>
-  <text x="259" y="107" text-anchor="middle" font-size="10">off</text>
-  <line x1="292" y1="125" x2="300" y2="125" stroke="#c00" stroke-width="3"/>
+  <rect x="185" y="112" width="70" height="26" rx="4" fill="#fff6d5" stroke="#333"/>
+  <text x="220" y="130" text-anchor="middle" font-size="12">2 A fuse</text>
+  <line x1="150" y1="125" x2="185" y2="125" stroke="#c00" stroke-width="3"/>
+  <line x1="255" y1="125" x2="300" y2="125" stroke="#c00" stroke-width="3"/>
   <line x1="150" y1="207" x2="300" y2="207" stroke="#000" stroke-width="3"/>
 
   <!-- regulator -->
@@ -84,7 +73,7 @@
   <polygon points="783,235 795,230 795,240" fill="#333"/>
   <text x="790" y="255" font-size="12">Y = driver</text>
 
-  <text x="20" y="370" font-size="13">Find CH3 NO with a meter (open to COM with the relay off); the board is mounted labels-down. Rocker 3 or HA closes it.</text>
-  <text x="20" y="392" font-size="13">IMU flat on standoffs, X arrow to the tongue, Y to the driver side. SDO/SA0, CS, INT1, INT2 unconnected.</text>
-  <text x="20" y="414" font-size="13">Box screwed to rigid structure; screws shorter than the floor. No USB while on 12 V. Status 2026-10-31: not built.</text>
+  <text x="20" y="370" font-size="13">Mount the IMU on standoffs, flat, X arrow toward the tongue, Y toward the driver (left) side.</text>
+  <text x="20" y="392" font-size="13">SDO/SA0, CS, INT1, INT2 unconnected. Box screwed to rigid structure; screws shorter than the floor.</text>
+  <text x="20" y="414" font-size="13">Always powered; the firmware idles between leveling sessions. Status 2026-10-31: not built.</text>
 </svg>
