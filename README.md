@@ -29,7 +29,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | 06 | [Four smart DC switches (BANDC + Waveshare)](modifications/06-smart-dc-switches/README.md) | Installed 2026-10-23: two LED light circuits on the Waveshare relays, two spare channels, rockers and Home Assistant; cabinet cover pending |
 | 07 | [Tank monitor to Home Assistant (propane on a XIAO ESP32-S3, fresh via a Garnet Bluetooth display, grey via Mopeka)](modifications/07-tank-monitor/README.md) | Propane reading (uncalibrated); fresh live; grey Mopeka mounted, no echo yet |
 | 08 | [E-ink dashboard (TRMNL 7.5" kit + ESPHome)](modifications/08-eink-dashboard/README.md) | Running; real tank entities and a Power page since 2026-10-28 |
-| 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Shore clamp installed per owner; HA reports negative shore watts, orientation/polarity and retest pending |
+| 10 | [AC voltage and power meter (Shelly EM Gen3)](modifications/10-ac-power-meter/README.md) | Shore clamp installed per owner; positive shore watts and source observed; inverter/transfer tests pending |
 | 11 | [Xantrex Freedom X 2000 inverter to Home Assistant](modifications/11-xantrex-freedom-x-inverter/README.md) | Inverter installed; HA integration installed, first live read pending |
 | 12 | [Cold-weather package (grey tank heat, drain protection, battery warming, freeze monitoring)](modifications/12-cold-weather/README.md) | Proposed; nothing ordered or measured |
 | 13 | [Level sensor to Home Assistant (LSM6DS3 + XIAO ESP32-S3)](modifications/13-rv-level-sensor/README.md) | Designed; all parts on hand, firmware compiles; leveling view for HA written |
