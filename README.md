@@ -33,6 +33,7 @@ This repository is the maintained record. The Google Docs that some of this star
 | 11 | [Xantrex Freedom X 2000 inverter to Home Assistant](modifications/11-xantrex-freedom-x-inverter/README.md) | Inverter installed; HA integration installed, first live read pending |
 | 12 | [Cold-weather package (grey tank heat, drain protection, battery warming, freeze monitoring)](modifications/12-cold-weather/README.md) | Proposed; nothing ordered or measured |
 | 13 | [Level sensor to Home Assistant (LSM6DS3 + XIAO ESP32-S3)](modifications/13-rv-level-sensor/README.md) | Designed; all parts on hand, firmware compiles; leveling view for HA written |
+| 14 | [Exterior propane quick-connect (passenger side, griddle and fire pit)](modifications/14-propane-quick-connect/README.md) | Planned; parts list ready, nothing ordered |
 
 Planned or under consideration (details in the [upgrade plan](docs/off-grid-upgrade-plan.md)):
 
