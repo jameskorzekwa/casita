@@ -58,8 +58,10 @@ class ConfigurationContract(unittest.TestCase):
     def test_local_idempotent_press_actions_only(self):
         inputs = self.config["binary_sensor"]
         self.assertEqual(len(inputs), 8)
+        rocker_to_channel = (3, 1, 2, 4)
         for index, sensor in enumerate(inputs):
-            load = f"load_{index // 2 + 1}"
+            rocker = index // 2 + 1
+            load = f"load_{rocker_to_channel[rocker - 1]}"
             # As installed 2026-10-23: odd inputs (even index) are DOWN, even inputs are UP.
             direction = "down" if index % 2 == 0 else "up"
             action = "switch.turn_on" if direction == "up" else "switch.turn_off"
@@ -67,7 +69,7 @@ class ConfigurationContract(unittest.TestCase):
                 "platform", "id", "internal", "pin", "filters", "on_press",
             })  # Reject release/state/click actions as well as hidden dependencies.
             self.assertEqual(sensor["platform"], "gpio")
-            self.assertEqual(sensor["id"], f"{load}_{direction}")
+            self.assertEqual(sensor["id"], f"rocker_{rocker}_{direction}")
             self.assertIs(sensor["internal"], True)
             self.assertEqual(sensor["pin"], {
                 "number": f"GPIO{4 + index}", "mode": "INPUT_PULLUP", "inverted": True,
