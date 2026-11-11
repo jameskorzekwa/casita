@@ -7,8 +7,8 @@
   <!-- 12 V source -->
   <rect x="20" y="110" width="130" height="110" rx="6" fill="#f3f3f3" stroke="#333"/>
   <text x="85" y="140" text-anchor="middle" font-weight="bold">Trailer 12 V</text>
-  <text x="85" y="165" text-anchor="middle">circuit</text>
-  <text x="85" y="183" text-anchor="middle">to confirm</text>
+  <text x="85" y="165" text-anchor="middle" font-size="12">fused circuit,</text>
+  <text x="85" y="183" text-anchor="middle" font-size="12">chosen on site</text>
   <text x="140" y="130" text-anchor="end" fill="#c00">+</text>
   <text x="140" y="212" text-anchor="end">-</text>
 
@@ -59,9 +59,9 @@
 
   <!-- IMU -->
   <rect x="730" y="110" width="150" height="180" rx="6" fill="#f0e8ff" stroke="#333"/>
-  <text x="805" y="102" text-anchor="middle" font-weight="bold">Adafruit 4503</text>
-  <text x="805" y="305" text-anchor="middle" font-size="12">LSM6DS3TR-C, I2C 0x6A</text>
-  <text x="740" y="150" font-size="12">VIN</text>
+  <text x="805" y="102" text-anchor="middle" font-weight="bold">LSM6DS3 board</text>
+  <text x="805" y="305" text-anchor="middle" font-size="12">I2C 0x6A or 0x6B</text>
+  <text x="740" y="150" font-size="12">VCC</text>
   <text x="740" y="190" font-size="12">GND</text>
   <text x="740" y="230" font-size="12">SDA</text>
   <text x="740" y="270" font-size="12">SCL</text>
@@ -74,6 +74,6 @@
   <text x="790" y="255" font-size="12">Y = driver</text>
 
   <text x="20" y="370" font-size="13">Mount the IMU on standoffs, flat, X arrow toward the tongue, Y toward the driver (left) side.</text>
-  <text x="20" y="392" font-size="13">ADDR, CS, INT1, INT2 unconnected. Box screwed to rigid structure; screws shorter than the floor.</text>
-  <text x="20" y="414" font-size="13">Status 2026-10-25: design only, not built.</text>
+  <text x="20" y="392" font-size="13">SDO/SA0, CS, INT1, INT2 unconnected. Box screwed to rigid structure; screws shorter than the floor.</text>
+  <text x="20" y="414" font-size="13">Always powered; the firmware idles between leveling sessions. Status 2026-10-31: not built.</text>
 </svg>

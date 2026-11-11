@@ -8,16 +8,14 @@
 # 2026-10-31, v7.0.1) for the bubble level. For a version without it see
 # leveling-view-core-only.yaml.
 #
-# Power: the sensor's 12 V comes through relay CH3 of the smart DC switch
-# board. The Start and Stop buttons call the scripts in leveling-power.yaml,
-# which power the sensor up, turn Leveling Mode on, and power it down again.
+# The sensor is always powered; the Start and Stop buttons call the scripts
+# in leveling-power.yaml, which switch the firmware's Leveling Mode.
 #
-# The circle is always shown: live readings while the sensor is on, else
-# the last saved reading (input_number.casita_level_last_side / _last_front).
+# The circle is always shown from the live sensor.
 #
-# Three states:
-#   Sensor off (normal):   last saved reading, the circle, "Start leveling".
-#   Starting:              CH3 on, waiting for the sensor to boot; Cancel.
+# Two states:
+#   Leveling Mode off:     idle line with the current reading, the circle,
+#                          the angles, "Start leveling".
 #   Leveling Mode on:      instruction line at the top, the circle live (the
 #                          dot rolls toward the LOW side; level when it sits
 #                          inside the green ring), the angles, "Stop leveling".
@@ -39,30 +37,11 @@ sections:
   - type: conditional
     conditions:
     - condition: state
-      entity: switch.casita_smart_dc_switches_load_3
-      state: 'off'
-    card:
-      type: markdown
-      content: 'Sensor off (low power). Last check {{ relative_time(states.input_datetime.casita_level_last_check.last_changed) }} ago: side to side **{{ states(''input_number.casita_level_last_side'') }}°**, front to back **{{ states(''input_number.casita_level_last_front'') }}°**. The sensor also wakes for a minute every 6 hours.'
-      grid_options:
-        columns: full
-    grid_options:
-      columns: full
-  - type: conditional
-    conditions:
-    - condition: state
-      entity: switch.casita_smart_dc_switches_load_3
-      state: 'on'
-    - &id001
-      condition: state
       entity: switch.casita_level_leveling_mode
       state_not: 'on'
     card:
       type: markdown
-      content: |-
-        ## Starting the sensor...
-
-        Power is on; waiting for it to connect (up to 90 s).
+      content: 'Idle (low activity): side to side **{{ states(''sensor.casita_level_side_to_side'') }}°**, front to back **{{ states(''sensor.casita_level_front_to_back'') }}°**, {{ ''level'' if is_state(''binary_sensor.casita_level_level'', ''on'') else ''not level'' }}. Updates on a 0.2° change or every 5 minutes.'
       grid_options:
         columns: full
     grid_options:
@@ -171,21 +150,15 @@ sections:
       #bubble { width: 100%; display: flex; justify-content: center; }
     grid_options:
       columns: full
-  - type: conditional
-    conditions:
-    - condition: state
-      entity: switch.casita_level_leveling_mode
-      state: 'on'
-    card:
-      type: glance
-      columns: 2
-      entities:
-      - entity: sensor.casita_level_side_to_side
-        name: Side to side
-      - entity: sensor.casita_level_front_to_back
-        name: Front to back
-      grid_options:
-        columns: full
+  - type: glance
+    columns: 3
+    entities:
+    - entity: sensor.casita_level_side_to_side
+      name: Side to side
+    - entity: sensor.casita_level_front_to_back
+      name: Front to back
+    - entity: binary_sensor.casita_level_level
+      name: Level
     grid_options:
       columns: full
   - type: conditional
@@ -193,25 +166,6 @@ sections:
     - condition: state
       entity: switch.casita_level_leveling_mode
       state_not: 'on'
-    card:
-      type: glance
-      columns: 3
-      entities:
-      - entity: input_number.casita_level_last_side
-        name: Side to side
-      - entity: input_number.casita_level_last_front
-        name: Front to back
-      - entity: input_datetime.casita_level_last_check
-        name: Last check
-      grid_options:
-        columns: full
-    grid_options:
-      columns: full
-  - type: conditional
-    conditions:
-    - condition: state
-      entity: switch.casita_smart_dc_switches_load_3
-      state: 'off'
     card:
       type: button
       name: Start leveling
@@ -221,25 +175,6 @@ sections:
       tap_action:
         action: call-service
         service: script.casita_level_start_leveling
-      grid_options:
-        columns: full
-    grid_options:
-      columns: full
-  - type: conditional
-    conditions:
-    - condition: state
-      entity: switch.casita_smart_dc_switches_load_3
-      state: 'on'
-    - *id001
-    card:
-      type: button
-      name: Cancel
-      icon: mdi:stop-circle-outline
-      icon_height: 48px
-      show_state: false
-      tap_action:
-        action: call-service
-        service: script.casita_level_stop_leveling
       grid_options:
         columns: full
     grid_options:

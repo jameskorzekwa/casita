@@ -40,7 +40,7 @@ sections:
       state: 'off'
     card:
       type: markdown
-      content: 'Sensor off (low power). Last check {{ relative_time(states.input_datetime.casita_level_last_check.last_changed) }} ago: side to side **{{ states(''input_number.casita_level_last_side'') }}°**, front to back **{{ states(''input_number.casita_level_last_front'') }}°**. (Demo: the sliders at the bottom set these.)'
+      content: 'Idle (low activity): side to side **{{ states(''input_number.casita_level_last_side'') }}°**, front to back **{{ states(''input_number.casita_level_last_front'') }}°**. (Demo: the sliders at the bottom set these.)'
       grid_options:
         columns: full
     grid_options:
