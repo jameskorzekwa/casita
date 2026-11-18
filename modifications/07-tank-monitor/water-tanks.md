@@ -1,5 +1,11 @@
 # Water Tank Sensors (Garnet SeeLeveL fresh + Mopeka grey)
 
+> **Current grey implementation (2026-11-18):** the grey level comes from the
+> Grey 2 Garnet sender, calibrated on a full fill and drain. Grey 1 and the
+> Mopeka are not used for the number. See [grey-fusion.md](grey-fusion.md).
+> Earlier Mopeka-only percentages are superseded. The display is a SeeLeveL
+> Soul (G708), not the 709-BTP7 named below.
+
 Part of [mod 07, the tank monitor](README.md). Fresh and grey water tank levels in the trailer's Home Assistant, with nothing inside either tank and no wiring to an ESP32: both sensors talk to the trailer's Home Assistant Pi over Bluetooth.
 
 - **Fresh tank: Garnet SeeLeveL II 709-BTP7 Bluetooth display** reading a SeeLeveL sender on the side of the 25 gal fresh tank, through the community [`garnet`](https://github.com/danTapps/garnet) integration. A template sensor turns its reading into `sensor.casita_fresh_tank`.

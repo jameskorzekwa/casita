@@ -1,5 +1,15 @@
 # Tank Monitor to Home Assistant (propane, fresh and grey)
 
+> **Grey level update, 2026-11-18:** the live grey gauge comes from the
+> **Grey 2 Garnet sender** (outlet-pipe corner), calibrated on a monitored full
+> fill and drain: 66 raw = full, 0 = basically empty (small residual possible).
+> Grey 1 is excluded (reads 0 even when full; fault still to find) and the
+> Mopeka is a diagnostic only. See [grey-fusion.md](grey-fusion.md) and
+> [the Mopeka echo incident](echo-fault-20261105.md). The controller is a
+> SeeLeveL **Soul** (G708), not a 709-BTP7; see
+> [garnet-direct-configuration.md](garnet-direct-configuration.md). These
+> supersede the older Mopeka-only and fresh-water estimate descriptions below.
+
 Propane in both 20 lb cylinders and the fresh and grey water levels in the trailer's Home Assistant, with nothing inside any tank. One ESPHome device for propane and two Bluetooth products for the water tanks:
 
 | Device | ESPHome name | Reads | Where | Power |
