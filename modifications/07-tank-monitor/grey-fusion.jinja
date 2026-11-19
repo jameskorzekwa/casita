@@ -1,0 +1,29 @@
+{# Casita grey level, calibrated 2026-11-18 from a monitored full fill and drain.
+   Local level of the tank, NOT calibrated gallons.
+   - Grey 2 (Garnet sender beside the outlet pipe) is the only numeric input:
+     raw 0 = basically empty (owner observed only a small residual), raw 66 = full.
+     It read 0,8,16,25,33,41,50,58,66 on the fill and back down on the drain.
+   - Grey 1 (Garnet sender, opposite corner) is excluded: the controller itself
+     broadcast 0 (status ok) for the whole fill, while the tank was full.
+   - The Mopeka is excluded from the number: during the fill and drain it reported
+     ~80 mm (the full depth) at 33-50 % and lost its echo below ~33 %.
+     It is shown only as a diagnostic. #}
+{% set raw_g = states('sensor.inside_fresh_water_tank_sensor_grey_tank2') %}
+{% set full_g = states('input_number.casita_grey_garnet_full_pct') | float(0) %}
+{% set ns = namespace(level=none, source='unavailable: Grey 2 sender not reporting') %}
+{% if is_number(raw_g) and full_g > 0 and raw_g | float >= 0 %}
+  {% set g = ([0, raw_g | float / full_g * 100, 100] | sort)[1] %}
+  {% set ns.level = g %}
+  {% if g == 0 %}
+    {% set ns.source = 'Grey 2 at 0: basically empty (small residual possible)' %}
+  {% elif g == 100 %}
+    {% set ns.source = 'Grey 2 at calibrated full' %}
+  {% else %}
+    {% set ns.source = 'Grey 2 sender (one step = 12 %)' %}
+  {% endif %}
+{% endif %}
+{% if output | default('level') == 'source' %}
+  {{ ns.source }}
+{% else %}
+  {{ ns.level | round(0) | int if ns.level is not none else none }}
+{% endif %}

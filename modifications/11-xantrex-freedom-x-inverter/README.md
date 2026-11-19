@@ -15,7 +15,7 @@ Xantrex publishes no protocol, so a Home Assistant integration was written for i
 | Part | Qty | Notes | Link |
 | --- | ---: | --- | --- |
 | Xantrex Freedom X 2000, 12 V, 120 V (817-2000) | 1 | 2000 W continuous at 40 °C, 4000 W surge for 5 s, 2200 W for 30 s. Built-in 30 A transfer relay (85-140 V AC input). LBCO adjustable 10.0-12.8 V. Peak efficiency 91 %. 14.6 × 10.8 × 3.9 in. Values from the data sheet; label `-P` suffix and GFCI option to confirm | [Amazon](https://www.amazon.com/dp/B074TDSRF1) |
-| Xantrex Freedom X Bluetooth Remote Panel (808-0817-02) | 1 | Comes with a 25 ft 6-conductor RJ12 cable; plugs into the inverter's Remote port. Powered by the inverter, so it only advertises while the inverter has DC power. BLE address `B8:3D:F6:B6:30:A5`, advertised name `ID` + serial | [Xantrex](https://xantrex.com/products/accessories/freedom-x-bluetooth-remote-panel/) |
+| Xantrex Freedom X Bluetooth Remote Panel (808-0817-02) | 1 | Comes with a 25 ft 6-conductor RJ12 cable; plugs into the inverter's Remote port. Powered by the inverter, so it only advertises while the inverter has DC power. Advertised name `ID` + serial | [Xantrex](https://xantrex.com/products/accessories/freedom-x-bluetooth-remote-panel/) |
 
 The owner's guide says: with the remote panel connected, leave the inverter's own Power button in Standby (up), so the panel's Power button controls the inverter.
 
